@@ -3,11 +3,11 @@ package br.com.youse.forms.formatters
 import java.util.regex.Pattern
 
 // 00:00
-class HoursFormatter(val splitter: String) : TextFormatter {
+class HoursFormatter(val splitter: String) : CharSequenceFormatter {
 
-    override fun getCursorPosition(previous: String, input: String, output: String) = output.length
+    override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
 
-    override fun format(inputText: String): String {
+    override fun format(inputText: CharSequence): CharSequence {
         val clearText = inputText.toDigitsOnly()
 
         return when (clearText.length) {
@@ -19,6 +19,6 @@ class HoursFormatter(val splitter: String) : TextFormatter {
 
 }
 
-private fun String.toDigitsOnly(): String {
+private fun CharSequence.toDigitsOnly(): String {
     return this.replace(Pattern.compile("[^0-9]").toRegex(), "")
 }
