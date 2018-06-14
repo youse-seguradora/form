@@ -60,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
                 })
 
         disposables.add(form.onValidSubmit()
-                //.map { it.map { it.second.toString() } }
                 .subscribe { list ->
                     println(list)
 

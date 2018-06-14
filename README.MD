@@ -5,10 +5,10 @@ RxJava form validation for Android and Java by Youse Seguros.
 
 Sample with Kotlin and RxBinding
 --------
-Just create a `RxForm.Builder<T>()` where `T` is the id type that identifies your fields,
-call `addFieldValidations()` once for each field with its id, an observable of the changes in the field
-and a list of validators for the given field. After that call the `build()` method and use the `RxForm` methods to listen to
-changes in the validation of each field (`onFieldValidationChange)`) or in the form as whole (`onFormValidationChange()`).
+Just create a `RxForm.Builder<T>()` where `T` is the type of each field id,
+then you can call `addFieldValidations()` for each field with its id, an observable that listens to changes in the given field and the field validators.
+After that, call the `build()` method and use the `RxForm` methods to listen to
+changes in the validation of each field (`onFieldValidationChange)`) or in the form as a whole (`onFormValidationChange()`).
 
 ```
 val form = RxForm.Builder<Int>(submit.clicks())
@@ -42,7 +42,7 @@ in the sample below we define an `HoursValidator` and a `ValidationMessage`, it 
 to the user when the validation fails and a `ValidationType` that was created to
 specify which type of validation failed (you can have multiple validators with the same validation type).
 
-Note that, your form can validate any type of input, here we used `String`,
+Note that your form can validate any type of input, here we used `String`,
 but your implementation can be of any class that you define and implements the `isValid` method.
 
 ```
