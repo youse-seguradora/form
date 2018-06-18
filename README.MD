@@ -6,7 +6,7 @@ RxJava form validation for Android and Java by Youse Seguros.
 Sample with Kotlin and RxBinding
 --------
 Just create a `RxForm.Builder<T>()` where `T` is the type of each field id,
-then you can call `addFieldValidations()` for each field with its id, an observable that listen to changes in the given field and the field validators.
+then you can call `addFieldValidations()` for each field with its id, an observable that listens to changes in the given field and the field validators.
 After that, call the `build()` method and use the `RxForm` methods to listen to
 changes in the validation of each field (`onFieldValidationChange)`) or in the form as a whole (`onFormValidationChange()`).
 
