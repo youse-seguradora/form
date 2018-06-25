@@ -5,10 +5,10 @@ RxJava form validation for Android and Java by Youse Seguros.
 
 Sample with Kotlin and RxBinding
 --------
-Just create a `RxForm.Builder<T>()` where `T` is the type of each field id,
-then you can call `addFieldValidations()` for each field with its id, an observable that listens to changes in the given field and the field validators.
+Just create a `RxForm.Builder<T>()` where `T` is the type of each observableValue id,
+then you can call `addFieldValidations()` for each observableValue with its id, an observable that listens to changes in the given observableValue and the observableValue validators.
 After that, call the `build()` method and use the `RxForm` methods to listen to
-changes in the validation of each field (`onFieldValidationChange)`) or in the form as a whole (`onFormValidationChange()`).
+changes in the validation of each observableValue (`onFieldValidationChange)`) or in the form as a whole (`onFormValidationChange()`).
 
 ```
 val form = RxForm.Builder<Int>(submit.clicks())
@@ -21,9 +21,9 @@ val form = RxForm.Builder<Int>(submit.clicks())
 
         disposables.add(form.onFieldValidationChange()
                 .subscribe {
-                    val field = findViewById<TextInputLayout>(it.first)
-                    field.isErrorEnabled = it.second.isNotEmpty()
-                    field.error = it.second.joinToString { it.message }
+                    val observableValue = findViewById<TextInputLayout>(it.first)
+                    observableValue.isErrorEnabled = it.second.isNotEmpty()
+                    observableValue.error = it.second.joinToString { it.message }
                 })
         disposables.add(form.onFormValidationChange()
                 .subscribe {
@@ -35,8 +35,8 @@ VALIDATION
 --------
 As an optional dependency we offer the possibility to use our validators module.
 
-A form validation is related to each field validation,
-so we need to define a list of validations for each field in the screen.
+A form validation is related to each observableValue validation,
+so we need to define a list of validations for each observableValue in the screen.
 You can define your own validators by implementing the `Validator<T>` interface,
 in the sample below we define an `HoursValidator` and a `ValidationMessage`, it takes a `message` to be shown
 to the user when the validation fails and a `ValidationType` that was created to
@@ -67,7 +67,7 @@ class HoursValidator(val message: String, val splitter: String) : Validator<Stri
 FORMATTERS
 --------
 As an optional dependency we offer the possibility to use our formatters module.
-Usually a formatter is coupled with the field validation. A field that displays hour and minutes (HH:MM) could be valid
+Usually a formatter is coupled with the observableValue validation. A observableValue that displays hour and minutes (HH:MM) could be valid
 if the the hours and minutes are valid only if in a given format.
 So a given formatter is used together with a given validator.
 
@@ -94,7 +94,7 @@ private fun String.toDigitsOnly(): String {
 }
 ```
 Note that each implementation of `TextFormatter` has a `getCursorPosition()` method that should return
-where the field cursor should be positioned after each change in the input field. A more general interface `Formatter<T>` can be used
+where the observableValue cursor should be positioned after each change in the input observableValue. A more general interface `Formatter<T>` can be used
 when the cursor position is not important or possible to be implemented.
 
 Download

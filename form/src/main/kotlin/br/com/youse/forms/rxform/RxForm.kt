@@ -5,11 +5,14 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Function
 
-class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidations: List<Observable<Triple<T, Any, List<ValidationMessage>>>>) {
+class RxForm<T>(private val submit: Observable<Unit>,
+                private val fieldsValidations: List<Observable<Triple<T, Any, List<ValidationMessage>>>>) : IRxForm<T> {
+    override fun dispose() {
+        // do nothing
+    }
 
-    fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
+    override fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
         return Observable.merge(fieldsValidations
                 .map {
                     it.map { Pair(it.first, it.third) }
@@ -18,7 +21,7 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun onFormValidationChange(): Observable<Boolean> {
+    override fun onFormValidationChange(): Observable<Boolean> {
         if (fieldsValidations.isEmpty()) {
             return submit.map { true }
         }
@@ -29,7 +32,7 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
                 .distinctUntilChanged()
     }
 
-    fun onValidSubmit(): Observable<List<Pair<T, Any>>> {
+    override fun onValidSubmit(): Observable<List<Pair<T, Any>>> {
         return submit.withLatestFrom(onFormValidationChange(),
                 BiFunction { _: Unit, isValidForm: Boolean -> isValidForm })
                 .filter { it }
@@ -57,7 +60,8 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
                 .switchMap { combined }
     }
 
-    class Builder<T>(submitObservable: Observable<Unit>, strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
+    class Builder<T>(submitObservable: Observable<Unit>,
+                     strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
         private val fieldsValidations = mutableListOf<Observable<Triple<T, Any, List<ValidationMessage>>>>()
 
@@ -66,27 +70,27 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
         else
             submitObservable.share()
 
-        fun <R> addFieldValidations(key: T, field: Observable<R>, validators: List<Validator<R>>): Builder<T> {
+        override fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): RxForm.Builder<T> {
 
-            val fieldValidationObservable = Observable.combineLatest(field, submit,
+            val fieldValidationObservable = Observable.combineLatest(fieldObservable, submit,
                     BiFunction { t1: R, _: Unit ->
                         t1
                     })
-                    .map {
+                    .map { value ->
                         val messages = mutableListOf<ValidationMessage>()
                         for (validator in validators) {
-                            if (!validator.isValid(it)) {
+                            if (!validator.isValid(value)) {
                                 messages += validator.validationMessage()
                             }
                         }
-                        Triple(key, it as Any, messages.toList())
+                        Triple(key, value as Any, messages.toList())
                     }
 
             fieldsValidations.add(fieldValidationObservable)
             return this
         }
 
-        fun build(): RxForm<T> {
+        override fun build(): IRxForm<T> {
             return RxForm(submit, fieldsValidations)
         }
     }
