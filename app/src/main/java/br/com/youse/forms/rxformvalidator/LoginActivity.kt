@@ -1,20 +1,15 @@
 package br.com.youse.forms.rxformvalidator
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
-import br.com.youse.forms.validators.ValidationStrategy
+import android.support.v7.app.AppCompatActivity
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Function3
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class LoginActivity : AppCompatActivity() {
 
