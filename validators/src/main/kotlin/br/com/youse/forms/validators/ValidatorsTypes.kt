@@ -4,4 +4,4 @@ object REQUIRED : ValidationType
 
 object MIN_LENGTH : ValidationType
 
-object HOUR_FORMAT: ValidationType
+object HOUR_FORMAT : ValidationType

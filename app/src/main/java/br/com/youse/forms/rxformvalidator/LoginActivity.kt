@@ -1,12 +1,13 @@
 package br.com.youse.forms.rxformvalidator
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+
 import android.widget.Toast
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.rxform.IRxForm
+import android.support.v7.app.AppCompatActivity
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.rxform.RxForm2
 import br.com.youse.forms.validators.MinLengthValidator
