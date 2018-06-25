@@ -10,7 +10,7 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
 
     /**
      * Emitts every time a field validation changes.
-     * Each emittion contains the field key and a list of validation messages,
+     * Each emission contains the field key and a list of validation messages,
      * if the list is empty the field it valid.
      */
     fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
@@ -23,7 +23,7 @@ class RxForm<T>(private val submit: Observable<Unit>, private val fieldsValidati
 
     /**
      * Emitts every time the form validation changes.
-     * Ech emittion contains a boolean indicating if the form is valid (true) or not (false).
+     * Ech emission contains a boolean indicating if the form is valid (true) or not (false).
      */
 
     @Suppress("UNCHECKED_CAST")
