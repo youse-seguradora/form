@@ -12,10 +12,12 @@ interface IRxForm<T> {
 
     fun onValidSubmit(): Observable<List<Pair<T, Any>>>
 
+    fun onSubmitValidationFailed(): Observable<List<Pair<T, List<ValidationMessage>>>>
+
     fun dispose()
 
     interface Builder<T> {
-        fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): IRxForm.Builder<T>
+        fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): Builder<T>
         fun build(): IRxForm<T>
     }
 }

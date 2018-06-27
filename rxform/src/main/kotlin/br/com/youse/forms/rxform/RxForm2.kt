@@ -14,9 +14,12 @@ class RxForm2<T>(
         strategy: ValidationStrategy,
         fieldValidations: Map<T, Pair<Observable<*>, List<Validator<*>>>>
 ) : IRxForm<T> {
+
+
     private val disposables = CompositeDisposable()
 
-    private val fieldValidationChange =  PublishSubject.create<Pair<T, List<ValidationMessage>>>()
+    private val submitValidationFailed = PublishSubject.create<List<Pair<T, List<ValidationMessage>>>>()
+    private val fieldValidationChange = PublishSubject.create<Pair<T, List<ValidationMessage>>>()
     private val formValidationChange = PublishSubject.create<Boolean>()
     private val validSubmit = PublishSubject.create<List<Pair<T, Any>>>()
 
@@ -28,8 +31,8 @@ class RxForm2<T>(
 
     private val builder = Form.Builder<T>()
             .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
-                override fun onChange(key: T, messages: List<ValidationMessage>) {
-                    fieldValidationChange.onNext(Pair(key, messages))
+                override fun onChange(messages: Pair<T, List<ValidationMessage>>) {
+                    fieldValidationChange.onNext(messages)
                 }
             })
             .setFormValidationListener(object : IForm.FormValidationChange {
@@ -40,6 +43,11 @@ class RxForm2<T>(
             .setValidSubmitListener(object : IForm.ValidSubmit<T> {
                 override fun onValidSubmit(fields: List<Pair<T, Any>>) {
                     validSubmit.onNext(fields)
+                }
+            })
+            .setSubmitValidationFailedListener(object : IForm.SubmitValidationFailed<T> {
+                override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+                    submitValidationFailed.onNext(validations)
                 }
             })
     private val observableValues = mutableMapOf<T, IForm.ObservableValue<*>>()
@@ -81,6 +89,10 @@ class RxForm2<T>(
 
     override fun onValidSubmit(): Observable<List<Pair<T, Any>>> {
         return validSubmit
+    }
+
+    override fun onSubmitValidationFailed(): Observable<List<Pair<T, List<ValidationMessage>>>> {
+        return submitValidationFailed
     }
 
     override fun dispose() {

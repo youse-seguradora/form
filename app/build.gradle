@@ -21,21 +21,25 @@ android {
         }
     }
 }
+def supportLibraryVersion = rootProject.ext.supportLibraryVersion
+def rxBindingVersion = rootProject.ext.rxBindingVersion
+def constraintLayoutVersion = rootProject.ext.constraintLayoutVersion
+def jUnitVersion = rootProject.ext.jUnitVersion
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation "com.android.support:design:27.1.1"
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxBindingVersion"
+    implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
 
     implementation project(":form")
+    implementation project(":rxform")
     implementation project(":validators")
     implementation project(":formatters")
 
-    implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.1.1'
-
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$jUnitVersion"
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

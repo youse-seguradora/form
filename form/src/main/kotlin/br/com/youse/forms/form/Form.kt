@@ -8,6 +8,7 @@ import br.com.youse.forms.validators.Validator
 class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
               private val formValidationListener: IForm.FormValidationChange?,
               private val validSubmitListener: IForm.ValidSubmit<T>?,
+              private val submitValidationFailedListener: IForm.SubmitValidationFailed<T>?,
               private val strategy: ValidationStrategy,
               fieldValidations: Map<T, Pair<IForm.ObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
 
@@ -34,14 +35,14 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
                         }
                     }
                     // verify if notify field validation changed
-                    val validationMessage = Pair(value as Any, messages)
+                    val validationMessage = Pair(value, messages)
 
                     val isFieldValid = validationMessage.isValid()
                     val wasFieldValid = lastFieldsMessages[key]?.isValid()
                     val hasFieldValidationChanged = wasFieldValid != isFieldValid
 
                     if (notifyListener && hasFieldValidationChanged) {
-                        fieldValidationListener?.onChange(key, messages)
+                        fieldValidationListener?.onChange(Pair(key, messages))
                     }
                     lastFieldsMessages[key] = validationMessage
 
@@ -68,7 +69,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
         // notify field validation changed
         lastFieldsMessages.forEach { key, values ->
-            fieldValidationListener?.onChange(key, values.second)
+            fieldValidationListener?.onChange(Pair(key, values.second))
         }
 
         // notify form validation changed
@@ -84,14 +85,21 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
                     .map { (key, values) ->
                         Pair(key, values.first)
                     })
+        } else {
+            submitValidationFailedListener?.onValidationFailed(lastFieldsMessages
+                    .filter { !it.value.isValid() }
+                    .map { Pair(it.key, it.value.second) }
+            )
         }
     }
 
 
     class Builder<T>(private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IForm.Builder<T> {
+
         private var fieldValidationListener: IForm.FieldValidationChange<T>? = null
         private var formValidationListener: IForm.FormValidationChange? = null
         private var validSubmitListener: IForm.ValidSubmit<T>? = null
+        private var submitValidationFailedListener: IForm.SubmitValidationFailed<T>? = null
 
         override fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): Builder<T> {
             fieldValidationListener = listener
@@ -108,10 +116,16 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             return this
         }
 
+        override fun setSubmitValidationFailedListener(listener: IForm.SubmitValidationFailed<T>): IForm.Builder<T> {
+            submitValidationFailedListener = listener
+            return this
+        }
 
         private val fieldValidations = mutableMapOf<T, Pair<IForm.ObservableValue<*>, List<Validator<*>>>>()
 
-        override fun <R> addFieldValidations(key: T, observableValue: IForm.ObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T> {
+        override fun <R> addFieldValidations(key: T,
+                                             observableValue: IForm.ObservableValue<R>,
+                                             validators: List<Validator<R>>): IForm.Builder<T> {
             fieldValidations[key] = Pair(observableValue, validators)
             return this
         }
@@ -122,6 +136,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             return Form(fieldValidationListener = fieldValidationListener,
                     formValidationListener = formValidationListener,
                     validSubmitListener = validSubmitListener,
+                    submitValidationFailedListener = submitValidationFailedListener,
                     strategy = strategy,
                     fieldValidations = fieldValidations)
         }
