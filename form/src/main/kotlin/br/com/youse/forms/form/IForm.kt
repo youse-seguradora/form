@@ -55,9 +55,15 @@ interface IForm<T> {
 
         private var listener: IForm.ObservableValue.ValueObserver<T>? = null
 
-        var value: T = initialValue
+        private var _value = initialValue
+
+        var value: T
+            get() = _value
             set(newValue) {
-                listener?.onChange(newValue)
+                if (_value != newValue) {
+                    _value = newValue
+                    listener?.onChange(newValue)
+                }
             }
 
         /**
@@ -65,7 +71,7 @@ interface IForm<T> {
          */
         fun setValueListener(valueObserver: IForm.ObservableValue.ValueObserver<T>) {
             listener = valueObserver
-            value = initialValue
+            listener?.onChange(value)
         }
     }
 
