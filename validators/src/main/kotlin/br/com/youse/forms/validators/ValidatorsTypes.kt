@@ -1,7 +1,12 @@
 package br.com.youse.forms.validators
 
-object REQUIRED : ValidationType
+class ValidationTypes {
+    companion object {
+        const val REQUIRED: ValidationType = "REQUIRED"
 
-object MIN_LENGTH : ValidationType
+        const val MIN_LENGTH: ValidationType = "MIN_LENGTH"
 
-object HOUR_FORMAT : ValidationType
+        const val HOUR_FORMAT: ValidationType = "HOUR_FORMAT"
+
+    }
+}

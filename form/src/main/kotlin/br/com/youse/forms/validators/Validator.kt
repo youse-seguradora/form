@@ -21,7 +21,7 @@ interface Validator<in T> {
  * A ValidationType represented why validation failed.
  * Multiple Validators can have the same ValidationType.
  */
-interface ValidationType
+typealias  ValidationType = String
 
 /**
  * Holds a validation failed message and the validation type.
