@@ -18,7 +18,7 @@ class RxForm2<T>(
 
     private val disposables = CompositeDisposable()
 
-    private val submitValidationFailed = PublishSubject.create<List<Pair<T, List<ValidationMessage>>>>()
+    private val submitFailed = PublishSubject.create<List<Pair<T, List<ValidationMessage>>>>()
     private val fieldValidationChange = PublishSubject.create<Pair<T, List<ValidationMessage>>>()
     private val formValidationChange = PublishSubject.create<Boolean>()
     private val validSubmit = PublishSubject.create<List<Pair<T, Any>>>()
@@ -45,9 +45,9 @@ class RxForm2<T>(
                     validSubmit.onNext(fields)
                 }
             })
-            .setSubmitValidationFailedListener(object : IForm.SubmitValidationFailed<T> {
+            .setSubmitFailedListener(object : IForm.SubmitFailed<T> {
                 override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
-                    submitValidationFailed.onNext(validations)
+                    submitFailed.onNext(validations)
                 }
             })
     private val observableValues = mutableMapOf<T, IForm.ObservableValue<*>>()
@@ -91,8 +91,8 @@ class RxForm2<T>(
         return validSubmit
     }
 
-    override fun onSubmitValidationFailed(): Observable<List<Pair<T, List<ValidationMessage>>>> {
-        return submitValidationFailed
+    override fun onSubmitFailed(): Observable<List<Pair<T, List<ValidationMessage>>>> {
+        return submitFailed
     }
 
     override fun dispose() {

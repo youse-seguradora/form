@@ -8,12 +8,13 @@ import br.com.youse.forms.validators.Validator
 class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
               private val formValidationListener: IForm.FormValidationChange?,
               private val validSubmitListener: IForm.ValidSubmit<T>?,
-              private val submitValidationFailedListener: IForm.SubmitValidationFailed<T>?,
+              private val submitFailedListener: IForm.SubmitFailed<T>?,
               private val strategy: ValidationStrategy,
               fieldValidations: Map<T, Pair<IForm.ObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
 
 
-    private val lastFieldsMessages = mutableMapOf<T, ValidationMessages>()
+    private val lastFieldsMessages = mutableMapOf<T, Pair<Any, List<ValidationMessage>>>()
+
     private var isFormValid: Boolean? = null
     private var isFormSubmitted: Boolean? = null
 
@@ -24,36 +25,38 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             val validators = pair.second as List<Validator<Any>>
             val listener = object : IForm.ObservableValue.ValueObserver<Any> {
                 override fun onChange(value: Any) {
+
                     val notifyListener = (strategy == ValidationStrategy.ALL_TIME)
                             ||
                             (strategy == ValidationStrategy.AFTER_SUBMIT && isFormSubmitted == true)
 
                     val messages = mutableListOf<ValidationMessage>()
                     for (validator in validators) {
-                        if (!validator.isValid(value)) {
+                       if (!validator.isValid(value)) {
                             messages += validator.validationMessage()
                         }
                     }
-                    // verify if notify field validation changed
+
                     val validationMessage = Pair(value, messages)
 
-                    val isFieldValid = validationMessage.isValid()
-                    val wasFieldValid = lastFieldsMessages[key]?.isValid()
+                    val isFieldValid = validationMessage.second.isEmpty()
+                    val wasFieldValid = lastFieldsMessages[key]?.second?.isEmpty()
                     val hasFieldValidationChanged = wasFieldValid != isFieldValid
 
                     if (notifyListener && hasFieldValidationChanged) {
+                        // notify field validation changed
                         fieldValidationListener?.onChange(Pair(key, messages))
                     }
                     lastFieldsMessages[key] = validationMessage
 
-                    // verify if notify form validation changed
                     val areAllFieldsValid = lastFieldsMessages.values
-                            .map { msgs -> msgs.isValid() }
+                            .map { msgs -> msgs.second.isEmpty() }
                             .reduce { acc, isValid -> acc && isValid }
 
                     val hasFormValidationChanged = isFormValid != areAllFieldsValid
 
                     if (notifyListener && hasFormValidationChanged) {
+                        // notify form validation changed
                         formValidationListener?.onChange(areAllFieldsValid)
                     }
                     isFormValid = areAllFieldsValid
@@ -67,28 +70,36 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
     override fun doSubmit() {
         isFormSubmitted = true
 
-        // notify field validation changed
-        lastFieldsMessages.forEach { key, values ->
-            fieldValidationListener?.onChange(Pair(key, values.second))
+        val areAllFieldsValid = lastFieldsMessages.values
+                .map { it.second.isEmpty() }
+                .reduce { acc, isValid -> acc && isValid }
+
+        if (strategy == ValidationStrategy.AFTER_SUBMIT) {
+
+            // notify field validation changed
+            lastFieldsMessages.forEach { key, values ->
+                fieldValidationListener?.onChange(Pair(key, values.second))
+            }
+
+            // notify form validation changed
+            formValidationListener?.onChange(areAllFieldsValid)
         }
 
-        // notify form validation changed
-        val areAllFieldsValid = lastFieldsMessages.values
-                .map { it.isValid() }
-                .reduce { acc, isValid -> acc && isValid }
-        formValidationListener?.onChange(areAllFieldsValid)
-
-
-        // notify a valid submit
         if (areAllFieldsValid) {
+
+            // notify a valid submit
             validSubmitListener?.onValidSubmit(lastFieldsMessages
                     .map { (key, values) ->
                         Pair(key, values.first)
                     })
         } else {
-            submitValidationFailedListener?.onValidationFailed(lastFieldsMessages
-                    .filter { !it.value.isValid() }
-                    .map { Pair(it.key, it.value.second) }
+
+            // notify a not valid submit
+            submitFailedListener?.onValidationFailed(lastFieldsMessages
+                    .filter { it.value.second.isNotEmpty() }
+                    .map { (key, values) ->
+                        Pair(key, values.second)
+                    }
             )
         }
     }
@@ -99,25 +110,25 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         private var fieldValidationListener: IForm.FieldValidationChange<T>? = null
         private var formValidationListener: IForm.FormValidationChange? = null
         private var validSubmitListener: IForm.ValidSubmit<T>? = null
-        private var submitValidationFailedListener: IForm.SubmitValidationFailed<T>? = null
+        private var submitFailedListener: IForm.SubmitFailed<T>? = null
 
-        override fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): Builder<T> {
+        override fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): IForm.Builder<T> {
             fieldValidationListener = listener
             return this
         }
 
-        override fun setFormValidationListener(listener: IForm.FormValidationChange): Builder<T> {
+        override fun setFormValidationListener(listener: IForm.FormValidationChange): IForm.Builder<T> {
             formValidationListener = listener
             return this
         }
 
-        override fun setValidSubmitListener(listener: IForm.ValidSubmit<T>): Builder<T> {
+        override fun setValidSubmitListener(listener: IForm.ValidSubmit<T>): IForm.Builder<T> {
             validSubmitListener = listener
             return this
         }
 
-        override fun setSubmitValidationFailedListener(listener: IForm.SubmitValidationFailed<T>): IForm.Builder<T> {
-            submitValidationFailedListener = listener
+        override fun setSubmitFailedListener(listener: IForm.SubmitFailed<T>): IForm.Builder<T> {
+            submitFailedListener = listener
             return this
         }
 
@@ -136,17 +147,11 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             return Form(fieldValidationListener = fieldValidationListener,
                     formValidationListener = formValidationListener,
                     validSubmitListener = validSubmitListener,
-                    submitValidationFailedListener = submitValidationFailedListener,
+                    submitFailedListener = submitFailedListener,
                     strategy = strategy,
                     fieldValidations = fieldValidations)
         }
 
     }
-}
-
-private typealias ValidationMessages = Pair<Any, List<ValidationMessage>>
-
-private fun ValidationMessages.isValid(): Boolean {
-    return second.isEmpty()
 }
 

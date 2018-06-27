@@ -88,7 +88,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.onSubmitValidationFailed().test()
+        val firstValidationFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
@@ -122,7 +122,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.onSubmitValidationFailed().test()
+        val firstValidationFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
@@ -183,7 +183,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.onSubmitValidationFailed().test()
+        val firstValidationFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("")
         passwordObservable.onNext("")
@@ -226,7 +226,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.onSubmitValidationFailed().test()
+        val firstValidationFailedSub = form.onSubmitFailed().test()
 
         submit.onNext(Unit)
 
