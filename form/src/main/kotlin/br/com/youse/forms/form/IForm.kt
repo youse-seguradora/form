@@ -16,6 +16,11 @@ interface IForm<T> {
     }
 
     interface SubmitFailed<T> {
+        /**
+         * It's called when a submit happens and the form is not valid.
+         * {@code validations} is an sorted list of {@link Pair}, each one with the field key and a list of validation messages.
+         * This is useful in case you want to scroll or give focus to the first or last invalid field.
+         */
         fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>)
     }
 
@@ -30,10 +35,10 @@ interface IForm<T> {
     interface FieldValidationChange<T> {
         /**
          * It's called every time a field validation changes.
-         * {@code messages} contains the field key and a list of validation messages,
+         * {@code validation} contains the field key and a list of validation messages,
          * if the validation messages list is empty the field it valid.
          */
-        fun onChange(messages: Pair<T, List<ValidationMessage>>)
+        fun onChange(validation: Pair<T, List<ValidationMessage>>)
     }
 
     /**

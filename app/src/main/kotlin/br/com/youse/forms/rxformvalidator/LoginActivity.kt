@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
                 MIN_PASSSWORD_LENGTH))
     }
 
-    lateinit var rxForm: IRxForm<Int>
+    lateinit var form: IRxForm<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,91 +41,24 @@ class LoginActivity : AppCompatActivity() {
         val submitHappens = submit.clicks().share()
         val emailChanges = email.textChanges().share()
         val passwordChanges = password.textChanges().share()
-/*
-        rxForm = RxForm.Builder<Int>(submitHappens)
-                .addFieldValidations(emailContainer.id,
-                        emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id,
-                        passwordChanges,
-                        passwordValidations)
-                .build()
 
-        disposables.add(rxForm.onFieldValidationChange()
-                .subscribe {
-                    val field = findViewById<TextInputLayout>(it.first)
-                    field.isErrorEnabled = it.second.isNotEmpty()
-                    field.error = it.second.joinToString { it.message }
-                })
-
-        val onFormValidationChange = rxForm.onFormValidationChange().share()
-        disposables.add(onFormValidationChange
-                .subscribe {
-                    submit.isEnabled = it
-                })
-
-        disposables.add(rxForm.onValidSubmit()
-                .subscribe { fields ->
-                    println(fields)
-
-                    val email = fields.first { it.first == emailContainer.id }.second.toString()
-                    val password = fields.first { it.first == passwordContainer.id }.second.toString()
-
-                    //TODO: submit email and password to server
-                    Toast.makeText(this@LoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
-                })
-
-        val newForm = Form(
-                object : IForm.FieldValidationChange<Int> {
-
-                    override fun onChange(key: Int, messages: List<ValidationMessage>) {
-                        val field = findViewById<TextInputLayout>(key)
-                        field.isErrorEnabled = messages.isNotEmpty()
-                        field.error = messages.joinToString { it.message }
-                    }
-                },
-                object : IForm.FormValidationChange {
-                    override fun onChange(isValid: Boolean) {
-                        submit.isEnabled = isValid
-                    }
-
-                },
-                object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
-                        println(fields)
-
-                        val email = fields.first { it.first == emailContainer.id }.second.toString()
-                        val password = fields.first { it.first == passwordContainer.id }.second.toString()
-
-                        // TODO: submit email and password to server
-                        Toast.makeText(this@LoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
-                    }
-                })
-
-        newForm.addFieldValidations(emailContainer.id, email.fieldChanges(), emailValidations)
-        newForm.addFieldValidations(passwordContainer.id, password.fieldChanges(), passwordValidations)
-        submit.setOnClickListener {
-            newForm.doSubmit()
-        }
-
-*/
-
-        rxForm = RxForm2.Builder<Int>(submitHappens)
+        form = RxForm2.Builder<Int>(submitHappens)
                 .addFieldValidations(emailContainer.id, emailChanges, emailValidations)
                 .addFieldValidations(passwordContainer.id, passwordChanges, passwordValidations)
                 .build()
 
-        disposables.add(rxForm.onFieldValidationChange()
+        disposables.add(form.onFieldValidationChange()
                 .subscribe {
                     val field = findViewById<TextInputLayout>(it.first)
                     field.isErrorEnabled = it.second.isNotEmpty()
                     field.error = it.second.joinToString { it.message }
                 })
-        disposables.add(rxForm.onFormValidationChange()
+        disposables.add(form.onFormValidationChange()
                 .subscribe {
                     submit.isEnabled = it
                 })
 
-        disposables.add(rxForm.onValidSubmit()
+        disposables.add(form.onValidSubmit()
                 .subscribe { fields ->
                     println(fields)
 
@@ -139,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        rxForm.dispose()
+        form.dispose()
         disposables.clear()
         super.onDestroy()
     }

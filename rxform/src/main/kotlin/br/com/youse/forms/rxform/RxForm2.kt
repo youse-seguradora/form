@@ -6,6 +6,8 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -31,8 +33,8 @@ class RxForm2<T>(
 
     private val builder = Form.Builder<T>()
             .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
-                override fun onChange(messages: Pair<T, List<ValidationMessage>>) {
-                    fieldValidationChange.onNext(messages)
+                override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
+                    fieldValidationChange.onNext(validation)
                 }
             })
             .setFormValidationListener(object : IForm.FormValidationChange {
@@ -53,11 +55,13 @@ class RxForm2<T>(
     private val observableValues = mutableMapOf<T, IForm.ObservableValue<*>>()
 
     init {
+        var isBuilt = false
 
         fieldValidations.forEach { key, pair ->
 
             val fieldObservable = pair.first as Observable<Any>
             val validators = pair.second as List<Validator<Any>>
+
             disposables.add(
                     fieldObservable.subscribe {
                         if (observableValues.containsKey(key)) {
@@ -68,15 +72,25 @@ class RxForm2<T>(
                             observableValues[key] = field
                             builder.addFieldValidations(key, field, validators)
                         }
+                        if (!isBuilt && fieldValidations.size == observableValues.size) {
+                            isBuilt = true
+                            val form = builder.build()
+                            disposables.add(
+                                    submit.subscribe {
+                                        form.doSubmit()
+                                    }
+                            )
+                        }
                     })
-
         }
-        val form = builder.build()
-        disposables.add(
-                submit.subscribe {
-                    form.doSubmit()
-                }
-        )
+        if (fieldValidations.isEmpty()) {
+            val form = builder.build()
+            disposables.add(
+                    submit.subscribe {
+                        form.doSubmit()
+                    }
+            )
+        }
     }
 
     override fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {

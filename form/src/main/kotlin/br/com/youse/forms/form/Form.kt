@@ -32,7 +32,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
                     val messages = mutableListOf<ValidationMessage>()
                     for (validator in validators) {
-                       if (!validator.isValid(value)) {
+                        if (!validator.isValid(value)) {
                             messages += validator.validationMessage()
                         }
                     }
@@ -49,7 +49,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
                     }
                     lastFieldsMessages[key] = validationMessage
 
-                    val areAllFieldsValid = lastFieldsMessages.values
+                    val areAllFieldsValid = lastFieldsMessages.isEmpty() || lastFieldsMessages.values
                             .map { msgs -> msgs.second.isEmpty() }
                             .reduce { acc, isValid -> acc && isValid }
 
@@ -70,7 +70,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
     override fun doSubmit() {
         isFormSubmitted = true
 
-        val areAllFieldsValid = lastFieldsMessages.values
+        val areAllFieldsValid = lastFieldsMessages.isEmpty() || lastFieldsMessages.values
                 .map { it.second.isEmpty() }
                 .reduce { acc, isValid -> acc && isValid }
 

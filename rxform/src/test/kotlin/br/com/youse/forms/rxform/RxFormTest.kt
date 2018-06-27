@@ -1,5 +1,7 @@
-package br.com.youse.forms.rxform
+package br.com.youse.forms.form
 
+import br.com.youse.forms.rxform.RxForm
+import br.com.youse.forms.rxform.RxForm2
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
@@ -79,7 +81,7 @@ class RxFormTest {
 
     @Test
     fun shouldValidateAllTheTime() {
-        val form = RxForm.Builder<Int>(submit, ValidationStrategy.ALL_TIME)
+        val form = RxForm2.Builder<Int>(submit, ValidationStrategy.ALL_TIME)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -115,7 +117,7 @@ class RxFormTest {
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
-        val form = RxForm.Builder<Int>(submit)
+        val form = RxForm2.Builder<Int>(submit)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -180,7 +182,7 @@ class RxFormTest {
 
     @Test
     fun shouldNotValidateBeforeSubmit() {
-        val form = RxForm.Builder<Int>(submit)
+        val form = RxForm2.Builder<Int>(submit)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -227,7 +229,7 @@ class RxFormTest {
 
     @Test
     fun shouldBuildFormWithoutFieldValidations() {
-        val form = RxForm.Builder<Int>(submit).build()
+        val form = RxForm2.Builder<Int>(submit).build()
 
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
@@ -242,7 +244,7 @@ class RxFormTest {
         formSub.assertValues(true)
                 .assertNoErrors()
 
-        validSubmitSub.assertNoValues()
+        validSubmitSub.assertValue(emptyList())
                 .assertNoErrors()
 
         submitFailedSub.assertNoValues()

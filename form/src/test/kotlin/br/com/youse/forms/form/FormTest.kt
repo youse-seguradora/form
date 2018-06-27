@@ -1,0 +1,204 @@
+package br.com.youse.forms.form
+
+import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.ValidationStrategy
+import br.com.youse.forms.validators.ValidationType
+import br.com.youse.forms.validators.Validator
+import org.junit.Assert.*
+
+import org.junit.Test
+
+class FormTest {
+    companion object {
+        const val EMAIL_ID = 1
+        const val PASSWORD_ID = 2
+        const val AGE_ID = 3
+        const val VALID_EMAIL = "some_email_@some_domain.com"
+        const val VALID_PASSWORD = "12345678"
+        const val MIN_AGE_VALUE = 21
+        const val MAX_AGE_VALUE = 100
+
+        private const val VALID_EMAIL_TYPE: ValidationType = "VALID_EMAIL_TYPE"
+        private const val VALID_PASSWORD_TYPE: ValidationType = "VALID_PASSWORD_TYPE"
+        private const val MIN_VALUE_TYPE: ValidationType = "MIN_VALUE_TYPE"
+        private const val MAX_VALUE_TYPE: ValidationType = "MAX_VALUE_TYPE"
+
+        val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
+        val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
+        val TOO_LARGE_MESSAGE = ValidationMessage("input is too large", MAX_VALUE_TYPE)
+        val TOO_SMALL_MESSAGE = ValidationMessage("input is too small", MIN_VALUE_TYPE)
+    }
+
+
+    private val emailValidators = listOf(object : Validator<String> {
+        override fun isValid(input: String): Boolean {
+            return VALID_EMAIL == input
+        }
+
+        override fun validationMessage(): ValidationMessage {
+            return INVALID_EMAIL_MESSAGE
+        }
+    })
+
+    private val passwordValidators = listOf(object : Validator<CharSequence> {
+        override fun isValid(input: CharSequence): Boolean {
+            return VALID_PASSWORD == input
+        }
+
+        override fun validationMessage(): ValidationMessage {
+            return INVALID_PASSWORD_MESSAGE
+        }
+    })
+
+    private val ageValidators = listOf(object : Validator<Int> {
+
+        override fun isValid(input: Int): Boolean {
+            return input >= MIN_AGE_VALUE
+        }
+
+        override fun validationMessage(): ValidationMessage {
+            return TOO_SMALL_MESSAGE
+        }
+
+    }, object : Validator<Int> {
+
+        override fun isValid(input: Int): Boolean {
+            return input <= MAX_AGE_VALUE
+        }
+
+        override fun validationMessage(): ValidationMessage {
+            return TOO_LARGE_MESSAGE
+        }
+
+    })
+
+    @Test
+    fun shouldValidateAllTheTime() {
+
+        val emailObservable = IForm.ObservableValue("foo")
+        val passwordObservable = IForm.ObservableValue("bar")
+        val ageObservable = IForm.ObservableValue(MIN_AGE_VALUE - 1)
+
+        val validationsList = listOf(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
+
+        val form = Form.Builder<Int>(ValidationStrategy.ALL_TIME)
+                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
+                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
+                    var index = 0
+                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
+                        assertEquals(validationsList[index], validation)
+                        index++
+                    }
+                })
+                .setFormValidationListener(object : IForm.FormValidationChange {
+                    var count = 0
+                    override fun onChange(isValid: Boolean) {
+                        if (count > 0) {
+                            fail()
+                        }
+                        count++
+                    }
+                })
+                .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                        fail()
+
+                    }
+                })
+                .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
+                    override fun onValidationFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
+                        assertEquals(validationsList, validations)
+                    }
+                })
+                .build()
+
+    }
+
+    @Test
+    fun shouldExecuteValidationAfterSubmit() {
+        val emailObservable = IForm.ObservableValue("foo")
+        val passwordObservable = IForm.ObservableValue("bar")
+        val ageObservable = IForm.ObservableValue(MIN_AGE_VALUE - 1)
+
+        var validate = false
+        var onFieldChangeCounter = 0
+        var onFormValidationChangeCounter = 0
+        var onValidSubmitCounter = 0
+        var onFailedSubmitCounter = 0
+
+        val form = Form.Builder<Int>()
+                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
+                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
+
+                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
+                        if (!validate) {
+                            fail()
+                        }
+                        onFieldChangeCounter++
+                    }
+                })
+                .setFormValidationListener(object : IForm.FormValidationChange {
+
+                    override fun onChange(isValid: Boolean) {
+                        if (!validate) {
+                            fail()
+                        }
+                        onFormValidationChangeCounter++
+                    }
+                })
+                .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                        if (!validate) {
+                            fail()
+                        }
+                        onValidSubmitCounter++
+                    }
+                })
+                .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
+                    override fun onValidationFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
+                        if (!validate) {
+                            fail()
+                        }
+                        onFailedSubmitCounter++
+                    }
+                })
+                .build()
+
+        emailObservable.value = "bar"
+        passwordObservable.value = "foo"
+        ageObservable.value = MAX_AGE_VALUE + 1
+        assertEquals(onFieldChangeCounter, 0)
+        assertEquals(onFormValidationChangeCounter, 0)
+        assertEquals(onValidSubmitCounter, 0)
+        assertEquals(onFailedSubmitCounter, 0)
+
+        validate = true
+        form.doSubmit()
+
+
+        assertEquals(onFieldChangeCounter, 3)
+        assertEquals(onFormValidationChangeCounter, 1)
+        assertEquals(onValidSubmitCounter, 0)
+        assertEquals(onFailedSubmitCounter, 1)
+
+        emailObservable.value = VALID_EMAIL
+        passwordObservable.value = VALID_PASSWORD
+        ageObservable.value = MIN_AGE_VALUE
+
+        assertEquals(onFieldChangeCounter, 6)
+        assertEquals(onFormValidationChangeCounter, 2)
+        assertEquals(onValidSubmitCounter, 0)
+        assertEquals(onFailedSubmitCounter, 1)
+
+        form.doSubmit()
+
+        assertEquals(onValidSubmitCounter, 1)
+        assertEquals(onFailedSubmitCounter, 1)
+    }
+}
