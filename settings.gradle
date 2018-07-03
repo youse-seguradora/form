@@ -1,1 +1,1 @@
-include ':app', ':form', ':validators', ':formatters'
+include ':app', ':form', ':rxform', ':validators', ':formatters'
