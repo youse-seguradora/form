@@ -2,12 +2,17 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 def rxJavaVersion = rootProject.ext.rxJavaVersion
+def jUnitVersion = rootProject.ext.jUnitVersion
 
 dependencies {
+
+    implementation project(":form")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    implementation project(":form")
+
+    testImplementation "junit:junit:$jUnitVersion"
 }
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
