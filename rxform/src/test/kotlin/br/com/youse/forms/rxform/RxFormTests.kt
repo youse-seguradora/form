@@ -4,11 +4,15 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
 import br.com.youse.forms.validators.Validator
+import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 import org.junit.Test
 
-class RxFormTest {
+abstract class RxFormTests {
+    abstract fun <T> getBuilder(submit: Observable<Unit>,
+                                strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT): IRxForm.Builder<T>
+
     companion object {
         private const val EMAIL_ID = 1
         private const val PASSWORD_ID = 2
@@ -79,7 +83,7 @@ class RxFormTest {
 
     @Test
     fun shouldValidateAllTheTime() {
-        val form = RxForm2.Builder<Int>(submit, ValidationStrategy.ALL_TIME)
+        val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -115,7 +119,7 @@ class RxFormTest {
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
-        val form = RxForm2.Builder<Int>(submit)
+        val form = getBuilder<Int>(submit)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -180,7 +184,7 @@ class RxFormTest {
 
     @Test
     fun shouldNotValidateBeforeSubmit() {
-        val form = RxForm2.Builder<Int>(submit)
+        val form = getBuilder<Int>(submit)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
@@ -227,7 +231,7 @@ class RxFormTest {
 
     @Test
     fun shouldBuildFormWithoutFieldValidations() {
-        val form = RxForm2.Builder<Int>(submit).build()
+        val form = getBuilder<Int>(submit).build()
 
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
