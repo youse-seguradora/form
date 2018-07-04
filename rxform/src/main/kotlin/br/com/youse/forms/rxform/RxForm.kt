@@ -20,7 +20,9 @@ class RxForm<T>(private val submit: Observable<Unit>,
     @Suppress("UNCHECKED_CAST")
     override fun onFormValidationChange(): Observable<Boolean> {
         if (fieldsValidations.isEmpty()) {
-            return submit.map { true }
+            return submit
+                    .map { true }
+                    .distinctUntilChanged()
         }
         return Observable.combineLatest(fieldsValidations)
         { args -> args.map { it as Triple<T, Any, List<ValidationMessage>> } }
@@ -30,6 +32,11 @@ class RxForm<T>(private val submit: Observable<Unit>,
     }
 
     override fun onValidSubmit(): Observable<List<Pair<T, Any>>> {
+        if (fieldsValidations.isEmpty()) {
+            return submit
+                    .map { emptyList<Pair<T, Any>>() }
+        }
+
         return submit.withLatestFrom(onFormValidationChange(),
                 BiFunction { _: Unit, isValidForm: Boolean -> isValidForm })
                 .filter { it }

@@ -33,14 +33,15 @@ class LoginActivity : AppCompatActivity() {
                 MIN_PASSSWORD_LENGTH))
     }
 
-    lateinit var form: IRxForm<Int>
+    private lateinit var form: IRxForm<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val submitHappens = submit.clicks().share()
-        val emailChanges = email.textChanges().share()
-        val passwordChanges = password.textChanges().share()
+
+        val submitHappens = submit.clicks()
+        val emailChanges = email.textChanges()
+        val passwordChanges = password.textChanges()
 
         form = RxForm2.Builder<Int>(submitHappens)
                 .addFieldValidations(emailContainer.id, emailChanges, emailValidations)
@@ -53,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
                     field.isErrorEnabled = it.second.isNotEmpty()
                     field.error = it.second.joinToString { it.message }
                 })
+
         disposables.add(form.onFormValidationChange()
                 .subscribe {
                     submit.isEnabled = it
