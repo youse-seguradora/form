@@ -44,7 +44,7 @@ interface IForm<T> {
     /**
      * Class that notifies its listener every time the value changes.
      */
-    class ObservableValue<T>(private val initialValue: T) {
+    class ObservableValue<T>(initialValue: T) {
 
         interface ValueObserver<T> {
             /**

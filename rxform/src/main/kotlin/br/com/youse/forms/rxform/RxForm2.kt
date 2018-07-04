@@ -6,15 +6,14 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
-import io.reactivex.ObservableSource
-import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
 class RxForm2<T>(
         submitObservable: Observable<Unit>,
         strategy: ValidationStrategy,
-        fieldValidations: Map<T, Pair<Observable<*>, List<Validator<*>>>>
+        fieldObservables: Map<T, Observable<Any>>,
+        fieldValidations: List<Pair<T, List<Validator<Any>>>>
 ) : IRxForm<T> {
 
 
@@ -31,49 +30,54 @@ class RxForm2<T>(
     else
         submitObservable.share()
 
-    private val builder = Form.Builder<T>()
-            .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
-                override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
-                    fieldValidationChange.onNext(validation)
-                }
-            })
-            .setFormValidationListener(object : IForm.FormValidationChange {
-                override fun onChange(isValid: Boolean) {
-                    formValidationChange.onNext(isValid)
-                }
-            })
-            .setValidSubmitListener(object : IForm.ValidSubmit<T> {
-                override fun onValidSubmit(fields: List<Pair<T, Any>>) {
-                    validSubmit.onNext(fields)
-                }
-            })
-            .setSubmitFailedListener(object : IForm.SubmitFailed<T> {
-                override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
-                    submitFailed.onNext(validations)
-                }
-            })
-    private val observableValues = mutableMapOf<T, IForm.ObservableValue<*>>()
-
     init {
+        val builder = Form.Builder<T>()
+                .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
+                    override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
+                        fieldValidationChange.onNext(validation)
+                    }
+                })
+                .setFormValidationListener(object : IForm.FormValidationChange {
+                    override fun onChange(isValid: Boolean) {
+                        formValidationChange.onNext(isValid)
+                    }
+                })
+                .setValidSubmitListener(object : IForm.ValidSubmit<T> {
+                    override fun onValidSubmit(fields: List<Pair<T, Any>>) {
+                        validSubmit.onNext(fields)
+                    }
+                })
+                .setSubmitFailedListener(object : IForm.SubmitFailed<T> {
+                    override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+                        submitFailed.onNext(validations)
+                    }
+                })
+
         var isBuilt = false
+        val observableValues = mutableMapOf<T, IForm.ObservableValue<Any>>()
 
-        fieldValidations.forEach { key, pair ->
-
-            val fieldObservable = pair.first as Observable<Any>
-            val validators = pair.second as List<Validator<Any>>
+        fieldObservables.forEach { (key, observable) ->
 
             disposables.add(
-                    fieldObservable.subscribe {
+                    observable.subscribe { value ->
                         if (observableValues.containsKey(key)) {
-                            val field = observableValues[key]!! as IForm.ObservableValue<Any>
-                            field.value = it
+                            observableValues[key]!!.value = value
                         } else {
-                            val field = IForm.ObservableValue(it)
-                            observableValues[key] = field
-                            builder.addFieldValidations(key, field, validators)
+                            observableValues[key] = IForm.ObservableValue(value)
                         }
+                        // NOTE: Only build the real form when all observables
+                        // emitted at least once.
                         if (!isBuilt && fieldValidations.size == observableValues.size) {
                             isBuilt = true
+
+                            // NOTE: fieldValidations list has the same order of elements
+                            // as the original addFieldValidations calls,
+                            // so we iterate over it to create the form with the same
+                            // sorting of fields.
+                            fieldValidations.forEach { (key1, validators) ->
+                                val field = observableValues[key1]!!
+                                builder.addFieldValidations(key1, field, validators)
+                            }
                             val form = builder.build()
                             disposables.add(
                                     submit.subscribe {
@@ -116,10 +120,12 @@ class RxForm2<T>(
     class Builder<T>(private val submitObservable: Observable<Unit>,
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
-        private val fieldValidations = mutableMapOf<T, Pair<Observable<*>, List<Validator<*>>>>()
+        private val fieldObservables = mutableMapOf<T, Observable<Any>>()
+        private val fieldValidations = mutableMapOf<T, List<Validator<Any>>>()
 
         override fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): IRxForm.Builder<T> {
-            fieldValidations[key] = Pair(fieldObservable, validators)
+            fieldValidations[key] = validators as List<Validator<Any>>
+            fieldObservables[key] = fieldObservable as Observable<Any>
             return this
         }
 
@@ -129,7 +135,8 @@ class RxForm2<T>(
             return RxForm2(
                     submitObservable = submitObservable,
                     strategy = strategy,
-                    fieldValidations = fieldValidations)
+                    fieldValidations = fieldValidations.map { (key, value) -> Pair(key, value) },
+                    fieldObservables = fieldObservables)
         }
     }
 }
