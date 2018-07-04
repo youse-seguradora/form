@@ -29,9 +29,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val submitHappens = submit.clicks().share()
-        val emailChanges = email.textChanges().share()
-        val passwordChanges = password.textChanges().share()
+
+        val submitHappens = submit.clicks()
+        val emailChanges = email.textChanges()
+        val passwordChanges = password.textChanges()
 
         val form = RxForm.Builder<Int>(submitHappens)
                 .addFieldValidations(emailContainer.id,
@@ -48,8 +49,7 @@ class LoginActivity : AppCompatActivity() {
                     field.error = it.second.joinToString { it.message }
                 })
 
-        val onFormValidationChange = form.onFormValidationChange().share()
-        disposables.add(onFormValidationChange
+        disposables.add(form.onFormValidationChange()
                 .subscribe {
                     submit.isEnabled = it
                 })
