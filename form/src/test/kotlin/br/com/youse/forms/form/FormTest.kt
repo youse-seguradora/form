@@ -10,18 +10,18 @@ import org.junit.Test
 
 class FormTest {
     companion object {
-        const val EMAIL_ID = 1
-        const val PASSWORD_ID = 2
-        const val AGE_ID = 3
-        const val VALID_EMAIL = "some_email_@some_domain.com"
-        const val VALID_PASSWORD = "12345678"
-        const val MIN_AGE_VALUE = 21
-        const val MAX_AGE_VALUE = 100
+        private const val EMAIL_ID = 1
+        private const val PASSWORD_ID = 2
+        private const val AGE_ID = 3
+        private const val VALID_EMAIL = "some_email_@some_domain.com"
+        private const val VALID_PASSWORD = "12345678"
+        private const val MIN_AGE_VALUE = 21
+        private const val MAX_AGE_VALUE = 100
 
-        private const val VALID_EMAIL_TYPE: ValidationType = "VALID_EMAIL_TYPE"
-        private const val VALID_PASSWORD_TYPE: ValidationType = "VALID_PASSWORD_TYPE"
-        private const val MIN_VALUE_TYPE: ValidationType = "MIN_VALUE_TYPE"
-        private const val MAX_VALUE_TYPE: ValidationType = "MAX_VALUE_TYPE"
+        private val VALID_EMAIL_TYPE = object : ValidationType {}
+        private val VALID_PASSWORD_TYPE = object : ValidationType {}
+        private val MIN_VALUE_TYPE = object : ValidationType {}
+        private val MAX_VALUE_TYPE = object : ValidationType {}
 
         val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
         val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
@@ -83,7 +83,7 @@ class FormTest {
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
-        val form = Form.Builder<Int>(ValidationStrategy.ALL_TIME)
+        Form.Builder<Int>(ValidationStrategy.ALL_TIME)
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)

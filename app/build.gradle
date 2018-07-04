@@ -27,17 +27,18 @@ def constraintLayoutVersion = rootProject.ext.constraintLayoutVersion
 def jUnitVersion = rootProject.ext.jUnitVersion
 
 dependencies {
+
+    implementation project(":form")
+    implementation project(":rxform")
+    implementation project(":validators")
+    implementation project(":formatters")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxBindingVersion"
     implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
-
-    implementation project(":form")
-    implementation project(":rxform")
-    implementation project(":validators")
-    implementation project(":formatters")
 
     testImplementation "junit:junit:$jUnitVersion"
 

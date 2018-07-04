@@ -96,4 +96,3 @@ class RxForm<T>(private val submit: Observable<Unit>,
         //NOTE: do nothing
     }
 }
-

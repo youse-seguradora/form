@@ -5,6 +5,7 @@ import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 
 
+@Suppress("UNCHECKED_CAST")
 class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
               private val formValidationListener: IForm.FormValidationChange?,
               private val validSubmitListener: IForm.ValidSubmit<T>?,

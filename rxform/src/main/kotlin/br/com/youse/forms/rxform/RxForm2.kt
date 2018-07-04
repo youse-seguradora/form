@@ -123,6 +123,7 @@ class RxForm2<T>(
         private val fieldObservables = mutableMapOf<T, Observable<Any>>()
         private val fieldValidations = mutableMapOf<T, List<Validator<Any>>>()
 
+        @Suppress("UNCHECKED_CAST")
         override fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): IRxForm.Builder<T> {
             fieldValidations[key] = validators as List<Validator<Any>>
             fieldObservables[key] = fieldObservable as Observable<Any>

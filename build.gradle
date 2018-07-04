@@ -14,12 +14,11 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-ext{
+ext {
     supportLibraryVersion = '27.1.1'
     rxJavaVersion = '2.1.7'
     rxBindingVersion = '2.1.1'
     constraintLayoutVersion = '1.1.2'
-
     jUnitVersion = '4.12'
 }
 allprojects {
