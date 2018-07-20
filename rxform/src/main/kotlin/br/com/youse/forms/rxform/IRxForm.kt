@@ -31,7 +31,7 @@ interface IRxForm<T> {
      *  This is useful to scroll or give focus to the given field.
      */
     fun onSubmitFailed(): Observable<List<Pair<T, List<ValidationMessage>>>>
-
+    
 
     /**
      * Builder to create an RxForm, it takes a submit observable that emits when the user submits the form
