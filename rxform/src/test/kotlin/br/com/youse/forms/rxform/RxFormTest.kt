@@ -88,7 +88,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.firstFieldValidationFailed().test()
+        val submitFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
@@ -103,9 +103,11 @@ class RxFormTest {
 
         formSub.assertValue(false)
 
-        firstValidationFailedSub.assertValue(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE))
-        )
+        submitFailedSub.assertValue(listOf(
+                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
+        ))
 
         validSubmitSub.assertNoValues().assertNoErrors()
 
@@ -122,7 +124,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.firstFieldValidationFailed().test()
+        val submitFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
@@ -137,9 +139,11 @@ class RxFormTest {
 
         formSub.assertValue(false)
 
-        firstValidationFailedSub.assertValue(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE))
-        )
+        submitFailedSub.assertValue(listOf(
+                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
+        ))
 
         validSubmitSub.assertNoValues().assertNoErrors()
 
@@ -160,10 +164,11 @@ class RxFormTest {
 
         submit.onNext(Unit)
 
-        firstValidationFailedSub.assertValues(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE))
-        )
-
+        submitFailedSub.assertValues(listOf(
+                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
+        ))
 
         validSubmitSub.assertValue(listOf(
                 Pair(EMAIL_ID, VALID_EMAIL),
@@ -184,7 +189,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.firstFieldValidationFailed().test()
+        val submitFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("")
         passwordObservable.onNext("")
@@ -199,7 +204,7 @@ class RxFormTest {
         validSubmitSub.assertNoValues()
                 .assertNoErrors()
 
-        firstValidationFailedSub.assertNoValues()
+        submitFailedSub.assertNoValues()
                 .assertNoErrors()
 
         emailObservable.onNext(VALID_EMAIL)
@@ -215,7 +220,7 @@ class RxFormTest {
         validSubmitSub.assertNoValues()
                 .assertNoErrors()
 
-        firstValidationFailedSub.assertNoValues()
+        submitFailedSub.assertNoValues()
                 .assertNoErrors()
 
     }
@@ -227,7 +232,7 @@ class RxFormTest {
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val firstValidationFailedSub = form.firstFieldValidationFailed().test()
+        val submitFailedSub = form.onSubmitFailed().test()
 
         submit.onNext(Unit)
 
@@ -237,10 +242,10 @@ class RxFormTest {
         formSub.assertValues(true)
                 .assertNoErrors()
 
-        validSubmitSub.assertNoValues()
+        validSubmitSub.assertValue(emptyList())
                 .assertNoErrors()
 
-        firstValidationFailedSub.assertNoValues()
+        submitFailedSub.assertNoValues()
                 .assertNoErrors()
     }
 }
