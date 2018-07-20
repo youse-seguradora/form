@@ -32,10 +32,6 @@ interface IRxForm<T> {
      */
     fun onSubmitFailed(): Observable<List<Pair<T, List<ValidationMessage>>>>
 
-    /**
-     * Dispose internal subscriptions
-     */
-    fun dispose()
 
     /**
      * Builder to create an RxForm, it takes a submit observable that emits when the user submits the form
