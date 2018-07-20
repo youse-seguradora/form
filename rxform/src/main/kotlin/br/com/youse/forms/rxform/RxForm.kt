@@ -102,4 +102,5 @@ class RxForm<T>(private val submit: Observable<Unit>,
     override fun dispose() {
         //NOTE: do nothing
     }
+
 }
