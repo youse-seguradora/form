@@ -1,15 +1,9 @@
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
+apply plugin: 'kotlin-platform-jvm'
 
+archivesBaseName = 'form'
 
 dependencies {
-
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    expectedBy project(':form-common')
     implementation deps.kotlin.stdlib.jdk
-
     testImplementation deps.kotlin.test.jdk
-    testImplementation deps.kotlin.test.annotations
 }
-
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"

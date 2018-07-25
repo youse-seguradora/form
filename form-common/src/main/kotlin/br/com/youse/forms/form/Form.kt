@@ -44,7 +44,9 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
     init {
 
-        fieldValidations.forEach { key, pair ->
+        fieldValidations.forEach { it ->
+            val key = it.key
+            val pair = it.value
             val observableValue = pair.first as IForm.ObservableValue<Any>
             val validators = pair.second as List<Validator<Any>>
             val listener = object : IForm.ObservableValue.ValueObserver<Any> {
@@ -101,7 +103,9 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         if (strategy == ValidationStrategy.AFTER_SUBMIT) {
 
             // notify field validation changed
-            lastFieldsMessages.forEach { key, values ->
+            lastFieldsMessages.forEach { it ->
+                val key = it.key
+                val values = it.value
                 fieldValidationListener?.onChange(Pair(key, values.second))
             }
 
