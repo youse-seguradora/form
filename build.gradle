@@ -31,7 +31,8 @@ buildscript {
                     ],
             ],
             rx           : [
-                    java: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
+                    java   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
+                    binding: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
             ],
             android      : [
                     support: [

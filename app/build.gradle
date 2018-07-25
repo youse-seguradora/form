@@ -36,6 +36,7 @@ dependencies {
     implementation deps.android.support.design
     implementation deps.android.support.constraintLayout
     implementation deps.rx.java
+    implementation deps.rx.binding
 
     testImplementation deps.junit
 
