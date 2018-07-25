@@ -1,0 +1,9 @@
+apply plugin: 'kotlin-platform-jvm'
+
+archivesBaseName = 'form-validators'
+
+dependencies {
+    expectedBy project(':validators-common')
+    implementation deps.kotlin.stdlib.jdk
+    testImplementation deps.kotlin.test.jdk
+}

@@ -27,7 +27,7 @@ dependencies {
 
     implementation project(":form-jdk")
     implementation project(":rxform")
-    implementation project(":validators")
+    implementation project(":validators-jdk")
     implementation project(":formatters")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
