@@ -31,13 +31,13 @@ dependencies {
     implementation project(":formatters")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
-    implementation "com.android.support:appcompat-v7:$versions.supportLibrary"
-    implementation "com.android.support:design:$versions.supportLibrary"
-    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$versions.rxBinding"
-    implementation "com.android.support.constraint:constraint-layout:$versions.constraintLayout"
+    implementation deps.kotlin.stdlib.jdk
+    implementation deps.android.support.appcompat
+    implementation deps.android.support.design
+    implementation deps.android.support.constraintLayout
+    implementation deps.rx.java
 
-    testImplementation "junit:junit:$versions.junit"
+    testImplementation deps.junit
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

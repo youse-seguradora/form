@@ -4,7 +4,7 @@ buildscript {
     ext.versions = [
             'minSdk'          : 16,
             'compileSdk'      : 28,
-            'targetSdk'      : 28,
+            'targetSdk'       : 28,
 
             'kotlin'          : '1.2.51',
 
@@ -20,19 +20,29 @@ buildscript {
 
     ext.deps = [
             androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-            'kotlin'     : [
-                    'stdlib': [
-                            'jdk': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+            kotlin       : [
+                    stdlib: [
+                            jdk: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
                     ],
-                    'test'  : [
+                    test  : [
                             'common'     : "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
                             'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
                             'jdk'        : "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}"
                     ],
             ],
+            rx           : [
+                    java: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
+            ],
+            android      : [
+                    support: [
+                            appcompat       : "com.android.support:appcompat-v7:${versions.supportLibrary}",
+                            design          : "com.android.support:design:${versions.supportLibrary}",
+                            constraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}"
+                    ]
+            ],
             annotations  : 'org.jetbrains:annotations:16.0.1',
 
-            junit        : 'junit:junit:4.12'
+            junit        : "junit:junit:${versions.junit}"
     ]
 
     repositories {
