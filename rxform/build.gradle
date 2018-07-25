@@ -9,7 +9,8 @@ dependencies {
     implementation deps.kotlin.stdlib.jdk
     implementation deps.rx.java
 
-    testImplementation deps.junit
+    testImplementation deps.kotlin.test.jdk
+    testImplementation deps.kotlin.test.annotations
 }
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
