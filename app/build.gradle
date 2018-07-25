@@ -25,7 +25,7 @@ android {
 
 dependencies {
 
-    implementation project(":form")
+    implementation project(":form-jdk")
     implementation project(":rxform")
     implementation project(":validators")
     implementation project(":formatters")
