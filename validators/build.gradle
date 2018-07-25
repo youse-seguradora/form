@@ -1,16 +1,14 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
-def jUnitVersion = rootProject.ext.jUnitVersion
-
 dependencies {
 
     implementation project(":form")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
-    testImplementation "junit:junit:$jUnitVersion"
+    testImplementation "junit:junit:$versions.junit"
 
 }
 

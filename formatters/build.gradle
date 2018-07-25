@@ -3,9 +3,9 @@ apply plugin: 'kotlin'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation project(":form")
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$versions.junit"
 }
 
 sourceCompatibility = "1.7"
