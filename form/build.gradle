@@ -5,8 +5,9 @@ apply plugin: 'kotlin'
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
-    testImplementation "junit:junit:$versions.junit"
+    implementation deps.kotlin.stdlib.jdk
+
+    testImplementation deps.junit
 }
 
 sourceCompatibility = "1.7"

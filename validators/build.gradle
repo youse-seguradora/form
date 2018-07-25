@@ -6,9 +6,9 @@ dependencies {
     implementation project(":form")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
+    implementation deps.kotlin.stdlib.jdk
 
-    testImplementation "junit:junit:$versions.junit"
+    testImplementation deps.junit
 
 }
 
