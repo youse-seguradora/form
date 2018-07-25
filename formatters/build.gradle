@@ -8,7 +8,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation deps.kotlin.stdlib.jdk
 
-    testImplementation deps.junit
+    testImplementation deps.kotlin.test.jdk
+    testImplementation deps.kotlin.test.annotations
 }
 
 sourceCompatibility = "1.7"
