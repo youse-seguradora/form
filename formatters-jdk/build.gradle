@@ -1,10 +1,10 @@
 apply plugin: 'kotlin-platform-jvm'
 
-archivesBaseName = 'validators'
+archivesBaseName = 'formatters'
 
 dependencies {
 
-    expectedBy project(':validators-common')
+    expectedBy project(':formatters-common')
 
     compile project(":form-jdk")
 

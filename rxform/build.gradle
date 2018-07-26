@@ -1,16 +1,18 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
+archivesBaseName = 'rxform'
+
+
 dependencies {
 
-    implementation project(":form-jdk")
+    compile project(":form-jdk")
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation deps.kotlin.stdlib.jdk
-    implementation deps.rx.java
+    compile deps.kotlin.stdlib.jdk
+    compile deps.rx.java
 
-    testImplementation deps.kotlin.test.jdk
-    testImplementation deps.kotlin.test.annotations
+    testCompile deps.kotlin.test.jdk
+    testCompile deps.kotlin.test.annotations
 }
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"

@@ -1,10 +1,12 @@
 apply plugin: 'org.jetbrains.kotlin.platform.common'
 
-archivesBaseName = 'form-validation-common'
+archivesBaseName = 'validation-common'
 
 dependencies {
-    implementation project(":form-common")
-    implementation deps.kotlin.stdlib.common
-    testImplementation deps.kotlin.test.common
-    testImplementation deps.kotlin.test.annotations
+    compile project(":form-common")
+
+    compile deps.kotlin.stdlib.common
+
+    testCompile deps.kotlin.test.common
+    testCompile deps.kotlin.test.annotations
 }

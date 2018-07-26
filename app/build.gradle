@@ -25,12 +25,10 @@ android {
 
 dependencies {
 
-    implementation project(":form-jdk")
     implementation project(":rxform")
     implementation project(":validators-jdk")
-    implementation project(":formatters")
+    implementation project(':formatters-jdk')
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation deps.kotlin.stdlib.jdk
     implementation deps.android.support.appcompat
     implementation deps.android.support.design

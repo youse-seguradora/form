@@ -3,7 +3,11 @@ apply plugin: 'kotlin-platform-jvm'
 archivesBaseName = 'form'
 
 dependencies {
+
     expectedBy project(':form-common')
-    implementation deps.kotlin.stdlib.jdk
-    testImplementation deps.kotlin.test.jdk
+
+    compile deps.kotlin.stdlib.jdk
+
+    testCompile deps.kotlin.test.jdk
+    testCompile deps.kotlin.test.annotations
 }
