@@ -2,10 +2,13 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
     implementation project(":form")
-    testImplementation 'junit:junit:4.12'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation deps.kotlin.stdlib.jdk
+
+    testImplementation deps.junit
 }
 
 sourceCompatibility = "1.7"

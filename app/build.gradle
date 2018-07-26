@@ -5,11 +5,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion versions.compileSdk
+
     defaultConfig {
         applicationId "br.com.youse.forms.rxformvalidator"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -21,10 +22,6 @@ android {
         }
     }
 }
-def supportLibraryVersion = rootProject.ext.supportLibraryVersion
-def rxBindingVersion = rootProject.ext.rxBindingVersion
-def constraintLayoutVersion = rootProject.ext.constraintLayoutVersion
-def jUnitVersion = rootProject.ext.jUnitVersion
 
 dependencies {
 
@@ -34,16 +31,14 @@ dependencies {
     implementation project(":formatters")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
-    implementation "com.android.support:design:$supportLibraryVersion"
-    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxBindingVersion"
-    implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
+    implementation deps.kotlin.stdlib.jdk
+    implementation deps.android.support.appcompat
+    implementation deps.android.support.design
+    implementation deps.android.support.constraintLayout
+    implementation deps.rx.java
+    implementation deps.rx.binding
 
-    implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-
-    testImplementation "junit:junit:$jUnitVersion"
+    testImplementation deps.junit
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
