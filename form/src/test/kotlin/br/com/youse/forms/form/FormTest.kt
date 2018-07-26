@@ -27,9 +27,10 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
 import br.com.youse.forms.validators.Validator
-import org.junit.Assert.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
-import org.junit.Test
 
 class FormTest {
     companion object {

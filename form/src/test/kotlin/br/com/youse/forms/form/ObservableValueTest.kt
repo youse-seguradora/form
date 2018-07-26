@@ -23,9 +23,9 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-import org.junit.Assert.*
-import org.junit.Test
 
 class ObservableValueTest {
 

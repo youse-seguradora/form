@@ -28,8 +28,8 @@ import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
 import br.com.youse.forms.validators.Validator
 import io.reactivex.subjects.PublishSubject
+import kotlin.test.Test
 
-import org.junit.Test
 
 class RxFormTest {
     companion object {

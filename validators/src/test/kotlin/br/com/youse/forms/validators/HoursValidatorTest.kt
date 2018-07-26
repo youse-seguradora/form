@@ -23,14 +23,16 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
 
 class HoursValidatorTest {
 
     private lateinit var validator: Validator<String>
-    @Before
+    @BeforeTest
     fun setup() {
         validator = HoursValidator("invalid message", ":")
     }
@@ -38,20 +40,20 @@ class HoursValidatorTest {
     @Test
     fun shouldValidate() {
 
-        Assert.assertFalse(validator.isValid(""))
-        Assert.assertFalse(validator.isValid(" "))
-        Assert.assertFalse(validator.isValid("a"))
-        Assert.assertFalse(validator.isValid("0"))
-        Assert.assertFalse(validator.isValid("01"))
-        Assert.assertFalse(validator.isValid("01:"))
-        Assert.assertFalse(validator.isValid(":0"))
-        Assert.assertFalse(validator.isValid("24:0"))
-        Assert.assertFalse(validator.isValid("24:0"))
+        assertFalse(validator.isValid(""))
+        assertFalse(validator.isValid(" "))
+        assertFalse(validator.isValid("a"))
+        assertFalse(validator.isValid("0"))
+        assertFalse(validator.isValid("01"))
+        assertFalse(validator.isValid("01:"))
+        assertFalse(validator.isValid(":0"))
+        assertFalse(validator.isValid("24:0"))
+        assertFalse(validator.isValid("24:0"))
 
-        Assert.assertFalse(validator.isValid("24:0:00"))
+        assertFalse(validator.isValid("24:0:00"))
 
-        Assert.assertTrue(validator.isValid("0:0"))
-        Assert.assertTrue(validator.isValid("23:59"))
-        Assert.assertTrue(validator.isValid("00:0"))
+        assertTrue(validator.isValid("0:0"))
+        assertTrue(validator.isValid("23:59"))
+        assertTrue(validator.isValid("00:0"))
     }
 }

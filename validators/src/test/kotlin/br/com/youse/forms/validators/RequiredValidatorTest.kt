@@ -23,22 +23,25 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
 
 class RequiredValidatorTest {
 
     private lateinit var validator: Validator<CharSequence>
-    @Before
+    
+    @BeforeTest
     fun setup() {
         validator = RequiredValidator("should not be empty")
     }
 
     @Test
     fun shouldValidate() {
-        Assert.assertFalse(validator.isValid(""))
-        Assert.assertTrue(validator.isValid(" "))
-        Assert.assertTrue(validator.isValid("1"))
+       assertFalse(validator.isValid(""))
+       assertTrue(validator.isValid(" "))
+       assertTrue(validator.isValid("1"))
     }
 }
