@@ -12,5 +12,11 @@ dependencies {
     testImplementation deps.kotlin.test.jdk
     testImplementation deps.kotlin.test.annotations
 }
+
+sourceSets {
+    main.java.srcDirs += "src/main/kotlin"
+    test.java.srcDirs += "src/test/kotlin"
+}
+
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
