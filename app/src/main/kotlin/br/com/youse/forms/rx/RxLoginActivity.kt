@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.rxformvalidator
+package br.com.youse.forms.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
@@ -33,8 +33,9 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
+import br.com.youse.forms.R
 
-class LoginActivity : AppCompatActivity() {
+class RxLoginActivity : AppCompatActivity() {
 
     val MIN_PASSSWORD_LENGTH = 8
     val disposables = CompositeDisposable()

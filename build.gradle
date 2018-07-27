@@ -47,8 +47,8 @@ buildscript {
     ]
 
     repositories {
-        jcenter()
         google()
+        jcenter()
         gradlePluginPortal()
     }
 
@@ -62,9 +62,9 @@ buildscript {
 
 subprojects {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
     }
 
     tasks.withType(Test) {
