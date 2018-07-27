@@ -33,6 +33,10 @@ class LiveDataLoginActivity : AppCompatActivity() {
             }
         })
 
+        vm.success.observe(this, Observer {
+            println(it?.toString())
+        })
+
     }
 
 

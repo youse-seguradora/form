@@ -1,9 +1,10 @@
 package br.com.youse.forms.livedata
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.*
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Observable
 
 class LoginViewModel : ViewModel() {
 
@@ -11,7 +12,7 @@ class LoginViewModel : ViewModel() {
 
     val password = MutableLiveData<String>()
 
-    val submit = MutableLiveData<Unit>()
+    val submit = MediatorLiveData<Unit>()
 
     private val emailValidations by lazy {
         listOf(RequiredValidator(
@@ -24,10 +25,6 @@ class LoginViewModel : ViewModel() {
                 8))
     }
 
-    fun onSubmit() {
-        submit.postValue(Unit)
-    }
-
     val form = LiveDataForm.Builder<String>(submit)
             .addFieldValidations("Email",
                     email, emailValidations)
@@ -35,5 +32,9 @@ class LoginViewModel : ViewModel() {
                     password,
                     passwordValidations)
             .build()
+
+    val success = Transformations.switchMap(form.onValidSubmit) {
+        LiveDataReactiveStreams.fromPublisher(Observable.just(true).toFlowable(BackpressureStrategy.BUFFER))
+    }
 
 }

@@ -1,6 +1,9 @@
 package br.com.youse.forms.livedata
 
-import android.arch.lifecycle.*
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.databinding.BindingAdapter
 import android.support.design.widget.TextInputLayout
 import android.text.Editable
@@ -12,8 +15,7 @@ import br.com.youse.forms.form.IForm
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
-class LiveDataForm<T>(submit: LiveData<Unit>, fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
-    val submit = MediatorLiveData<Unit>()
+class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
 
     val onFieldValidationChange = MutableLiveData<Pair<T, List<ValidationMessage>>>()
     val onFormValidationChange = MutableLiveData<Boolean>()
@@ -74,6 +76,9 @@ class LiveDataForm<T>(submit: LiveData<Unit>, fieldValidations: MutableMap<T, Pa
         @BindingAdapter(value = ["formSubmit", "owner"], requireAll = true)
         fun onSubmit(view: View, ld: MediatorLiveData<Unit>, owner: LifecycleOwner) {
             ld.observe(owner, Observer<Unit> { })
+            view.setOnClickListener {
+                ld.postValue(Unit)
+            }
         }
 
 
@@ -106,7 +111,7 @@ class LiveDataForm<T>(submit: LiveData<Unit>, fieldValidations: MutableMap<T, Pa
         }
     }
 
-    class Builder<T>(private val submit: MutableLiveData<Unit>) {
+    class Builder<T>(private val submit: MediatorLiveData<Unit>) {
         private val fieldValidations = mutableMapOf<T, Pair<MutableLiveData<*>, List<Validator<*>>>>()
         fun <R> addFieldValidations(key: T, field: MutableLiveData<R>, validators: List<Validator<R>>): LiveDataForm.Builder<T> {
             fieldValidations.put(key, Pair(field, validators))
