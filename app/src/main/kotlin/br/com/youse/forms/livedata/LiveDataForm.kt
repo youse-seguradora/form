@@ -73,8 +73,8 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
 
     companion object {
         @JvmStatic
-        @BindingAdapter(value = ["formSubmit", "owner"], requireAll = true)
-        fun onSubmit(view: View, ld: MediatorLiveData<Unit>, owner: LifecycleOwner) {
+        @BindingAdapter(value = ["owner", "formSubmit"], requireAll = true)
+        fun onSubmit(view: View, owner: LifecycleOwner, ld: MediatorLiveData<Unit>) {
             ld.observe(owner, Observer<Unit> { })
             view.setOnClickListener {
                 ld.postValue(Unit)
@@ -83,11 +83,13 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
 
 
         @JvmStatic
-        @BindingAdapter(value = ["onFieldValidationChange", "fieldKey"], requireAll = true)
-        fun onFieldValidationChange(view: TextInputLayout, key: Any, ld: MutableLiveData<Pair<Any, List<ValidationMessage>>>) {
-            ld.observe(view.context as LifecycleOwner, Observer<Pair<Any, List<ValidationMessage>>> { t ->
-                if (t?.first == key) {
-                    view.error = t.second.joinToString { it.message }
+        @BindingAdapter(value = ["owner", "formFieldKey", "onFieldValidationChange"], requireAll = true)
+        fun <T> onFieldValidationChange(view: TextInputLayout, owner: LifecycleOwner,
+                                        formFieldKey: T,
+                                        ld: MutableLiveData<Pair<T, List<ValidationMessage>>>) {
+            ld.observe(owner, Observer<Pair<T, List<ValidationMessage>>> { t ->
+                if (t?.first == formFieldKey) {
+                    view.error = t?.second?.joinToString { it.message }
                 }
             })
         }
@@ -111,7 +113,7 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
         }
     }
 
-    class Builder<T>(private val submit: MediatorLiveData<Unit>) {
+    class Builder<T>(private val submit: MediatorLiveData<Unit> = MediatorLiveData()) {
         private val fieldValidations = mutableMapOf<T, Pair<MutableLiveData<*>, List<Validator<*>>>>()
         fun <R> addFieldValidations(key: T, field: MutableLiveData<R>, validators: List<Validator<R>>): LiveDataForm.Builder<T> {
             fieldValidations.put(key, Pair(field, validators))
