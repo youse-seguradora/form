@@ -23,6 +23,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     dataBinding {
         enabled = true
     }
@@ -36,12 +37,10 @@ android {
 
 dependencies {
 
-    implementation project(":form")
     implementation project(":rxform")
-    implementation project(":validators")
-    implementation project(":formatters")
+    implementation project(":validators-jdk")
+    implementation project(':formatters-jdk')
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation deps.kotlin.stdlib.jdk
     implementation deps.android.support.appcompat
     implementation deps.android.support.design

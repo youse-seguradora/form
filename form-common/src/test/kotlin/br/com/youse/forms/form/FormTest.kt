@@ -42,10 +42,10 @@ class FormTest {
         private const val MIN_AGE_VALUE = 21
         private const val MAX_AGE_VALUE = 100
 
-        private val VALID_EMAIL_TYPE = object : ValidationType {}
-        private val VALID_PASSWORD_TYPE = object : ValidationType {}
-        private val MIN_VALUE_TYPE = object : ValidationType {}
-        private val MAX_VALUE_TYPE = object : ValidationType {}
+        private val VALID_EMAIL_TYPE: ValidationType = object : ValidationType {}
+        private val VALID_PASSWORD_TYPE: ValidationType = object : ValidationType {}
+        private val MIN_VALUE_TYPE: ValidationType = object : ValidationType {}
+        private val MAX_VALUE_TYPE: ValidationType = object : ValidationType {}
 
         val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
         val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
@@ -54,7 +54,7 @@ class FormTest {
     }
 
 
-    private val emailValidators = listOf(object : Validator<String> {
+    private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
         override fun isValid(input: String): Boolean {
             return VALID_EMAIL == input
         }
@@ -64,7 +64,7 @@ class FormTest {
         }
     })
 
-    private val passwordValidators = listOf(object : Validator<CharSequence> {
+    private val passwordValidators: List<Validator<CharSequence>> = listOf(object : Validator<CharSequence> {
         override fun isValid(input: CharSequence): Boolean {
             return VALID_PASSWORD == input
         }
@@ -74,7 +74,7 @@ class FormTest {
         }
     })
 
-    private val ageValidators = listOf(object : Validator<Int> {
+    private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
         override fun isValid(input: Int): Boolean {
             return input >= MIN_AGE_VALUE

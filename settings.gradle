@@ -1,1 +1,9 @@
-include ':app', ':form', ':rxform', ':validators', ':formatters'
+rootProject.name = 'forms'
+include ':app',
+        ':form-common',
+        ':validators-common',
+        ':formatters-common',
+        ':form-jdk',
+        ':validators-jdk',
+        ':formatters-jdk',
+        ':rxform'
