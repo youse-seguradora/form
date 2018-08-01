@@ -33,13 +33,11 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            app:formFieldKey="@{vm.EMAIL}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:onFieldValidationChange="@{vm.form.onFieldValidationChange}"
-            app:owner="@{owner}">
+            app:onFieldValidationChange="@{vm.form.onFieldValidationChange[vm.EMAIL]}">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/email"
@@ -61,9 +59,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailContainer"
-            app:onFieldValidationChange="@{vm.form.onFieldValidationChange}"
-            app:formFieldKey="@{vm.PASSWORD}"
-            app:owner="@{owner}"
+            app:onFieldValidationChange="@{vm.form.onFieldValidationChange[vm.PASSWORD]}"
             tools:layout_editor_absoluteY="390dp">
 
             <android.support.design.widget.TextInputEditText

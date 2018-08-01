@@ -13,20 +13,25 @@ import android.widget.EditText
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 
-class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
+@Suppress("UNCHECKED_CAST")
+class LiveDataForm<T>(
+        val submit: MediatorLiveData<Unit>,
+        strategy: ValidationStrategy,
+        fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
 
-    val onFieldValidationChange = MutableLiveData<Pair<T, List<ValidationMessage>>>()
+    val onFieldValidationChange = mutableMapOf<T, MutableLiveData<List<ValidationMessage>>>()
     val onFormValidationChange = MutableLiveData<Boolean>()
     val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
-    val onValidSubmit = MutableLiveData<List<Pair<T, Any>>>()
+    val onValidSubmit = MutableLiveData<List<Pair<T, Any?>>>()
 
     init {
-        val builder = Form.Builder<T>()
+        val builder = Form.Builder<T>(strategy = strategy)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
                     override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
-                        onFieldValidationChange.value = validation
+                        onFieldValidationChange[validation.first]!!.value = validation.second
                     }
                 })
                 .setFormValidationListener(object : IForm.FormValidationChange {
@@ -40,33 +45,33 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<T> {
-                    override fun onValidSubmit(fields: List<Pair<T, Any>>) {
-                        onValidSubmit.postValue(fields)
+                    override fun onValidSubmit(fields: List<Pair<T, Any?>>) {
+                        onValidSubmit.value = fields
                     }
                 })
 
-        val map = mutableMapOf<T, IForm.ObservableValue<Any>>()
-        var isBuilt = false
-        fieldValidations.forEach { key, values ->
-            val ld = values.first
-            val validators = values.second
+        val initialValues = mutableMapOf<T, IForm.ObservableValue<Any?>>()
+        fieldValidations.forEach { entry ->
+            val fieldKey = entry.key
+            val validators = entry.value.second as List<Validator<Any?>>
+            val value = IForm.ObservableValue(null as Any?)
+
+            initialValues[fieldKey] = value
+            onFieldValidationChange[fieldKey] = MutableLiveData()
+            builder.addFieldValidations(fieldKey, value, validators)
+
+        }
+        val form = builder.build()
+        this.submit.addSource(submit) {
+            form.doSubmit()
+        }
+
+        fieldValidations.forEach { it ->
+            val key = it.key
+            val ld = it.value.first
 
             this.submit.addSource(ld) {
-
-                if (!map.containsKey(key)) {
-                    val value = IForm.ObservableValue(it!!)
-                    builder.addFieldValidations(key, value, validators as List<Validator<Any>>)
-                    map[key] = value
-                } else {
-                    map[key]!!.value = it!!
-                }
-                if (map.size == fieldValidations.size && !isBuilt) {
-                    isBuilt = true
-                    val form = builder.build()
-                    this.submit.addSource(submit) {
-                        form.doSubmit()
-                    }
-                }
+                initialValues[key]?.value = it
             }
         }
     }
@@ -83,19 +88,14 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
 
 
         @JvmStatic
-        @BindingAdapter(value = ["owner", "formFieldKey", "onFieldValidationChange"], requireAll = true)
-        fun <T> onFieldValidationChange(view: TextInputLayout, owner: LifecycleOwner,
-                                        formFieldKey: T,
-                                        ld: MutableLiveData<Pair<T, List<ValidationMessage>>>) {
-            ld.observe(owner, Observer<Pair<T, List<ValidationMessage>>> { t ->
-                if (t?.first == formFieldKey) {
-                    view.error = t?.second?.joinToString { it.message }
-                }
-            })
+        @BindingAdapter(value = ["onFieldValidationChange"], requireAll = true)
+        fun onFieldValidationChange(view: TextInputLayout,
+                                    validations: List<ValidationMessage>) {
+            view.error = validations.firstOrNull()?.message
         }
 
 
-        @BindingAdapter(value = "formField")
+        @BindingAdapter(value = ["formField"])
         @JvmStatic
         fun formField(view: EditText, ld: MutableLiveData<String>) {
             view.addTextChangedListener(object : TextWatcher {
@@ -113,15 +113,16 @@ class LiveDataForm<T>(val submit: MediatorLiveData<Unit>, fieldValidations: Muta
         }
     }
 
-    class Builder<T>(private val submit: MediatorLiveData<Unit> = MediatorLiveData()) {
+    class Builder<T>(private val submit: MediatorLiveData<Unit> = MediatorLiveData(),
+                     private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
         private val fieldValidations = mutableMapOf<T, Pair<MutableLiveData<*>, List<Validator<*>>>>()
         fun <R> addFieldValidations(key: T, field: MutableLiveData<R>, validators: List<Validator<R>>): LiveDataForm.Builder<T> {
-            fieldValidations.put(key, Pair(field, validators))
+            fieldValidations[key] = Pair(field, validators)
             return this
         }
 
         fun build(): LiveDataForm<T> {
-            return LiveDataForm(submit, fieldValidations)
+            return LiveDataForm(submit, strategy, fieldValidations)
         }
     }
 }

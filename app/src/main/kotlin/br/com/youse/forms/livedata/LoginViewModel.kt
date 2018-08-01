@@ -6,6 +6,7 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
+import br.com.youse.forms.validators.ValidationStrategy
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 
@@ -30,7 +31,7 @@ class LoginViewModel : ViewModel() {
                 8))
     }
 
-    val form = LiveDataForm.Builder<String>()
+    val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.ALL_TIME)
             .addFieldValidations(EMAIL,
                     email, emailValidations)
             .addFieldValidations(PASSWORD,

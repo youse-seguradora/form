@@ -36,7 +36,7 @@ interface IForm<T> {
          * {@code fields} is list of {@link Pair}, each one with the field key and the current value of that field.
          * NOTE: As each field can be of a different type we need to use Any here.
          */
-        fun onValidSubmit(fields: List<Pair<T, Any>>)
+        fun onValidSubmit(fields: List<Pair<T, Any?>>)
     }
 
     interface SubmitFailed<T> {

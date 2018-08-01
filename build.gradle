@@ -41,6 +41,12 @@ buildscript {
                             appcompat       : "com.android.support:appcompat-v7:${versions.supportLibrary}",
                             design          : "com.android.support:design:${versions.supportLibrary}",
                             constraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}"
+                    ],
+                    arch   : [
+                            lifecycle: [
+                                    extensions     : "android.arch.lifecycle:extensions:1.1.1",
+                                    reactivestreams: "android.arch.lifecycle:reactivestreams:1.1.1"
+                            ]
                     ]
             ],
             annotations  : 'org.jetbrains:annotations:16.0.1',
