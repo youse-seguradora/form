@@ -47,10 +47,10 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         fieldValidations.forEach { it ->
             val key = it.key
             val pair = it.value
-            val observableValue = pair.first as IForm.ObservableValue<Any?>
-            val validators = pair.second as List<Validator<Any?>>
-            val listener = object : IForm.ObservableValue.ValueObserver<Any?> {
-                override fun onChange(value: Any?) {
+            val observableValue = pair.first as IForm.ObservableValue<Any>
+            val validators = pair.second as List<Validator<Any>>
+            val listener = object : IForm.ObservableValue.ValueObserver<Any> {
+                override fun onChange(value: Any) {
 
                     val notifyListener = (strategy == ValidationStrategy.ALL_TIME)
                             ||
