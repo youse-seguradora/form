@@ -25,6 +25,7 @@ package br.com.youse.forms.form
 
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
+import kotlin.properties.Delegates
 
 
 interface IForm<T> {
@@ -78,16 +79,12 @@ interface IForm<T> {
 
         private var listener: IForm.ObservableValue.ValueObserver<T>? = null
 
-        private var _value = initialValue
-
-        var value: T
-            get() = _value
-            set(newValue) {
-                if (_value != newValue) {
-                    _value = newValue
-                    listener?.onChange(newValue)
-                }
+        var value: T by Delegates.observable(initialValue) { _, old, new ->
+            if (old != new) {
+                listener?.onChange(new)
             }
+        }
+
 
         /**
          * Sets a listener for {@code value} changes.s
