@@ -4,12 +4,6 @@
 
     <data>
 
-        <import type="android.arch.lifecycle.LifecycleOwner" />
-
-        <variable
-            name="owner"
-            type="android.arch.lifecycle.LifecycleOwner" />
-
         <variable
             name="vm"
             type="br.com.youse.forms.livedata.LoginViewModel" />
@@ -44,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                app:formField="@{vm.email}" />
+                app:formField="@={vm.email}" />
         </android.support.design.widget.TextInputLayout>
 
 
@@ -68,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPassword"
-                app:formField="@{vm.password}" />
+                app:formField="@={vm.password}" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
@@ -87,7 +81,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/passwordContainer"
-            app:owner="@{owner}" />
+            />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

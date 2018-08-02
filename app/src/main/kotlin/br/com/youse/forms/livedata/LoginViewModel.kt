@@ -19,7 +19,6 @@ class LoginViewModel : ViewModel() {
 
     val password = MutableLiveData<String>()
 
-
     private val emailValidations by lazy {
         listOf(RequiredValidator(
                 "required"
@@ -31,7 +30,7 @@ class LoginViewModel : ViewModel() {
                 8))
     }
 
-    val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.ALL_TIME)
+    val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.AFTER_SUBMIT)
             .addFieldValidations(EMAIL,
                     email, emailValidations)
             .addFieldValidations(PASSWORD,
@@ -40,6 +39,7 @@ class LoginViewModel : ViewModel() {
             .build()
 
     val success = Transformations.switchMap(form.onValidSubmit) {
+
         LiveDataReactiveStreams.fromPublisher(Observable.just(true).toFlowable(BackpressureStrategy.BUFFER))
     }
 

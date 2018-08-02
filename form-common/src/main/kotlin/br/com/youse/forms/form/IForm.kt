@@ -65,11 +65,7 @@ interface IForm<T> {
         fun onChange(validation: Pair<T, List<ValidationMessage>>)
     }
 
-    /**
-     * Class that notifies its listener every time the value changes.
-     */
-    class ObservableValue<T>(initialValue: T) {
-
+    interface IObservableValue<T> {
         interface ValueObserver<T> {
             /**
              * Notifies a value change.
@@ -77,7 +73,18 @@ interface IForm<T> {
             fun onChange(value: T)
         }
 
-        private var listener: IForm.ObservableValue.ValueObserver<T>? = null
+        /**
+         * Sets a listener for {@code value} changes.s
+         */
+        fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>)
+    }
+
+    /**
+     * Class that notifies its listener every time the value changes.
+     */
+    class ObservableValue<T>(initialValue: T) : IObservableValue<T> {
+
+        private var listener: IObservableValue.ValueObserver<T>? = null
 
         var value: T by Delegates.observable(initialValue) { _, old, new ->
             if (old != new) {
@@ -89,7 +96,7 @@ interface IForm<T> {
         /**
          * Sets a listener for {@code value} changes.s
          */
-        fun setValueListener(valueObserver: IForm.ObservableValue.ValueObserver<T>) {
+        override fun setValueListener(valueObserver: IForm.IObservableValue.ValueObserver<T>) {
             listener = valueObserver
             listener?.onChange(value)
         }
@@ -127,7 +134,7 @@ interface IForm<T> {
          * an {@code observableValue} that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T, observableValue: IForm.ObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
+        fun <R> addFieldValidations(key: T, observableValue: IForm.IObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
 
         /**
          * Builds the {@code IForm}.

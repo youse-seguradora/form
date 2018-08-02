@@ -34,7 +34,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
               private val validSubmitListener: IForm.ValidSubmit<T>?,
               private val submitFailedListener: IForm.SubmitFailed<T>?,
               private val strategy: ValidationStrategy,
-              fieldValidations: Map<T, Pair<IForm.ObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
+              fieldValidations: Map<T, Pair<IForm.IObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
 
 
     private val lastFieldsMessages = mutableMapOf<T, Pair<Any?, List<ValidationMessage>>>()
@@ -47,10 +47,10 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         fieldValidations.forEach { it ->
             val key = it.key
             val pair = it.value
-            val observableValue = pair.first as IForm.ObservableValue<Any>
-            val validators = pair.second as List<Validator<Any>>
-            val listener = object : IForm.ObservableValue.ValueObserver<Any> {
-                override fun onChange(value: Any) {
+            val observableValue = pair.first as IForm.IObservableValue<Any?>
+            val validators = pair.second as List<Validator<Any?>>
+            val listener = object : IForm.IObservableValue.ValueObserver<Any?> {
+                override fun onChange(value: Any?) {
 
                     val notifyListener = (strategy == ValidationStrategy.ALL_TIME)
                             ||
@@ -160,10 +160,10 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             return this
         }
 
-        private val fieldValidations = mutableMapOf<T, Pair<IForm.ObservableValue<*>, List<Validator<*>>>>()
+        private val fieldValidations = mutableMapOf<T, Pair<IForm.IObservableValue<*>, List<Validator<*>>>>()
 
         override fun <R> addFieldValidations(key: T,
-                                             observableValue: IForm.ObservableValue<R>,
+                                             observableValue: IForm.IObservableValue<R>,
                                              validators: List<Validator<R>>): IForm.Builder<T> {
             fieldValidations[key] = Pair(observableValue, validators)
             return this
