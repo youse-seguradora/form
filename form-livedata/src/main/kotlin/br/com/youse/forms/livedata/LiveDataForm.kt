@@ -22,7 +22,7 @@ import br.com.youse.forms.validators.Validator
 
 @Suppress("UNCHECKED_CAST")
 class LiveDataForm<T>(
-        val submit: MediatorLiveData<Unit>,
+        val submit: MediatorLiveData<Boolean>,
         strategy: ValidationStrategy,
         fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
 
@@ -83,22 +83,37 @@ class LiveDataForm<T>(
     }
 
     companion object {
-        @JvmStatic
-        @BindingAdapter(value = ["formSubmit"])
-        fun onSubmit(view: View, ld: MediatorLiveData<Unit>) {
 
-            view.setOnClickListener {
-                ld.postValue(Unit)
-            }
-        }
-
-
-        @JvmStatic
         @BindingAdapter(value = ["onFieldValidationChange"], requireAll = true)
+        @JvmStatic
         fun onFieldValidationChange(view: TextInputLayout,
                                     validations: List<ValidationMessage>?) {
             view.error = validations?.firstOrNull()?.message
 
+        }
+
+        @BindingAdapter(value = ["formSubmit"])
+        @JvmStatic
+        fun setFormSubmit(view: View, b: Boolean?) {
+            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
+        }
+
+        @InverseBindingAdapter(attribute = "formSubmit", event = "formSubmitAttrChanged")
+        @JvmStatic
+        fun getFormSubmit(view: View): Boolean {
+            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
+            return true
+        }
+
+        @BindingAdapter(value = ["formSubmitAttrChanged"])
+        @JvmStatic
+        fun setFormSubmitListener(view: View, listener: InverseBindingListener?) {
+            if (listener == null) {
+                return
+            }
+            view.setOnClickListener {
+                listener.onChange()
+            }
         }
 
         @BindingAdapter(value = ["formField"])
@@ -119,7 +134,7 @@ class LiveDataForm<T>(
 
         @BindingAdapter(value = ["formFieldAttrChanged"])
         @JvmStatic
-        fun setListener(view: TextView, listener: InverseBindingListener) {
+        fun setFormFieldListener(view: TextView, listener: InverseBindingListener?) {
             if (listener == null) {
                 return
             }
@@ -138,7 +153,7 @@ class LiveDataForm<T>(
         }
     }
 
-    class Builder<T>(private val submit: MediatorLiveData<Unit> = MediatorLiveData(),
+    class Builder<T>(private val submit: MediatorLiveData<Boolean> = MediatorLiveData(),
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
         private val fieldValidations = mutableMapOf<T, Pair<MutableLiveData<*>, List<Validator<*>>>>()
         fun <R> addFieldValidations(key: T, field: MutableLiveData<R>, validators: List<Validator<R>>): LiveDataForm.Builder<T> {

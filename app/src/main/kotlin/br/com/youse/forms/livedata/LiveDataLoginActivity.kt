@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import br.com.youse.forms.R
 import br.com.youse.forms.databinding.LiveDataActivityBinding
+import kotlinx.android.synthetic.main.live_data_activity.*
 
 class LiveDataLoginActivity : AppCompatActivity() {
 
@@ -19,8 +20,6 @@ class LiveDataLoginActivity : AppCompatActivity() {
         val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         binding.vm = vm
         binding.setLifecycleOwner(this)
-
-        vm.form.submit.observe(this, Observer<Unit> { })
 
         vm.success.observe(this, Observer {
             println(it?.toString())
