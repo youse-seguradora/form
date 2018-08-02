@@ -23,18 +23,19 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 
 
 @Suppress("UNCHECKED_CAST")
-class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
-              private val formValidationListener: IForm.FormValidationChange?,
-              private val validSubmitListener: IForm.ValidSubmit<T>?,
-              private val submitFailedListener: IForm.SubmitFailed<T>?,
+class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
+              private val formValidationListener: FormValidationChange?,
+              private val validSubmitListener: ValidSubmit<T>?,
+              private val submitFailedListener: SubmitFailed<T>?,
               private val strategy: ValidationStrategy,
-              fieldValidations: Map<T, Pair<IForm.IObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
+              fieldValidations: Map<T, Pair<IObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
 
 
     private val lastFieldsMessages = mutableMapOf<T, Pair<Any?, List<ValidationMessage>>>()
@@ -47,9 +48,9 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         fieldValidations.forEach { it ->
             val key = it.key
             val pair = it.value
-            val observableValue = pair.first as IForm.IObservableValue<Any?>
+            val observableValue = pair.first as IObservableValue<Any?>
             val validators = pair.second as List<Validator<Any?>>
-            val listener = object : IForm.IObservableValue.ValueObserver<Any?> {
+            val listener = object : IObservableValue.ValueObserver<Any?> {
                 override fun onChange(value: Any?) {
 
                     val notifyListener = (strategy == ValidationStrategy.ALL_TIME)
@@ -135,35 +136,35 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
     class Builder<T>(private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IForm.Builder<T> {
 
-        private var fieldValidationListener: IForm.FieldValidationChange<T>? = null
-        private var formValidationListener: IForm.FormValidationChange? = null
-        private var validSubmitListener: IForm.ValidSubmit<T>? = null
-        private var submitFailedListener: IForm.SubmitFailed<T>? = null
+        private var fieldValidationListener: FieldValidationChange<T>? = null
+        private var formValidationListener: FormValidationChange? = null
+        private var validSubmitListener: ValidSubmit<T>? = null
+        private var submitFailedListener: SubmitFailed<T>? = null
 
-        override fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): IForm.Builder<T> {
+        override fun setFieldValidationListener(listener: FieldValidationChange<T>): IForm.Builder<T> {
             fieldValidationListener = listener
             return this
         }
 
-        override fun setFormValidationListener(listener: IForm.FormValidationChange): IForm.Builder<T> {
+        override fun setFormValidationListener(listener: FormValidationChange): IForm.Builder<T> {
             formValidationListener = listener
             return this
         }
 
-        override fun setValidSubmitListener(listener: IForm.ValidSubmit<T>): IForm.Builder<T> {
+        override fun setValidSubmitListener(listener: ValidSubmit<T>): IForm.Builder<T> {
             validSubmitListener = listener
             return this
         }
 
-        override fun setSubmitFailedListener(listener: IForm.SubmitFailed<T>): IForm.Builder<T> {
+        override fun setSubmitFailedListener(listener: SubmitFailed<T>): IForm.Builder<T> {
             submitFailedListener = listener
             return this
         }
 
-        private val fieldValidations = mutableMapOf<T, Pair<IForm.IObservableValue<*>, List<Validator<*>>>>()
+        private val fieldValidations = mutableMapOf<T, Pair<IObservableValue<*>, List<Validator<*>>>>()
 
         override fun <R> addFieldValidations(key: T,
-                                             observableValue: IForm.IObservableValue<R>,
+                                             observableValue: IObservableValue<R>,
                                              validators: List<Validator<R>>): IForm.Builder<T> {
             fieldValidations[key] = Pair(observableValue, validators)
             return this
