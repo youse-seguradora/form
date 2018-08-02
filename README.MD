@@ -1,65 +1,118 @@
 FORM
 ========
 
-RxJava form validation for Android and Java by Youse Seguros.
+Form makes it easy to format and validate form fields and submit the form when every thing is ready.
 
-Sample with Kotlin and RxBinding
+And it come in many flavors:
+ - Form for the 100% pure Kotlin library;
+ - [RxForm](https://github.com/youse-seguradora/form/tree/master/rxform) for RxJava lovers;
+ - [LiveDataForm](https://github.com/youse-seguradora/form/tree/master/form-livedata) for Databinding/LiveData addicts;
+
+How to Form
 --------
-Just create a `RxForm.Builder<T>()` where `T` is the type of each field id,
-then you can call `addFieldValidations()` for each field with its id, an observable that listens to changes in the given field and the field validators.
-After that, call the `build()` method and use the `RxForm` methods to listen to
-changes in the validation of each field (`onFieldValidationChange)`) or in the form as a whole (`onFormValidationChange()`).
+1) Create a `Form.Builder<T>()` where `T` is the type of each field key;
+2) Set the callbacks for the validation events, like `.setFieldValidationListener()` or `builder.setValidSubmitListener()`;
+3) Call `addFieldValidations()` as many fields in the form using the parameters:
+   - a key of type T;
+   - an `IFrm.ObservableValue<R>`;
+   - a list of Validator<R>;
+4) Execute the `build()` method to get a hold of a `Form` instance;
+5) Every time the user requests to submit the form, call the method `form.doSubmit()`;
 
-```
-val form = RxForm.Builder<Int>(submit.clicks())
-                .addFieldValidations(emailContainer.id,
-                        email.textChanges(), emailValidations)
-                .addFieldValidations(passwordContainer.id,
-                        password.textChanges(),
-                        passwordValidations)
-                .build()
+In the sample below we use `Int` as `T` because we are using the Android R.id.$viewId `Int` as keys
+and `String` as `R` since `email` and `password` are EditTexts.
 
-        disposables.add(form.onFieldValidationChange()
-                .subscribe {
-                    val field = findViewById<TextInputLayout>(it.first)
-                    field.isErrorEnabled = it.second.isNotEmpty()
-                    field.error = it.second.joinToString { it.message }
-                })
-        disposables.add(form.onFormValidationChange()
-                .subscribe {
-                    submit.isEnabled = it
-                })
+``` kotlin
+val emailChanges = ObservableValue(email.text.toString())
+val passwordChanges = ObservableValue(password.text.toString())
+
+email.addTextChangedListener(getTextWatcher(emailChanges))
+password.addTextChangedListener(getTextWatcher(passwordChanges))
+
+
+val form = Form.Builder<Int>()
+        .setFieldValidationListener(this)
+        .setFormValidationListener(this)
+        .setValidSubmitListener(this)
+        .setSubmitFailedListener(this)
+
+        .addFieldValidations(emailContainer.id,
+                emailChanges, emailValidations)
+        .addFieldValidations(passwordContainer.id,
+                passwordChanges,
+                passwordValidations)
+        .build()
+
+submit.setOnClickListener {
+    form.doSubmit()
+}
 ```
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/form/FormLoginActivity.kt)
+
+How to RxForm
+--------
+RxForm [README](https://github.com/youse-seguradora/form/blob/master/rxform/README.MD)
+
+How to LiveDataForm
+--------
+TODO: Add readme to livedata when the feature is merged.
+LiveDataForm [README](https://github.com/youse-seguradora/form/blob/master/form-livedata/README.MD)
+
+VALIDATION CALLBACKS
+--------
+There are four standard callbacks in every flavor of Form, depending on the form flavor you choose to use the events are delivered as a pure Kotlin callbacks, an `Observable` emissions or `LiveData` events.
+Does not matter the flavor, the behavior and naming should be consistent enough to understand what is happening.
+
+### FieldValidationChange
+ - Is triggered when a given field validation state change. This callback gives access to a `List<ValidationMessage>` that if it is empty, the field is valid.
+ This callback allows you to set/unset a error message for each field in the form.
+
+### FormValidationChange
+ - Is triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
+ This callback allow you to enable or disable a submit button or hint the user about the form state.
+
+### ValidSubmit
+ - Is triggered when a valid submit happens. This callback gives access to a `List<Pair<T, Any>>` where `T` is a field key, and the `Any` is that field current value.
+ This callback is called to allow you to send the form data to your server.
+
+### SubmitFailed
+ - Is triggered when a submit happens but the form is not valid. This callback gives access to a `List<Pair<T, List<ValidationMesage>>>` where `T` is a field key and `List<ValidationMessage>` indicates how many validations failed for that given field.
+ This callback is used when you need to scroll to a invalid field after a submit.
+
 
 VALIDATION
 --------
 As an optional dependency we offer the possibility to use our validators module.
 
 A form validation is related to each field validation,
-so we need to define a list of validations for each field in the screen.
+so we need to define a list of validations for each field in the form.
 You can define your own validators by implementing the `Validator<T>` interface,
-in the sample below we define an `HoursValidator` and a `ValidationMessage`, it takes a `message` to be shown
+in the sample below we define an `HoursValidator` and a `ValidationMessage`. It takes a `message` to be shown
 to the user when the validation fails and a `ValidationType` that was created to
-specify which type of validation failed (you can have multiple validators with the same validation type).
+specify which type of validation failed (you can have multiple validators with the same `ValidationType`).
 
 Note that your form can validate any type of input, here we used `String`,
 but your implementation can be of any class that you define and implements the `isValid` method.
 
-```
-class HoursValidator(val message: String, val splitter: String) : Validator<String> {
+``` kotlin
+class HoursValidator(val message: String, val divider: String) : Validator<String> {
     override fun validationMessage(): ValidationMessage {
         return ValidationMessage(message = message, validationType = HOUR_FORMAT)
     }
 
     override fun isValid(input: String): Boolean {
-        val parts = input.split(splitter)
-        val hours = parts.firstOrNull()?.toInt() ?: -1
-        val minutes = parts.lastOrNull()?.toInt() ?: -1
-        return parts.size == 2
-                && hours >= 0
-                && hours <= 23
-                && minutes >= 0
-                && minutes <= 59
+        return try {
+            val parts = input.split(divider)
+            val hours = parts.firstOrNull()?.toInt() ?: -1
+            val minutes = parts.lastOrNull()?.toInt() ?: -1
+            (parts.size == 2
+                    && hours >= 0
+                    && hours <= 23
+                    && minutes >= 0
+                    && minutes <= 59)
+        } catch (e: Throwable) {
+            false
+        }
     }
 }
 ```
@@ -71,26 +124,26 @@ Usually a formatter is coupled with the field validation. A field that displays 
 if the the hours and minutes are valid only if in a given format.
 So a given formatter is used together with a given validator.
 
-```
+``` kotlin
 // 00:00
-class HoursFormatter(val splitter: String) : TextFormatter {
+class HoursFormatter(val divider: String) : TextFormatter {
+    private val digitsOnlyRegex = "[^0-9]".toRegex()
 
-    override fun getCursorPosition(previous: String, input: String, output: String) = output.length
+    override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
 
-    override fun format(inputText: String): String {
-        val clearText = inputText.toDigitsOnly()
+    override fun format(input: CharSequence): CharSequence {
+        val clearText = input.toDigitsOnly()
 
         return when (clearText.length) {
-            0, 1, 2 -> clearText
-            3, 4 -> clearText.substring(0, 2) + splitter + clearText.substring(2)
-            else -> clearText.substring(0, 2) + splitter + clearText.substring(2, 4)
+            0, 1 -> clearText
+            2, 3, 4 -> clearText.substring(0, 2) + divider + clearText.substring(2)
+            else -> clearText.substring(0, 2) + divider + clearText.substring(2, 4)
         }
     }
 
-}
-
-private fun String.toDigitsOnly(): String {
-    return this.replace(Pattern.compile("[^0-9]").toRegex(), "")
+    private fun CharSequence.toDigitsOnly(): String {
+        return replace(digitsOnlyRegex, "")
+    }
 }
 ```
 Note that each implementation of `TextFormatter` has a `getCursorPosition()` method that should return
@@ -111,6 +164,7 @@ Download or grab via Maven:
 or Gradle:
 ```groovy
 implementation 'br.com.youse.form:form:0.0.1'
+implementation 'br.com.youse.form:rxform:0.0.1'
 implementation 'br.com.youse.form:validators:0.0.1' // optional
 implementation 'br.com.youse.form:formatters:0.0.1' // optional
 ```
