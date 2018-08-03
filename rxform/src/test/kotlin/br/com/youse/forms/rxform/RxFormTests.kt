@@ -1,3 +1,26 @@
+/**
+MIT License
+
+Copyright (c) 2018 Youse Seguros
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
 package br.com.youse.forms.rxform
 
 import br.com.youse.forms.validators.ValidationMessage
@@ -6,8 +29,8 @@ import br.com.youse.forms.validators.ValidationType
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import kotlin.test.Test
 
-import org.junit.Test
 
 abstract class RxFormTests {
     abstract fun <T> getBuilder(submit: Observable<Unit>,
@@ -22,10 +45,10 @@ abstract class RxFormTests {
         private const val MIN_AGE_VALUE = 21
         private const val MAX_AGE_VALUE = 100
 
-        private val VALID_EMAIL_TYPE = object : ValidationType {}
-        private val VALID_PASSWORD_TYPE = object : ValidationType {}
-        private val MIN_VALUE_TYPE = object : ValidationType {}
-        private val MAX_VALUE_TYPE = object : ValidationType {}
+        private val VALID_EMAIL_TYPE: ValidationType = object : ValidationType {}
+        private val VALID_PASSWORD_TYPE: ValidationType = object : ValidationType {}
+        private val MIN_VALUE_TYPE: ValidationType = object : ValidationType {}
+        private val MAX_VALUE_TYPE: ValidationType = object : ValidationType {}
 
         val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
         val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
@@ -39,7 +62,7 @@ abstract class RxFormTests {
     private val passwordObservable = PublishSubject.create<CharSequence>()
     private val ageObservable = PublishSubject.create<Int>()
 
-    private val emailValidators = listOf(object : Validator<String> {
+    private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
         override fun isValid(input: String): Boolean {
             return VALID_EMAIL == input
         }
@@ -49,7 +72,7 @@ abstract class RxFormTests {
         }
     })
 
-    private val passwordValidators = listOf(object : Validator<CharSequence> {
+    private val passwordValidators: List<Validator<CharSequence>> = listOf(object : Validator<CharSequence> {
         override fun isValid(input: CharSequence): Boolean {
             return VALID_PASSWORD == input
         }
@@ -59,7 +82,7 @@ abstract class RxFormTests {
         }
     })
 
-    private val ageValidators = listOf(object : Validator<Int> {
+    private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
         override fun isValid(input: Int): Boolean {
             return input >= MIN_AGE_VALUE
