@@ -25,15 +25,6 @@ package br.com.youse.forms.livedata
 
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.databinding.BindingAdapter
-import android.databinding.InverseBindingAdapter
-import android.databinding.InverseBindingListener
-import android.support.design.widget.TextInputLayout
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.IObservableValue
@@ -49,16 +40,18 @@ class LiveDataForm<T>(
         strategy: ValidationStrategy,
         fieldValidations: MutableMap<T, Pair<MutableLiveData<*>, List<Validator<*>>>>) {
 
-    val onFieldValidationChange = mutableMapOf<T, MutableLiveData<List<ValidationMessage>>>()
+    val onFieldValidationChange: Map<T, MutableLiveData<List<ValidationMessage>>>
     val onFormValidationChange = MutableLiveData<Boolean>()
     val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
     val onValidSubmit = MutableLiveData<List<Pair<T, Any?>>>()
 
     init {
+        val fieldValidationChange = mutableMapOf<T, MutableLiveData<List<ValidationMessage>>>()
+
         val builder = Form.Builder<T>(strategy = strategy)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
                     override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
-                        onFieldValidationChange[validation.first]!!.value = validation.second
+                        fieldValidationChange[validation.first]!!.value = validation.second
                     }
                 })
                 .setFormValidationListener(object : IForm.FormValidationChange {
@@ -77,17 +70,18 @@ class LiveDataForm<T>(
                     }
                 })
 
-
-        val initialValues = mutableMapOf<T, DeferedObservableValue<Any?>>()
+        val initialValues = mutableMapOf<T, DeferredObservableValue<Any?>>()
         fieldValidations.forEach { entry ->
             val fieldKey = entry.key
             val validators = entry.value.second as List<Validator<Any?>>
-            val value = DeferedObservableValue<Any?>()
+            val value = DeferredObservableValue<Any?>()
             initialValues[fieldKey] = value
-            onFieldValidationChange[fieldKey] = MutableLiveData()
+            fieldValidationChange[fieldKey] = MutableLiveData()
             builder.addFieldValidations(fieldKey, value, validators)
 
         }
+
+        onFieldValidationChange = fieldValidationChange
 
         fieldValidations.forEach { it ->
             val key = it.key
@@ -105,77 +99,6 @@ class LiveDataForm<T>(
         }
     }
 
-    companion object {
-
-        @BindingAdapter(value = ["onFieldValidationChange"], requireAll = true)
-        @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-
-        }
-
-        @BindingAdapter(value = ["formSubmit"])
-        @JvmStatic
-        fun setFormSubmit(view: View, b: Boolean?) {
-            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
-        }
-
-        @InverseBindingAdapter(attribute = "formSubmit", event = "formSubmitAttrChanged")
-        @JvmStatic
-        fun getFormSubmit(view: View): Boolean {
-            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
-            return true
-        }
-
-        @BindingAdapter(value = ["formSubmitAttrChanged"])
-        @JvmStatic
-        fun setFormSubmitListener(view: View, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.setOnClickListener {
-                listener.onChange()
-            }
-        }
-
-        @BindingAdapter(value = ["formField"])
-        @JvmStatic
-        fun setFormField(view: EditText, newText: String?) {
-
-            val oldText = view.text.toString()
-            if (newText != oldText) {
-                view.setText(newText)
-            }
-        }
-
-        @InverseBindingAdapter(attribute = "formField", event = "formFieldAttrChanged")
-        @JvmStatic
-        fun getFormField(editText: EditText): String {
-            return editText.text.toString()
-        }
-
-        @BindingAdapter(value = ["formFieldAttrChanged"])
-        @JvmStatic
-        fun setFormFieldListener(view: TextView, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(p0: Editable?) {
-                    listener.onChange()
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-            })
-            listener.onChange()
-        }
-    }
-
     class Builder<T>(private val submit: MediatorLiveData<Boolean> = MediatorLiveData(),
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
         private val fieldValidations = mutableMapOf<T, Pair<MutableLiveData<*>, List<Validator<*>>>>()
@@ -189,7 +112,7 @@ class LiveDataForm<T>(
         }
     }
 
-    private class DeferedObservableValue<T> : IObservableValue<T> {
+    private class DeferredObservableValue<T> : IObservableValue<T> {
         private var valueObserver: ValueObserver<T>? = null
         private var value: T? = null
         override fun setValueListener(valueObserver: ValueObserver<T>) {
