@@ -27,8 +27,7 @@ import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
-import br.com.youse.forms.form.IForm.IObservableValue
-import br.com.youse.forms.form.IForm.IObservableValue.ValueObserver
+import br.com.youse.forms.form.IForm.DeferredObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -109,21 +108,6 @@ class LiveDataForm<T>(
 
         fun build(): LiveDataForm<T> {
             return LiveDataForm(submit, strategy, fieldValidations)
-        }
-    }
-
-    private class DeferredObservableValue<T> : IObservableValue<T> {
-        private var valueObserver: ValueObserver<T>? = null
-        private var value: T? = null
-        override fun setValueListener(valueObserver: ValueObserver<T>) {
-            this.valueObserver = valueObserver
-        }
-
-        fun setValue(value: T) {
-            if (value != this.value) {
-                this.value = value
-                this.valueObserver?.onChange(value)
-            }
         }
     }
 }
