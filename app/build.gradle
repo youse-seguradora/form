@@ -48,9 +48,8 @@ dependencies {
     implementation deps.android.support.constraintLayout
     implementation deps.rx.java
     implementation deps.rx.binding
-    implementation "android.arch.lifecycle:extensions:1.1.1"
-    implementation "android.arch.lifecycle:reactivestreams:1.1.1"
-
+    implementation deps.android.arch.lifecycle.extensions
+    implementation deps.android.arch.lifecycle.reactivestreams
 
     androidTestImplementation deps.junit
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RxFormValidator</string>
+    <string name="app_name">Form Sample</string>
     <string name="empty_email_validation_message">Email não pode ficar em branco</string>
     <string name="min_password_length_validation_message">Tamanho minimo de %1$d letras</string>
 </resources>
