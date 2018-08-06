@@ -38,7 +38,7 @@ android {
 dependencies {
 
     implementation project(":rxform")
-    implementation project(":form-livedata")
+    implementation project(':livedata-form')
     implementation project(":validators-jdk")
     implementation project(':formatters-jdk')
 
