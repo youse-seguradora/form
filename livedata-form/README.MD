@@ -5,9 +5,9 @@ LiveData version of `Form`
 
 How to `LiveDataForm`
 --------
-1) Create a `LiveDataForm.Builder<T>(submitObservable)` where `T` is the type of each field key;
-2) Call `builder.addFieldValidations()` as many fields in the screen using as parameters a key, a `LiveData` and a list of validators;
-3) Execute the `builder.build()` method to get a hold of a `RxForm` instance;
+1) Create a `LiveDataForm.Builder<T>()` where `T` is the type of each field key;
+2) Call `builder.addFieldValidations()` as many fields in the form using as parameters a key, a `LiveData` and a list of validators;
+3) Execute the `builder.build()` method to get a hold of a `LiveDataForm` instance;
 4) Observe the `form.submit` MediatorLiveData<Boolean>, this will bootstrap the form validation. Without it the form will not work!!
 5) Observe to the other LiveData available from the `LiveDataForm` instance methods;
 
