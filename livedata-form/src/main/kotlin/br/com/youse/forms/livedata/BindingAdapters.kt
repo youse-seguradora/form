@@ -31,7 +31,6 @@ import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import br.com.youse.forms.validators.ValidationMessage
 
@@ -76,18 +75,17 @@ class BindingAdapters {
 
         @BindingAdapter(value = ["formField"])
         @JvmStatic
-        fun setFormField(view: EditText, newText: String?) {
-
-            val oldText = view.text.toString()
+        fun setFormField(view: TextView, newText: CharSequence?) {
+            val oldText = view.text
             if (newText != oldText) {
-                view.setText(newText)
+                view.text = newText
             }
         }
 
         @InverseBindingAdapter(attribute = "formField", event = "formFieldAttrChanged")
         @JvmStatic
-        fun getFormField(editText: EditText): String {
-            return editText.text.toString()
+        fun getFormField(view: TextView): CharSequence {
+            return view.text
         }
 
         @BindingAdapter(value = ["formFieldAttrChanged"])

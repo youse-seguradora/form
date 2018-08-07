@@ -38,9 +38,9 @@ class LoginViewModel : ViewModel() {
     val EMAIL = "email"
     val PASSWORD = "password"
 
-    val email = MutableLiveData<String>()
+    val email = MutableLiveData<CharSequence>()
 
-    val password = MutableLiveData<String>()
+    val password = MutableLiveData<CharSequence>()
 
     private val emailValidations by lazy {
         listOf(RequiredValidator(
