@@ -6,7 +6,7 @@ Form makes it easy to format and validate form fields and submit the form when e
 And it come in many flavors:
  - Form for the 100% pure Kotlin library;
  - [RxForm](https://github.com/youse-seguradora/form/tree/master/rxform) for RxJava lovers;
- - [LiveDataForm](https://github.com/youse-seguradora/form/tree/master/form-livedata) for Databinding/LiveData addicts;
+ - [LiveDataForm](https://github.com/youse-seguradora/form/tree/master/livedata-form) for DataBinding/LiveData addicts;
 
 How to Form
 --------
@@ -55,8 +55,7 @@ RxForm [README](https://github.com/youse-seguradora/form/blob/master/rxform/READ
 
 How to LiveDataForm
 --------
-TODO: Add readme to livedata when the feature is merged.
-LiveDataForm [README](https://github.com/youse-seguradora/form/blob/master/form-livedata/README.MD)
+LiveDataForm [README](https://github.com/youse-seguradora/form/blob/master/livedata-form/README.MD)
 
 VALIDATION CALLBACKS
 --------

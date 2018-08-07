@@ -51,15 +51,15 @@ class BindingAdapters {
         @JvmStatic
         @Suppress("UNUSED_PARAMETER")
         fun setFormSubmit(view: View, b: Boolean?) {
-            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
+            // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
         }
 
         @InverseBindingAdapter(attribute = "formSubmit", event = "formSubmitAttrChanged")
         @JvmStatic
         @Suppress("UNUSED_PARAMETER")
-        fun getFormSubmit(view: View): Boolean {
-            // NOTE: Do nothing... we should be using Unit, but Databinding does not accept that
-            return true
+        fun getFormSubmit(view: View): Boolean? {
+            // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
+            return null
         }
 
         @BindingAdapter(value = ["formSubmitAttrChanged"])

@@ -1,4 +1,4 @@
-RXFORM
+RxForm
 ========
 
 Reactive version of `Form`
