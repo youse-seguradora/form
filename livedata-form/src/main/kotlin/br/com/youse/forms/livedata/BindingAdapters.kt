@@ -38,13 +38,20 @@ import br.com.youse.forms.validators.ValidationMessage
 class BindingAdapters {
 
     companion object {
+        @BindingAdapter(value = ["onFormValidationChange"])
+        @JvmStatic
+        @Suppress("UNUSED_PARAMETER")
+        fun onFormValidationChange(view: View, enabled: Boolean?) {
+            enabled?.let {
+                view.isEnabled = enabled
+            }
+        }
 
         @BindingAdapter(value = ["onFieldValidationChange"], requireAll = true)
         @JvmStatic
         fun onFieldValidationChange(view: TextInputLayout,
                                     validations: List<ValidationMessage>?) {
             view.error = validations?.firstOrNull()?.message
-
         }
 
         @BindingAdapter(value = ["formSubmit"])
@@ -52,6 +59,7 @@ class BindingAdapters {
         @Suppress("UNUSED_PARAMETER")
         fun setFormSubmit(view: View, b: Boolean?) {
             // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
+            // Waiting release https://issuetracker.google.com/issues/78662035
         }
 
         @InverseBindingAdapter(attribute = "formSubmit", event = "formSubmitAttrChanged")
@@ -59,6 +67,7 @@ class BindingAdapters {
         @Suppress("UNUSED_PARAMETER")
         fun getFormSubmit(view: View): Boolean? {
             // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
+            // Waiting release https://issuetracker.google.com/issues/78662035
             return null
         }
 
@@ -77,7 +86,9 @@ class BindingAdapters {
         @JvmStatic
         fun setFormField(view: TextView, newText: CharSequence?) {
             val oldText = view.text
-            if (newText != oldText) {
+            // ATTENTION: We are using toString() because the equals and hashcode results are undefined for CharSequence
+            // https://stackoverflow.com/questions/1049228/charsequence-vs-string-in-java#comment11633702_1049244
+            if (oldText.toString() != newText.toString()) {
                 view.text = newText
             }
         }

@@ -11,12 +11,12 @@ And it come in many flavors:
 How to Form
 --------
 1) Create a `Form.Builder<T>()` where `T` is the type of each field key;
-2) Set the callbacks for the validation events, like `.setFieldValidationListener()` or `builder.setValidSubmitListener()`;
-3) Call `addFieldValidations()` as many fields in the form using the parameters:
+2) Set the callbacks for the validation events, like `builder.setFieldValidationListener()` or `builder.setValidSubmitListener()`;
+3) Call `builder.addFieldValidations()` as many fields in the form using the parameters:
    - a key of type T;
-   - an `IFrm.ObservableValue<R>`;
+   - an `IForm.ObservableValue<R>` or `IForm.DeferredObservableValue<R>`;
    - a list of Validator<R>;
-4) Execute the `build()` method to get a hold of a `Form` instance;
+4) Execute the `builder.build()` method to get a hold of a `Form` instance;
 5) Every time the user requests to submit the form, call the method `form.doSubmit()`;
 
 In the sample below we use `Int` as `T` because we are using the Android R.id.$viewId `Int` as keys

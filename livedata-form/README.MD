@@ -6,10 +6,10 @@ LiveData version of `Form`
 How to `LiveDataForm`
 --------
 1) Create a `LiveDataForm.Builder<T>(submitObservable)` where `T` is the type of each field key;
-2) Call `addFieldValidations()` as many fields in the screen using as parameters a key, a `LiveData` and a list of validators;
-3) Execute the `build()` method to get a hold of a `RxForm` instance;
-4) Observe to the LiveData available from the `LiveDataForm` instance methods;
-
+2) Call `builder.addFieldValidations()` as many fields in the screen using as parameters a key, a `LiveData` and a list of validators;
+3) Execute the `builder.build()` method to get a hold of a `RxForm` instance;
+4) Observe the `form.submit` MediatorLiveData<Boolean>, this will bootstrap the form validation. Without it the form will not work!!
+5) Observe to the other LiveData available from the `LiveDataForm` instance methods;
 
 ``` kotlin
 // In the ViewModel
@@ -53,6 +53,7 @@ val form = LiveDataForm.Builder<String>()
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Submit"
+    app:onFormValidationChange="@{vm.form.onFormValidationChange}"
     app:formSubmit="@={vm.form.submit}" />
 ```
 
@@ -60,14 +61,18 @@ Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/
 
 BindingAdapters and LiveData
 --------
+### form.submit
+ - The LiveDataForm class uses this MediatorLiveData as validation bootstrap. This should be bound to the form submission button
+ using the tag `app:formSubmit`. *NOTE*: The Boolean being emitted has no real meaning, it exist just to overcome a DataBinding limitation.
 
 ### form.onFieldValidationChange
  - Is a `Map<T, MutableLiveData>` where each LiveData will emit when the field of key T suffers a validation change.
- It is usually used together with the XML tag `app:onFieldValidationChange`.
+ It is usually used together with the XML tag `app:onFieldValidationChange` to show or remove a validation error.
 
-### form.submit
- - The LiveDataForm class uses this MediatorLiveData as validation bootstrap. This should be bound to the form submission button
- using the tag `app:formSubmit`. NOTE: The Boolean being emitted has no real value, it exist just to overcome a DataBinding limitation.
+### form.onFormValidationChange
+ - Is triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
+ This LiveData allow you to enable or disable a submit button when used together with the XML tag
+ `app:onFormValidationChange`.
 
 ### form.onValidSubmit
  - It emits when a valid submit happens. This LiveData gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any` is that field current value.
