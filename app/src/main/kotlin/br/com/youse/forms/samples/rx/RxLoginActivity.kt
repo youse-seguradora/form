@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.rx
+package br.com.youse.forms.samples.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout

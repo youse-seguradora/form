@@ -51,6 +51,8 @@ dependencies {
     implementation deps.android.arch.lifecycle.extensions
     implementation deps.android.arch.lifecycle.reactivestreams
 
+    implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
+
     androidTestImplementation deps.junit
 
 

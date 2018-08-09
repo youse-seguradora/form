@@ -21,34 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.livedata
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import br.com.youse.forms.R
-import br.com.youse.forms.databinding.LiveDataActivityBinding
-import kotlinx.android.synthetic.main.live_data_activity.*
+package br.com.youse.forms.samples.livedata
 
-class LiveDataLoginActivity : AppCompatActivity() {
+import android.databinding.BindingAdapter
+import android.support.design.widget.TextInputLayout
+import br.com.youse.forms.validators.ValidationMessage
 
+class BindingAdapters {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    companion object {
 
-        val binding: LiveDataActivityBinding = DataBindingUtil.setContentView(this, R.layout.live_data_activity)
-
-        val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-        binding.vm = vm
-        binding.setLifecycleOwner(this)
-
-        vm.success.observe(this, Observer {
-            println(it?.toString())
-        })
-
+        @BindingAdapter(value = ["fieldError"])
+        @JvmStatic
+        fun onFieldValidationChange(view: TextInputLayout,
+                                    validations: List<ValidationMessage>?) {
+            view.error = validations?.firstOrNull()?.message
+        }
     }
-
-
 }

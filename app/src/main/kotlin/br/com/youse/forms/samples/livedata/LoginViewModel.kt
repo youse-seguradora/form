@@ -21,25 +21,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.livedata
+package br.com.youse.forms.samples.livedata
 
 import android.arch.lifecycle.LiveDataReactiveStreams
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
+import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
+import com.snakydesign.livedataextensions.startWith
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 
 class LoginViewModel : ViewModel() {
 
-    val EMAIL = "email"
-    val PASSWORD = "password"
+    private val EMAIL_KEY = "email"
+    private val PASSWORD_KEY = "password"
 
     val email = MutableLiveData<CharSequence>()
-
     val password = MutableLiveData<CharSequence>()
 
     private val emailValidations by lazy {
@@ -47,6 +48,7 @@ class LoginViewModel : ViewModel() {
                 "required"
         ))
     }
+
     private val passwordValidations by lazy {
         listOf(MinLengthValidator(
                 "Min length",
@@ -54,16 +56,23 @@ class LoginViewModel : ViewModel() {
     }
 
     val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.AFTER_SUBMIT)
-            .addFieldValidations(EMAIL,
+            .addFieldValidations(EMAIL_KEY,
                     email, emailValidations)
-            .addFieldValidations(PASSWORD,
+            .addFieldValidations(PASSWORD_KEY,
                     password,
                     passwordValidations)
             .build()
 
+
+    // android:enabled is false by default when using DataBinding
+    // it is up to the develop to change the behavior.
+    val enabled = form.onFormValidationChange.startWith(true)
+
+    val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
+    val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!
+
     val success = Transformations.switchMap(form.onValidSubmit) {
-
-        LiveDataReactiveStreams.fromPublisher(Observable.just(true).toFlowable(BackpressureStrategy.BUFFER))
+        LiveDataReactiveStreams.fromPublisher(Observable.just(Unit)
+                .toFlowable(BackpressureStrategy.BUFFER))
     }
-
 }

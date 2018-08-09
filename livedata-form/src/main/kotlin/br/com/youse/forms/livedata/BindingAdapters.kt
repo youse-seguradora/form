@@ -27,34 +27,17 @@ package br.com.youse.forms.livedata
 import android.databinding.BindingAdapter
 import android.databinding.InverseBindingAdapter
 import android.databinding.InverseBindingListener
-import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
-import br.com.youse.forms.validators.ValidationMessage
 
 @Suppress("UNUSED")
 class BindingAdapters {
 
     companion object {
-        @BindingAdapter(value = ["onFormValidationChange"])
-        @JvmStatic
-        @Suppress("UNUSED_PARAMETER")
-        fun onFormValidationChange(view: View, enabled: Boolean?) {
-            enabled?.let {
-                view.isEnabled = enabled
-            }
-        }
 
-        @BindingAdapter(value = ["onFieldValidationChange"], requireAll = true)
-        @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-        }
-
-        @BindingAdapter(value = ["formSubmit"])
+        @BindingAdapter(value = ["submit"])
         @JvmStatic
         @Suppress("UNUSED_PARAMETER")
         fun setFormSubmit(view: View, b: Boolean?) {
@@ -62,7 +45,7 @@ class BindingAdapters {
             // Waiting release https://issuetracker.google.com/issues/78662035
         }
 
-        @InverseBindingAdapter(attribute = "formSubmit", event = "formSubmitAttrChanged")
+        @InverseBindingAdapter(attribute = "submit", event = "submitAttrChanged")
         @JvmStatic
         @Suppress("UNUSED_PARAMETER")
         fun getFormSubmit(view: View): Boolean? {
@@ -71,7 +54,7 @@ class BindingAdapters {
             return null
         }
 
-        @BindingAdapter(value = ["formSubmitAttrChanged"])
+        @BindingAdapter(value = ["submitAttrChanged"])
         @JvmStatic
         fun setFormSubmitListener(view: View, listener: InverseBindingListener?) {
             if (listener == null) {
@@ -82,7 +65,7 @@ class BindingAdapters {
             }
         }
 
-        @BindingAdapter(value = ["formField"])
+        @BindingAdapter(value = ["field"])
         @JvmStatic
         fun setFormField(view: TextView, newText: CharSequence?) {
             val oldText = view.text
@@ -93,13 +76,13 @@ class BindingAdapters {
             }
         }
 
-        @InverseBindingAdapter(attribute = "formField", event = "formFieldAttrChanged")
+        @InverseBindingAdapter(attribute = "field", event = "fieldAttrChanged")
         @JvmStatic
         fun getFormField(view: TextView): CharSequence {
             return view.text
         }
 
-        @BindingAdapter(value = ["formFieldAttrChanged"])
+        @BindingAdapter(value = ["fieldAttrChanged"])
         @JvmStatic
         fun setFormFieldListener(view: TextView, listener: InverseBindingListener?) {
             if (listener == null) {

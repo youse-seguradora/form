@@ -14,8 +14,8 @@ How to `LiveDataForm`
 ``` kotlin
 // In the ViewModel
 
-val EMAIL = "email"
-val PASSWORD = "password"
+val EMAIL_KEY = "email"
+val PASSWORD_KEY = "password"
 
 val email = MutableLiveData<CharSequence>()
 
@@ -25,9 +25,9 @@ private val emailValidations ...
 private val passwordValidations ...
 
 val form = LiveDataForm.Builder<String>()
-        .addFieldValidations(EMAIL,
+        .addFieldValidations(EMAIL_KEY,
                 email, emailValidations)
-        .addFieldValidations(PASSWORD,
+        .addFieldValidations(PASSWORD_KEY,
                 password,
                 passwordValidations)
         .build()
@@ -38,14 +38,14 @@ val form = LiveDataForm.Builder<String>()
     android:id="@+id/emailContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:onFieldValidationChange="@{vm.form.onFieldValidationChange[vm.EMAIL]}">
+    app:fieldError="@{vm.onEmailValidationChange}">
 
     <android.support.design.widget.TextInputEditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        app:formField="@={vm.email}" />
+        app:field="@={vm.email}" />
 </android.support.design.widget.TextInputLayout>
 ...
 <Button
@@ -53,8 +53,8 @@ val form = LiveDataForm.Builder<String>()
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Submit"
-    app:onFormValidationChange="@{vm.form.onFormValidationChange}"
-    app:formSubmit="@={vm.form.submit}" />
+    android:enabled="@{vm.enabled}"
+    app:submit="@={vm.form.submit}" />
 ```
 
 Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/livedata/LiveDataLoginActivity.kt)
@@ -63,19 +63,18 @@ BindingAdapters and LiveData
 --------
 ### form.submit
  - The LiveDataForm class uses this MediatorLiveData as validation bootstrap. This should be bound to the form submission button
- using the tag `app:formSubmit`. *NOTE*: The Boolean being emitted has no real meaning, it exist just to overcome a DataBinding limitation.
+ using the tag `app:submit`. *NOTE*: The Boolean being emitted has no real meaning, it exist just to overcome a DataBinding limitation.
 
 ### form.onFieldValidationChange
  - Is a `Map<T, MutableLiveData>` where each LiveData will emit when the field of key T suffers a validation change.
- It is usually used together with the XML tag `app:onFieldValidationChange` to show or remove a validation error.
+ It is usually used together with the XML tag `app:fieldError` to show or remove a validation error.
 
 ### form.onFormValidationChange
  - Is triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
- This LiveData allow you to enable or disable a submit button when used together with the XML tag
- `app:onFormValidationChange`.
+ This LiveData allow you to enable or disable a submit button.
 
 ### form.onValidSubmit
- - It emits when a valid submit happens. This LiveData gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any` is that field current value.
+ - It emits when a valid submit happens. This LiveData gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any?` is that field current value.
  This LiveData is called to inform you when to send the form data to your server.
 
 ### form.onSubmitFailed
