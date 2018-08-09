@@ -57,7 +57,7 @@ val form = LiveDataForm.Builder<String>()
     app:submit="@={vm.form.submit}" />
 ```
 
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/livedata/LiveDataLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/livedata/LiveDataLoginActivity.kt)
 
 BindingAdapters and LiveData
 --------
