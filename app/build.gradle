@@ -4,11 +4,13 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion versions.compileSdk
 
     defaultConfig {
-        applicationId "br.com.youse.forms.rxformvalidator"
+        applicationId "br.com.youse.forms"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
         versionCode 1
@@ -22,6 +24,10 @@ android {
         }
     }
 
+    dataBinding {
+        enabled = true
+    }
+
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
@@ -32,6 +38,7 @@ android {
 dependencies {
 
     implementation project(":rxform")
+    implementation project(':livedata-form')
     implementation project(":validators-jdk")
     implementation project(':formatters-jdk')
 
@@ -41,8 +48,11 @@ dependencies {
     implementation deps.android.support.constraintLayout
     implementation deps.rx.java
     implementation deps.rx.binding
+    implementation deps.android.arch.lifecycle.extensions
+    implementation deps.android.arch.lifecycle.reactivestreams
 
     androidTestImplementation deps.junit
+
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

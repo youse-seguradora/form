@@ -21,19 +21,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.validators
+package br.com.youse.forms.livedata
 
-import br.com.youse.forms.validators.ValidationTypes.Companion.MIN_LENGTH
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.databinding.DataBindingUtil
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import br.com.youse.forms.R
+import br.com.youse.forms.databinding.LiveDataActivityBinding
+import kotlinx.android.synthetic.main.live_data_activity.*
 
-class MinLengthValidator(val message: String, private val minLength: Int) : Validator<CharSequence?> {
+class LiveDataLoginActivity : AppCompatActivity() {
 
-    private val validationMessage = ValidationMessage(message = message, validationType = MIN_LENGTH)
 
-    override fun validationMessage(): ValidationMessage {
-        return validationMessage
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val binding: LiveDataActivityBinding = DataBindingUtil.setContentView(this, R.layout.live_data_activity)
+
+        val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        binding.vm = vm
+        binding.setLifecycleOwner(this)
+
+        vm.success.observe(this, Observer {
+            println(it?.toString())
+        })
+
     }
 
-    override fun isValid(input: CharSequence?): Boolean {
-        return input != null && input.length >= minLength
-    }
+
 }

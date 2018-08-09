@@ -29,8 +29,8 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import br.com.youse.forms.R
 import br.com.youse.forms.form.IForm.*
-import br.com.youse.forms.rxformvalidator.R
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
@@ -121,7 +121,7 @@ class FormLoginActivity : AppCompatActivity(),
         }
     }
 
-    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
         val email = fields.first { it.first == emailContainer.id }.second.toString()
         val password = fields.first { it.first == passwordContainer.id }.second.toString()
 

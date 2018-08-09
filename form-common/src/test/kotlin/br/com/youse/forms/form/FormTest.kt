@@ -128,7 +128,7 @@ class FormTest {
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
                         fail()
 
                     }
@@ -177,7 +177,7 @@ class FormTest {
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
                         if (!validate) {
                             fail()
                         }
