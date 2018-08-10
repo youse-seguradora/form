@@ -64,17 +64,15 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
                         }
                     }
 
-                    val validationMessage = Pair(value, messages)
+                    val lastMessages = lastFieldsMessages[key]?.second
 
-                    val isFieldValid = validationMessage.second.isEmpty()
-                    val wasFieldValid = lastFieldsMessages[key]?.second?.isEmpty()
-                    val hasFieldValidationChanged = wasFieldValid != isFieldValid
+                    val hasFieldValidationChanged = messages != lastMessages
 
                     if (notifyListener && hasFieldValidationChanged) {
                         // notify field validation changed
                         fieldValidationListener?.onChange(Pair(key, messages))
                     }
-                    lastFieldsMessages[key] = validationMessage
+                    lastFieldsMessages[key] = Pair(value, messages)
 
                     val areAllFieldsValid = lastFieldsMessages.isEmpty() || lastFieldsMessages.values
                             .map { msgs -> msgs.second.isEmpty() }
