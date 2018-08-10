@@ -45,6 +45,7 @@ class LiveDataForm<T>(
     val onValidSubmit = MutableLiveData<List<Pair<T, Any?>>>()
 
     init {
+
         val fieldValidationChange = mutableMapOf<T, MutableLiveData<List<ValidationMessage>>>()
 
         val builder = Form.Builder<T>(strategy = strategy)
