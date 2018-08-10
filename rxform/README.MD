@@ -32,7 +32,7 @@ disposables.add(form.onFormValidationChange()
         })
 ```
 
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/rx/RxLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/rx/RxLoginActivity.kt)
 
 Download
 --------
