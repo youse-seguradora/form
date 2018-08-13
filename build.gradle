@@ -20,9 +20,9 @@ buildscript {
     ]
 
     ext.deps = [
-            androidPlugin           : "com.android.tools.build:gradle:${versions.androidPlugin}",
+            androidPlugin      : "com.android.tools.build:gradle:${versions.androidPlugin}",
             databindingCompiler: "com.android.databinding:compiler:${versions.androidPlugin}",
-            kotlin                  : [
+            kotlin             : [
                     stdlib: [
                             'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
                             'jdk'   : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
@@ -31,14 +31,15 @@ buildscript {
                     test  : [
                             'common'     : "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
                             'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
-                            'jdk'        : "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}"
+                            'jdk'        : "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}",
+                            'js'         : "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
                     ],
             ],
-            rx                      : [
+            rx                 : [
                     java   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
                     binding: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
             ],
-            android                 : [
+            android            : [
                     support: [
                             appcompat       : "com.android.support:appcompat-v7:${versions.supportLibrary}",
                             design          : "com.android.support:design:${versions.supportLibrary}",
@@ -52,22 +53,23 @@ buildscript {
                             core     : [testing: "android.arch.core:core-testing:${versions.androidArch}"]
                     ]
             ],
-            annotations             : 'org.jetbrains:annotations:16.0.1',
+            annotations        : 'org.jetbrains:annotations:16.0.1',
 
-            junit                   : "junit:junit:${versions.junit}"
+            junit              : "junit:junit:${versions.junit}"
     ]
 
     repositories {
         google()
         jcenter()
         gradlePluginPortal()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     }
 
     dependencies {
         classpath deps.androidPlugin
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
-        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.36"
     }
 }
 
@@ -80,7 +82,7 @@ subprojects {
 
     tasks.withType(Test) {
         testLogging {
-            events "failed"
+            events "passed", "skipped", "failed", "standard_error", "standard_out"
             exceptionFormat "full"
             showExceptions true
             showStackTraces true
