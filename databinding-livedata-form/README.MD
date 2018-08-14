@@ -82,7 +82,7 @@ Download or grab via Maven:
 ```xml
 <dependency>
   <groupId>br.com.youse.form</groupId>
-  <artifactId>livedata-form</artifactId>
+  <artifactId>databinding-livedata-form</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
