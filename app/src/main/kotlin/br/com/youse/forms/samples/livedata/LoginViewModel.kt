@@ -31,7 +31,6 @@ import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
-import com.snakydesign.livedataextensions.startWith
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 
@@ -51,7 +50,7 @@ class LoginViewModel : ViewModel() {
 
     private val passwordValidations by lazy {
         listOf(MinLengthValidator(
-                "Min length",
+                "Min length 8 letters",
                 8))
     }
 
@@ -63,10 +62,7 @@ class LoginViewModel : ViewModel() {
                     passwordValidations)
             .build()
 
-
-    // android:enabled is false by default when using DataBinding
-    // it is up to the develop to change the behavior.
-    val enabled = form.onFormValidationChange.startWith(true)
+    val enabled = form.onFormValidationChange
 
     val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
     val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!

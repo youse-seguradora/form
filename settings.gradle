@@ -7,4 +7,5 @@ include ':app',
         ':validators-jdk',
         ':formatters-jdk',
         ':rxform',
-        ':livedata-form'
+        ':livedata-form',
+        ':databinding-livedata-form'
