@@ -36,6 +36,8 @@ dependencies {
 
     implementation project(":rxform")
     implementation project(':databinding-livedata-form')
+    implementation project(':rx-form-jdk')
+
     implementation project(":validators-jdk")
     implementation project(':formatters-jdk')
 
