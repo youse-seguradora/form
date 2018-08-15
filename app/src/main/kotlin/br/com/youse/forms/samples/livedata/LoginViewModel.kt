@@ -62,8 +62,6 @@ class LoginViewModel : ViewModel() {
                     passwordValidations)
             .build()
 
-    val enabled = form.onFormValidationChange
-
     val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
     val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!
 

@@ -47,7 +47,7 @@ val form = LiveDataForm.Builder<String>()
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Submit"
-    app:formEnabled="@{vm.enabled}"
+    app:formEnabled="@{vm.form.onFormValidationChange}"
     app:submit="@={vm.form.submit}" />
 ```
 

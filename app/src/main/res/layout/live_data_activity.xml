@@ -76,7 +76,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Submit"
-            app:formEnabled="@{vm.enabled}"
+            app:formEnabled="@{vm.form.onFormValidationChange}"
             app:submit="@={vm.form.submit}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
