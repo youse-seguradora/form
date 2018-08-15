@@ -1,8 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
-
-archivesBaseName = 'form-livedata'
+archivesBaseName = 'databinding-form-livedata'
 android {
     compileSdkVersion versions.compileSdk
     defaultConfig {
@@ -10,6 +10,11 @@ android {
         targetSdkVersion versions.targetSdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    dataBinding {
+        enabled = true
+    }
+
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
@@ -18,13 +23,14 @@ android {
 }
 dependencies {
 
-    api project(":form-jdk")
+    api project(":livedata-form")
 
     implementation deps.kotlin.stdlib.jdk
     implementation deps.android.arch.lifecycle.extensions
+    implementation deps.android.support.design
+    kapt deps.databindingCompiler
 
     testImplementation deps.kotlin.test.jdk
     testImplementation deps.kotlin.test.annotations
-    testImplementation deps.android.arch.core.testing
 }
 
