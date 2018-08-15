@@ -6,6 +6,7 @@ include ':app',
         ':form-jdk',
         ':validators-jdk',
         ':formatters-jdk',
-        ':rxform',
+        ':rx-form-jdk',
         ':livedata-form',
         ':form-js'
+
