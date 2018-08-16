@@ -1,9 +1,6 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -37,8 +34,8 @@ android {
 
 dependencies {
 
+    implementation project(':databinding-livedata-form')
     implementation project(':rx-form-jdk')
-    implementation project(':livedata-form')
     implementation project(":validators-jdk")
     implementation project(':formatters-jdk')
 
@@ -50,8 +47,6 @@ dependencies {
     implementation deps.rx.binding
     implementation deps.android.arch.lifecycle.extensions
     implementation deps.android.arch.lifecycle.reactivestreams
-    implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
-
 
     androidTestImplementation deps.junit
 
