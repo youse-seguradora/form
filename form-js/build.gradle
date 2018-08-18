@@ -54,3 +54,5 @@ compileTestKotlin2Js {
     kotlinOptions.moduleKind = 'commonjs'
     kotlinOptions.main = "call"
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

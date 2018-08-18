@@ -34,3 +34,4 @@ dependencies {
     testImplementation deps.kotlin.test.annotations
 }
 
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
