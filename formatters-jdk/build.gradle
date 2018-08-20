@@ -18,3 +18,5 @@ sourceSets {
     main.java.srcDirs += "src/main/kotlin"
     test.java.srcDirs += "src/test/kotlin"
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

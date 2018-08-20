@@ -81,14 +81,14 @@ Download
 Download or grab via Maven:
 ```xml
 <dependency>
-  <groupId>br.com.youse.form</groupId>
+  <groupId>br.com.youse</groupId>
   <artifactId>databinding-livedata-form</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-implementation 'br.com.youse.form:databinding-livedata-form:0.0.1'
+implementation 'br.com.youse:databinding-livedata-form:0.0.1'
 ```
 
 

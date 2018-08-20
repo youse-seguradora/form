@@ -28,3 +28,4 @@ dependencies {
     testImplementation deps.android.arch.core.testing
 }
 
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

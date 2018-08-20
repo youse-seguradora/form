@@ -40,16 +40,16 @@ Download
 Download or grab via Maven:
 ```xml
 <dependency>
-  <groupId>br.com.youse.form</groupId>
+  <groupId>br.com.youse</groupId>
   <artifactId>rxform</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-implementation 'br.com.youse.form:rxform:0.0.1'
-implementation 'br.com.youse.form:validators:0.0.1' // optional
-implementation 'br.com.youse.form:formatters:0.0.1' // optional
+implementation 'br.com.youse:rxform:0.0.1'
+implementation 'br.com.youse:validators:0.0.1' // optional
+implementation 'br.com.youse:formatters:0.0.1' // optional
 ```
 
 
