@@ -5,7 +5,7 @@ Form makes it easy to format and validate form fields and submit the form when e
 
 And it come in many flavors:
  - Form for the 100% pure Kotlin library;
- - [RxForm](https://github.com/youse-seguradora/form/tree/master/rxform) for RxJava lovers;
+ - [RxForm](https://github.com/youse-seguradora/form/tree/master/rx-form-jdk) for RxJava lovers;
  - [LiveDataForm](https://github.com/youse-seguradora/form/tree/master/livedata-form) for DataBinding/LiveData addicts;
 
 How to Form
@@ -51,7 +51,7 @@ Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/
 
 How to RxForm
 --------
-RxForm [README](https://github.com/youse-seguradora/form/blob/master/rxform/README.MD)
+RxForm [README](https://github.com/youse-seguradora/form/blob/master/rx-form-jdk/README.MD)
 
 How to LiveDataForm
 --------
@@ -155,17 +155,26 @@ Download
 Download or grab via Maven:
 ```xml
 <dependency>
-  <groupId>br.com.youse</groupId>
-  <artifactId>form</artifactId>
+  <groupId>br.com.youse.forms</groupId>
+  <artifactId>form-jdk</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
 or Gradle:
+
+add
+
 ```groovy
-implementation 'br.com.youse:form:0.0.1'
-implementation 'br.com.youse:rxform:0.0.1'
-implementation 'br.com.youse:validators:0.0.1' // optional
-implementation 'br.com.youse:formatters:0.0.1' // optional
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
+```
+
+and
+
+```groovy
+implementation 'br.com.youse.forms:form-jdk:0.0.1'
+implementation 'br.com.youse.forms:rx-form-jdk:0.0.1'
+implementation 'br.com.youse.forms:validators-jdk:0.0.1' // optional
+implementation 'br.com.youse.forms:formatters-jdk:0.0.1' // optional
 ```
 
 
