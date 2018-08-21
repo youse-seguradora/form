@@ -91,14 +91,19 @@ Download
 Download or grab via Maven:
 ```xml
 <dependency>
-  <groupId>br.com.youse</groupId>
+  <groupId>br.com.youse.forms</groupId>
   <artifactId>livedata-form</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
+add
+```groovy
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
+```
+and
 or Gradle:
 ```groovy
-implementation 'br.com.youse:livedata-form:0.0.1'
+implementation 'br.com.youse.forms:livedata-form:0.0.1'
 ```
 
 

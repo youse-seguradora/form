@@ -40,16 +40,19 @@ Download
 Download or grab via Maven:
 ```xml
 <dependency>
-  <groupId>br.com.youse</groupId>
-  <artifactId>rxform</artifactId>
+  <groupId>br.com.youse.forms</groupId>
+  <artifactId>rx-form-jdk</artifactId>
   <version>0.0.1</version>
 </dependency>
 ```
 or Gradle:
+add
 ```groovy
-implementation 'br.com.youse:rxform:0.0.1'
-implementation 'br.com.youse:validators:0.0.1' // optional
-implementation 'br.com.youse:formatters:0.0.1' // optional
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
+```
+and
+```groovy
+implementation 'br.com.youse.forms:rx-form-jdk:0.0.1'
 ```
 
 
