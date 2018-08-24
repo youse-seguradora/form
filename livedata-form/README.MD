@@ -57,7 +57,7 @@ Sample below uses databinding-livedata-form module to observe the LiveData event
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Submit"
-    app:formEnabledapp:formEnabled="@{vm.form.onFormValidationChange}"
+    app:formEnabled="@{vm.form.onFormValidationChange}"
     app:submit="@={vm.form.submit}" />
 ```
 
