@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+repositories {
+    maven { url 'https://dl.bintray.com/musichin/maven' }
+}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -33,7 +36,8 @@ android {
 }
 
 dependencies {
-
+    implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
+    implementation 'com.github.musichin.reactivelivedata:reactivelivedata:0.14.0'
     implementation project(':databinding-livedata-form')
     implementation project(':rx-form-jdk')
     implementation project(":validators-jdk")
@@ -48,6 +52,7 @@ dependencies {
     implementation deps.android.arch.lifecycle.extensions
     implementation deps.android.arch.lifecycle.reactivestreams
 
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     androidTestImplementation deps.junit
 
 
