@@ -23,8 +23,6 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.livedata
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.livedata.LiveDataForm
@@ -32,7 +30,6 @@ import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
 import com.github.musichin.reactivelivedata.ReactiveLiveData
-import com.github.musichin.reactivelivedata.combineLatestWith
 import com.snakydesign.livedataextensions.*
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -71,7 +68,7 @@ class LoginViewModel : ViewModel() {
     val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
     val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!
 
-    val submitData = SingleLiveEvent<LoginState>()
+    val submitData = MutableLiveEvent<LoginState>()
 
     val onSubmit = form.onValidSubmit
             .doBeforeNext(OnNextAction {

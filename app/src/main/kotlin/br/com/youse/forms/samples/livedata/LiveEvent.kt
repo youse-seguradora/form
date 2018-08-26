@@ -3,7 +3,7 @@ package br.com.youse.forms.samples.livedata
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 
-class SingleEvent<T>(private val content: T) {
+class LiveEvent<T>(private val content: T) {
     private var consumed = false	
      fun getContent(): T? {	
         return if (!consumed) {	
@@ -15,19 +15,19 @@ class SingleEvent<T>(private val content: T) {
     }	
 }
 
-class SingleLiveEvent<T> : MutableLiveData<SingleEvent<T>>() {
+class MutableLiveEvent<T> : MutableLiveData<LiveEvent<T>>() {
 
     fun setEvent(event: T) {
-        value = SingleEvent(event)
+        value = LiveEvent(event)
     }
 
     fun postEvent(event: T) {
-        postValue(SingleEvent(event))
+        postValue(LiveEvent(event))
     }
 }
 
-abstract class SingleEventObserver<T> : Observer<SingleEvent<T>> {
-    override fun onChanged(t: SingleEvent<T>?) {
+abstract class LiveEventObserver<T> : Observer<LiveEvent<T>> {
+    override fun onChanged(t: LiveEvent<T>?) {
         onEventChanged(t?.getContent())
     }
 

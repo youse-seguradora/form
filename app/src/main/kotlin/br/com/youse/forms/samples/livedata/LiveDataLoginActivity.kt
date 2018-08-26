@@ -45,7 +45,7 @@ class LiveDataLoginActivity : AppCompatActivity() {
         binding.vm = vm
         binding.setLifecycleOwner(this)
 
-        vm.onSubmit.observe(this, object : SingleEventObserver<LoginState>() {
+        vm.onSubmit.observe(this, object : LiveEventObserver<LoginState>() {
             override fun onEventChanged(event: LoginState?) {
                 event?.data?.let {
                     handleSuccess()
