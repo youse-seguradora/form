@@ -30,7 +30,7 @@ class HoursFormatter(val divider: String) : TextFormatter {
 
     override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
 
-    override fun format(input: CharSequence): CharSequence {
+    override fun format(input: CharSequence): String {
         val clearText = input.toDigitsOnly()
 
         return when (clearText.length) {
