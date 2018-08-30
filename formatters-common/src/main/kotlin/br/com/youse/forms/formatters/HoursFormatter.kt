@@ -28,9 +28,9 @@ package br.com.youse.forms.formatters
 class HoursFormatter(val divider: String) : TextFormatter {
     private val digitsOnlyRegex = "[^0-9]".toRegex()
 
-    override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
+    override fun getCursorPosition(previous: String, input: String, output: String) = output.length
 
-    override fun format(input: CharSequence): String {
+    override fun format(input: String): String {
         val clearText = input.toDigitsOnly()
 
         return when (clearText.length) {

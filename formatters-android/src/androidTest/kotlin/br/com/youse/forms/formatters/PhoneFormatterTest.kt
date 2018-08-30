@@ -14,6 +14,8 @@ class PhoneFormatterTest {
 
         assertEquals(formatter.format("1899969"), "1899969")
 
+        assertEquals(formatter.format("189996938"), "189996938")
+
         assertEquals(formatter.format("1899969388"), "(18) 9996-9388")
 
         assertEquals(formatter.format("18999693880"), "(18) 99969-3880")
