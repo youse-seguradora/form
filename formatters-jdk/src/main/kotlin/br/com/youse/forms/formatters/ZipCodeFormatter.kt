@@ -4,13 +4,11 @@ import br.com.youse.forms.extensions.toDigitsOnly
 
 
 // NOTE: Only supports PT_BR locale.
-class ZipCodeFormatter() : Formatter<String> {
+class ZipCodeFormatter : Formatter<String> {
 
     private val formatter: Formatter<String> = BrazilianZipCodeFormatter()
 
-    override fun format(input: String): String {
-        return formatter.format(input)
-    }
+    override fun format(input: String): String = formatter.format(input)
 
 }
 
