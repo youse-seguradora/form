@@ -1,10 +1,10 @@
-package br.com.youse.formatters
+package br.com.youse.forms.formatters
 
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class CurrencyFormatterTest() {
+class CurrencyFormatterTest {
 
 
     @Test

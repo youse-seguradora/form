@@ -1,4 +1,4 @@
-package br.com.youse.formatters
+package br.com.youse.forms.formatters
 
 import br.com.youse.forms.formatters.Formatter
 import java.text.NumberFormat
