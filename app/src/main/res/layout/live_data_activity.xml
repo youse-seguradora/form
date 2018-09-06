@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".LoginActivity">
 
     <data>
 
@@ -10,11 +12,10 @@
 
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout
 
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".LoginActivity">
+        android:layout_height="match_parent">
 
 
         <android.support.design.widget.TextInputLayout
@@ -27,11 +28,11 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            app:fieldError="@{vm.onEmailValidationChange}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:fieldError="@{vm.onEmailValidationChange}">
+            app:layout_constraintTop_toTopOf="parent">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/email"
@@ -50,10 +51,10 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
+            app:fieldError="@{vm.onPasswordValidationChange}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailContainer"
-            app:fieldError="@{vm.onPasswordValidationChange}"
             tools:layout_editor_absoluteY="390dp">
 
             <android.support.design.widget.TextInputEditText
@@ -76,12 +77,29 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Submit"
-            app:formEnabled="@{vm.form.onFormValidationChange}"
-            app:submit="@={vm.form.submit}"
+            app:formEnabled="@{vm.formEnabled}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordContainer" />
+            app:layout_constraintTop_toBottomOf="@+id/passwordContainer"
+            app:submit="@={vm.form.submit}" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visible="@{vm.loading}" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

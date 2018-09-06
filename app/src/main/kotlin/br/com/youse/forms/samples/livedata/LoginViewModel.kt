@@ -23,24 +23,30 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.livedata
 
-import android.arch.lifecycle.LiveDataReactiveStreams
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Observable
+import com.github.musichin.reactivelivedata.ReactiveLiveData
+import com.snakydesign.livedataextensions.*
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import java.util.concurrent.TimeUnit
 
+data class LoginState(val data: Unit? = null, val error: Throwable? = null)
 class LoginViewModel : ViewModel() {
 
     private val EMAIL_KEY = "email"
     private val PASSWORD_KEY = "password"
 
+    val disposables = CompositeDisposable()
+
     val email = MutableLiveData<CharSequence>()
     val password = MutableLiveData<CharSequence>()
+    val loading = MutableLiveData<Boolean>()
+
 
     private val emailValidations by lazy {
         listOf(RequiredValidator(
@@ -55,18 +61,58 @@ class LoginViewModel : ViewModel() {
     }
 
     val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.AFTER_SUBMIT)
-            .addFieldValidations(EMAIL_KEY,
-                    email, emailValidations)
-            .addFieldValidations(PASSWORD_KEY,
-                    password,
-                    passwordValidations)
+            .addFieldValidations(EMAIL_KEY, email, emailValidations)
+            .addFieldValidations(PASSWORD_KEY, password, passwordValidations)
             .build()
 
     val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
     val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!
 
-    val success = Transformations.switchMap(form.onValidSubmit) {
-        LiveDataReactiveStreams.fromPublisher(Observable.just(Unit)
-                .toFlowable(BackpressureStrategy.BUFFER))
+    val submitData = MutableLiveEvent<LoginState>()
+
+    val onSubmit = form.onValidSubmit
+            .doBeforeNext(OnNextAction {
+                loading.value = true
+            })
+            .doAfterNext(OnNextAction {
+                disposables.add(submitFormToApi()
+                        .subscribe({ response ->
+                            submitData.postEvent(LoginState(data = response))
+                        }, { error ->
+                            submitData.postEvent(LoginState(error = error))
+                        }))
+            })
+            .switchMap {
+                submitData
+            }
+            .doAfterNext(OnNextAction {
+                loading.value = false
+            })
+
+    val formEnabled = ReactiveLiveData.combineLatest(form.onFormValidationChange, loading) { isValidForm, isLoading ->
+        if (isLoading == true) {
+            false
+        } else {
+            isValidForm != false
+        }
+    }
+
+    init {
+        loading.value = false
+
+    }
+
+
+    private fun submitFormToApi(): Single<Unit> {
+        return Single.defer {
+            Single.just(Unit)
+                    .delay(1, TimeUnit.SECONDS)
+        }
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
     }
 }

@@ -23,14 +23,15 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.livedata
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.databinding.LiveDataActivityBinding
+import br.com.youse.forms.samples.home.HomeActivity
 
 class LiveDataLoginActivity : AppCompatActivity() {
 
@@ -44,10 +45,19 @@ class LiveDataLoginActivity : AppCompatActivity() {
         binding.vm = vm
         binding.setLifecycleOwner(this)
 
-        vm.success.observe(this, Observer {
-            Toast.makeText(this, "Data sent to server \\o/", Toast.LENGTH_SHORT).show()
+        vm.onSubmit.observe(this, object : LiveEventObserver<LoginState>() {
+            override fun onEventChanged(event: LoginState?) {
+                event?.data?.let {
+                    handleSuccess()
+                }
+            }
         })
 
+    }
+
+    fun handleSuccess() {
+        Toast.makeText(this, "Data sent to server \\o/", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, HomeActivity::class.java))
     }
 
 
