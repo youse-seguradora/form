@@ -28,7 +28,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            app:fieldError="@{vm.onEmailValidationChange}"
+            app:fieldError="@{vm.email.errors}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                app:field="@={vm.email}" />
+                app:field="@={vm.email.input}" />
         </android.support.design.widget.TextInputLayout>
 
 
@@ -51,7 +51,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
-            app:fieldError="@{vm.onPasswordValidationChange}"
+            app:fieldError="@{vm.password.errors}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailContainer"
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPassword"
-                app:field="@={vm.password}" />
+                app:field="@={vm.password.input}" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
@@ -82,7 +82,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/passwordContainer"
-            app:submit="@={vm.form.submit}" />
+            android:onClick="@{ _ -> vm.form.doSubmit()}" />
 
         <ProgressBar
             android:id="@+id/progressBar"

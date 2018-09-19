@@ -31,6 +31,7 @@ import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import br.com.youse.forms.validators.ValidationMessage
 
@@ -41,24 +42,22 @@ class BindingAdapters {
 
         @BindingAdapter(value = ["field"])
         @JvmStatic
-        fun setFormField(view: TextView, newText: CharSequence?) {
-            val oldText = view.text
-            // ATTENTION: We are using toString() because the equals and hashcode results are undefined for CharSequence
-            // https://stackoverflow.com/questions/1049228/charsequence-vs-string-in-java#comment11633702_1049244
-            if (oldText.toString() != newText.toString()) {
-                view.text = newText
+        fun setFormField(view: EditText, newText: String?) {
+            val oldText = view.text.toString()
+            if (oldText != newText) {
+                view.setText(newText)
             }
         }
 
         @InverseBindingAdapter(attribute = "field", event = "fieldAttrChanged")
         @JvmStatic
-        fun getFormField(view: TextView): CharSequence {
-            return view.text
+        fun getFormField(view: EditText): String {
+            return view.text.toString()
         }
 
         @BindingAdapter(value = ["fieldAttrChanged"])
         @JvmStatic
-        fun setFormFieldListener(view: TextView, listener: InverseBindingListener?) {
+        fun setFormFieldListener(view: EditText, listener: InverseBindingListener?) {
             if (listener == null) {
                 return
             }
@@ -88,34 +87,6 @@ class BindingAdapters {
         fun onFormValidationChange(view: View, enabled: Boolean?) {
             enabled?.let {
                 view.isEnabled = enabled
-            }
-        }
-
-        @BindingAdapter(value = ["submit"])
-        @JvmStatic
-        @Suppress("UNUSED_PARAMETER")
-        fun setFormSubmit(view: View, b: Boolean?) {
-            // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
-            // Waiting release https://issuetracker.google.com/issues/78662035
-        }
-
-        @InverseBindingAdapter(attribute = "submit", event = "submitAttrChanged")
-        @JvmStatic
-        @Suppress("UNUSED_PARAMETER")
-        fun getFormSubmit(view: View): Boolean? {
-            // NOTE: Do nothing... we should be using Unit, but DataBinding does not accept that
-            // Waiting release https://issuetracker.google.com/issues/78662035
-            return null
-        }
-
-        @BindingAdapter(value = ["submitAttrChanged"])
-        @JvmStatic
-        fun setFormSubmitListener(view: View, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.setOnClickListener {
-                listener.onChange()
             }
         }
     }
