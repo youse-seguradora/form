@@ -30,7 +30,7 @@ import kotlin.test.assertTrue
 
 
 class MinLengthValidatorTest {
-    lateinit var validator: Validator<CharSequence>
+    lateinit var validator: Validator<String>
 
     @BeforeTest
     fun setup() {

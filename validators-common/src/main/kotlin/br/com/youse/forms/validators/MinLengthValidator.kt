@@ -25,7 +25,7 @@ package br.com.youse.forms.validators
 
 import br.com.youse.forms.validators.ValidationTypes.Companion.MIN_LENGTH
 
-class MinLengthValidator(val message: String, private val minLength: Int) : Validator<CharSequence?> {
+class MinLengthValidator(val message: String, private val minLength: Int) : Validator<String?> {
 
     private val validationMessage = ValidationMessage(message = message, validationType = MIN_LENGTH)
 
@@ -33,7 +33,7 @@ class MinLengthValidator(val message: String, private val minLength: Int) : Vali
         return validationMessage
     }
 
-    override fun isValid(input: CharSequence?): Boolean {
+    override fun isValid(input: String?): Boolean {
         return input != null && input.length >= minLength
     }
 }
