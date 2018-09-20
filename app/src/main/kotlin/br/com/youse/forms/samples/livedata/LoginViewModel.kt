@@ -29,9 +29,11 @@ import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.LiveField
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationStrategy
 import com.github.musichin.reactivelivedata.ReactiveLiveData
-import com.snakydesign.livedataextensions.*
+import com.snakydesign.livedataextensions.OnNextAction
+import com.snakydesign.livedataextensions.doAfterNext
+import com.snakydesign.livedataextensions.doBeforeNext
+import com.snakydesign.livedataextensions.switchMap
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
@@ -58,8 +60,8 @@ class LoginViewModel : ViewModel() {
                 "Min length 8 letters",
                 8))
     }
-    val email = LiveField<String, String>(key = EMAIL_KEY, validators = emailValidations)
-    val password = LiveField<String, String>(key = PASSWORD_KEY, validators = passwordValidations)
+    val email = LiveField(key = EMAIL_KEY, validators = emailValidations)
+    val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
     val form = LiveDataForm.Builder<String>()
             .addFieldValidations(email)
