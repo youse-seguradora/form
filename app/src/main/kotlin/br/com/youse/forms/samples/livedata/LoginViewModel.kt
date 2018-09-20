@@ -105,6 +105,9 @@ class LoginViewModel : ViewModel() {
 
 
     private fun submitFormToApi(): Single<Unit> {
+        val emailValue = email.input.value
+        val passwordValue = password.input.value
+        println("sending $emailValue and $passwordValue to server...")
         return Single.defer {
             Single.just(Unit)
                     .delay(1, TimeUnit.SECONDS)
