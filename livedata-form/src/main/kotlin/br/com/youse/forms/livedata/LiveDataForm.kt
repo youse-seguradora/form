@@ -95,10 +95,6 @@ class LiveDataForm<T>(
     class Builder<T>(private val submit: MediatorLiveData<Boolean> = MediatorLiveData(),
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
         private val fields = mutableListOf<LiveField<*, *>>()
-        fun <R> addFieldValidations(key: T, field: MutableLiveData<R>, validators: List<Validator<R>>): LiveDataForm.Builder<T> {
-            fields.add(LiveField(key = key, input = field, validators = validators))
-            return this
-        }
 
         fun <R> addFieldValidations(field: LiveField<T, R>): LiveDataForm.Builder<T> {
             fields.add(field)
