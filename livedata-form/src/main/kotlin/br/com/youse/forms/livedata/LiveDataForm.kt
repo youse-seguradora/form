@@ -63,7 +63,7 @@ class LiveDataForm<T>(
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<T> {
-                    override fun onValidSubmit(data: List<Pair<T, Any?>>) {
+                    override fun onValidSubmit(fields: List<Pair<T, Any?>>) {
                         onValidSubmit.value = Unit
                     }
                 })

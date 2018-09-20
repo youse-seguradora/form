@@ -32,14 +32,14 @@ val form = LiveDataForm.Builder<String>()
     android:id="@+id/emailContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:fieldError="@{vm.onEmailValidationChange}">
+    app:fieldError="@{vm.email.errors}">
 
     <android.support.design.widget.TextInputEditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        app:field="@={vm.email}" />
+        app:field="@={vm.email.input}" />
 </android.support.design.widget.TextInputLayout>
 ...
 <Button
