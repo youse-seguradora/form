@@ -15,6 +15,7 @@ include ':app',
         // android
         ':livedata-form',
         ':databinding-livedata-form',
+        ':formatters-android'
 
         // js
         ':form-js'

@@ -23,14 +23,16 @@ SOFTWARE.
  */
 package br.com.youse.forms.formatters
 
+import br.com.youse.forms.extensions.toDigitsOnly
+
 
 // 00:00
 class HoursFormatter(val divider: String) : TextFormatter {
-    private val digitsOnlyRegex = "[^0-9]".toRegex()
 
-    override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
 
-    override fun format(input: CharSequence): CharSequence {
+    override fun getCursorPosition(previous: String, input: String, output: String) = output.length
+
+    override fun format(input: String): String {
         val clearText = input.toDigitsOnly()
 
         return when (clearText.length) {
@@ -38,9 +40,5 @@ class HoursFormatter(val divider: String) : TextFormatter {
             2, 3, 4 -> clearText.substring(0, 2) + divider + clearText.substring(2)
             else -> clearText.substring(0, 2) + divider + clearText.substring(2, 4)
         }
-    }
-
-    private fun CharSequence.toDigitsOnly(): String {
-        return replace(digitsOnlyRegex, "")
     }
 }
