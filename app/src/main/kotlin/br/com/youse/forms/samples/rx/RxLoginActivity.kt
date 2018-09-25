@@ -26,6 +26,7 @@ package br.com.youse.forms.samples.rx
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AppCompatActivity
+import br.com.youse.forms.R
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
@@ -33,7 +34,6 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
-import br.com.youse.forms.R
 
 class RxLoginActivity : AppCompatActivity() {
 
@@ -55,8 +55,8 @@ class RxLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val submitHappens = submit.clicks()
-        val emailChanges = email.textChanges()
-        val passwordChanges = password.textChanges()
+        val emailChanges = email.textChanges().map { it.toString() }
+        val passwordChanges = password.textChanges().map { it.toString() }
 
         val form = RxForm.Builder<Int>(submitHappens)
                 .addFieldValidations(emailContainer.id,

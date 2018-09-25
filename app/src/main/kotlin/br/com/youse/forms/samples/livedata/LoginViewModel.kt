@@ -26,11 +26,14 @@ package br.com.youse.forms.samples.livedata
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.livedata.LiveDataForm
+import br.com.youse.forms.livedata.LiveField
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationStrategy
 import com.github.musichin.reactivelivedata.ReactiveLiveData
-import com.snakydesign.livedataextensions.*
+import com.snakydesign.livedataextensions.OnNextAction
+import com.snakydesign.livedataextensions.doAfterNext
+import com.snakydesign.livedataextensions.doBeforeNext
+import com.snakydesign.livedataextensions.switchMap
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
@@ -43,8 +46,6 @@ class LoginViewModel : ViewModel() {
 
     val disposables = CompositeDisposable()
 
-    val email = MutableLiveData<CharSequence>()
-    val password = MutableLiveData<CharSequence>()
     val loading = MutableLiveData<Boolean>()
 
 
@@ -59,14 +60,14 @@ class LoginViewModel : ViewModel() {
                 "Min length 8 letters",
                 8))
     }
+    val email = LiveField(key = EMAIL_KEY, validators = emailValidations)
+    val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
-    val form = LiveDataForm.Builder<String>(strategy = ValidationStrategy.AFTER_SUBMIT)
-            .addFieldValidations(EMAIL_KEY, email, emailValidations)
-            .addFieldValidations(PASSWORD_KEY, password, passwordValidations)
+    val form = LiveDataForm.Builder<String>()
+            .addFieldValidations(email)
+            .addFieldValidations(password)
             .build()
 
-    val onEmailValidationChange = form.onFieldValidationChange[EMAIL_KEY]!!
-    val onPasswordValidationChange = form.onFieldValidationChange[PASSWORD_KEY]!!
 
     val submitData = MutableLiveEvent<LoginState>()
 
@@ -104,6 +105,9 @@ class LoginViewModel : ViewModel() {
 
 
     private fun submitFormToApi(): Single<Unit> {
+        val emailValue = email.input.value
+        val passwordValue = password.input.value
+        println("sending $emailValue and $passwordValue to server...")
         return Single.defer {
             Single.just(Unit)
                     .delay(1, TimeUnit.SECONDS)

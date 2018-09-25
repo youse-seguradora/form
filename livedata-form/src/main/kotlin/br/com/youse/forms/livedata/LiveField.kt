@@ -21,30 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.validators
+package br.com.youse.forms.livedata
 
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import android.arch.lifecycle.MutableLiveData
+import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.Validator
 
-
-class MinLengthValidatorTest {
-    lateinit var validator: Validator<String>
-
-    @BeforeTest
-    fun setup() {
-        validator = MinLengthValidator("invalid min length", 3)
-    }
-
-    @Test
-    fun shouldValidate() {
-        assertFalse(validator.isValid(""))
-        assertFalse(validator.isValid("1"))
-        assertFalse(validator.isValid("12"))
-
-        assertFalse(validator.isValid(" "))
-        assertTrue(validator.isValid("123"))
-        assertTrue(validator.isValid("1234"))
-    }
-}
+class LiveField<T, R>(val key: T,
+                      val input: MutableLiveData<R> = MutableLiveData(),
+                      val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
+                      val validators: List<Validator<R>>)

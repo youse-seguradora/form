@@ -101,17 +101,16 @@ class LiveDataFormTest {
 
     })
 
-    private var emailLiveData = MutableLiveData<String>()
-    private var passwordLiveData = MutableLiveData<String>()
-    private var ageLiveData = MutableLiveData<Int>()
+    private lateinit var email: LiveField<Int, String>
+    private lateinit var password: LiveField<Int, String>
+    private lateinit var age: LiveField<Int, Int>
+
 
     @BeforeTest
     fun setup() {
-        emailLiveData = MutableLiveData()
-        passwordLiveData = MutableLiveData()
-        ageLiveData = MutableLiveData()
-
-
+        email = LiveField(key = EMAIL_ID, validators = emailValidators)
+        password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
+        age = LiveField(key = AGE_ID, validators = ageValidators)
     }
 
     private fun <T> setupCountableOnChange(ld: MutableLiveData<T>, count: Int, callback: (T?) -> Unit): Observer<T> {
@@ -144,33 +143,29 @@ class LiveDataFormTest {
         val strategy = if (afterSubmit) ValidationStrategy.AFTER_SUBMIT else ValidationStrategy.ALL_TIME
 
         val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
-                .addFieldValidations(EMAIL_ID, emailLiveData, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordLiveData, passwordValidators)
-                .addFieldValidations(AGE_ID, ageLiveData, ageValidators)
+                .addFieldValidations(email)
+                .addFieldValidations(password)
+                .addFieldValidations(age)
                 .build()
 
         var emailMessages: List<ValidationMessage>? = null
-        val emailValidation = form.onFieldValidationChange[EMAIL_ID]!!
+        val emailValidation = email.errors
         setupCountableOnChange(emailValidation, 2) {
             emailMessages = it
         }
 
         var passwordMessages: List<ValidationMessage>? = null
-        val passwordValidation = form.onFieldValidationChange[PASSWORD_ID]!!
+        val passwordValidation = password.errors
         setupCountableOnChange(passwordValidation, 2) {
             passwordMessages = it
         }
 
         var ageMessages: List<ValidationMessage>? = null
-        val ageValidation = form.onFieldValidationChange[AGE_ID]!!
+        val ageValidation = age.errors
         setupCountableOnChange(ageValidation, 2) {
             ageMessages = it
         }
 
-        val submit = form.submit
-        setupCountableOnChange(submit, 2) {
-            // nothing
-        }
 
         val failedSubmit = form.onSubmitFailed
         var submitFailedMessages: List<Pair<Int, List<ValidationMessage>>>? = null
@@ -184,7 +179,7 @@ class LiveDataFormTest {
             currentFormValidation = it
         }
         val validSubmit = form.onValidSubmit
-        var validSubmitContents: List<Pair<Int, Any?>>? = null
+        var validSubmitContents: Unit? = null
         setupCountableOnChange(validSubmit, 1) {
             validSubmitContents = it
         }
@@ -196,9 +191,9 @@ class LiveDataFormTest {
         assertNull(currentFormValidation)
         assertNull(validSubmitContents)
 
-        emailLiveData.value = ""
-        passwordLiveData.value = ""
-        ageLiveData.value = MIN_AGE_VALUE - 1
+        email.input.value = ""
+        password.input.value = ""
+        age.input.value = MIN_AGE_VALUE - 1
 
         if (afterSubmit) {
             // nothing should be initialized yet
@@ -223,7 +218,7 @@ class LiveDataFormTest {
             assertNull(validSubmitContents)
         }
 
-        submit.value = true
+        form.doSubmit()
 
         // field validation was triggered
         assertNotNull(emailMessages)
@@ -257,9 +252,9 @@ class LiveDataFormTest {
 
 
         // valid form
-        emailLiveData.value = VALID_EMAIL
-        passwordLiveData.value = VALID_PASSWORD
-        ageLiveData.value = MIN_AGE_VALUE
+        email.input.value = VALID_EMAIL
+        password.input.value = VALID_PASSWORD
+        age.input.value = MIN_AGE_VALUE
 
         // all messages are empty
         assertTrue(emailMessages!!.isEmpty())
@@ -268,16 +263,6 @@ class LiveDataFormTest {
 
         // the form is valid
         assertTrue(currentFormValidation!!)
-
-        submit.value = true
-
-        // valid form submit triggered
-        assertEquals(validSubmitContents, listOf(
-                Pair(EMAIL_ID, VALID_EMAIL),
-                Pair(PASSWORD_ID, VALID_PASSWORD),
-                Pair(AGE_ID, MIN_AGE_VALUE))
-        )
-
     }
 
 }

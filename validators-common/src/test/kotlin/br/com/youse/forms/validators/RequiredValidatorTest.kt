@@ -31,7 +31,7 @@ import kotlin.test.assertTrue
 
 class RequiredValidatorTest {
 
-    private lateinit var validator: Validator<CharSequence>
+    private lateinit var validator: Validator<String>
     
     @BeforeTest
     fun setup() {
