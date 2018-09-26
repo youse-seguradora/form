@@ -36,7 +36,7 @@ interface IForm<T> {
          * {@code fields} is list of {@link Pair}, each one with the field key and the current value of that field.
          * NOTE: As each field can be of a different type we need to use Any here.
          */
-        fun onValidSubmit(fields: List<Pair<T, Any>>)
+        fun onValidSubmit(fields: List<Pair<T, Any?>>)
     }
 
     interface SubmitFailed<T> {
@@ -65,11 +65,7 @@ interface IForm<T> {
         fun onChange(validation: Pair<T, List<ValidationMessage>>)
     }
 
-    /**
-     * Class that notifies its listener every time the value changes.
-     */
-    class ObservableValue<T>(initialValue: T) {
-
+    interface IObservableValue<T> {
         interface ValueObserver<T> {
             /**
              * Notifies a value change.
@@ -77,7 +73,19 @@ interface IForm<T> {
             fun onChange(value: T)
         }
 
-        private var listener: IForm.ObservableValue.ValueObserver<T>? = null
+        /**
+         * Sets a listener for {@code value} changes.s
+         */
+        fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>)
+    }
+
+    /**
+     * Class that notifies its listener every time the value changes.
+     * This class requires an {@code initialValue}, if one is not available, use {@Link DeferredObservableValue} class.
+     */
+    class ObservableValue<T>(initialValue: T) : IObservableValue<T> {
+
+        private var listener: IObservableValue.ValueObserver<T>? = null
 
         var value: T by Delegates.observable(initialValue) { _, old, new ->
             if (old != new) {
@@ -87,11 +95,39 @@ interface IForm<T> {
 
 
         /**
-         * Sets a listener for {@code value} changes.s
+         * Sets a listener for {@code value} changes.
          */
-        fun setValueListener(valueObserver: IForm.ObservableValue.ValueObserver<T>) {
+        override fun setValueListener(valueObserver: IForm.IObservableValue.ValueObserver<T>) {
             listener = valueObserver
             listener?.onChange(value)
+        }
+    }
+
+    /**
+     * Class that notifies its listener every time the value changes.
+     * This class uses a nullable {@code value}, if an initial value is available
+     * when the form is being build, use {@Link ObservableValue}.
+     */
+    class DeferredObservableValue<T> : IObservableValue<T> {
+        private var listener: IObservableValue.ValueObserver<T>? = null
+        private var value: T? = null
+
+        /**
+         * Sets a listener for {@code value} changes.
+         */
+        override fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>) {
+            this.listener = valueObserver
+        }
+
+        /**
+         *  Updates the current value if the new value is different.
+         *  Only calls the listener if the current value is updated.
+         */
+        fun setValue(value: T) {
+            if (value != this.value) {
+                this.value = value
+                this.listener?.onChange(value)
+            }
         }
     }
 
@@ -127,7 +163,7 @@ interface IForm<T> {
          * an {@code observableValue} that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T, observableValue: IForm.ObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
+        fun <R> addFieldValidations(key: T, observableValue: IForm.IObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
 
         /**
          * Builds the {@code IForm}.

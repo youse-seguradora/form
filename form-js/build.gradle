@@ -1,0 +1,58 @@
+apply plugin: 'kotlin2js'
+apply plugin: 'kotlin-dce-js'
+apply plugin: 'org.jetbrains.kotlin.platform.js'
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+
+archivesBaseName = 'form'
+
+dependencies {
+    expectedBy project(':form-common')
+    compile deps.kotlin.stdlib.js
+    testCompile deps.kotlin.test.js
+}
+
+kotlinFrontend {
+    downloadNodeJsVersion = "latest"
+
+    npm {
+        dependency "style-loader"
+
+        devDependency("karma")
+        devDependency("karma-spec-reporter")
+    }
+
+    webpackBundle {
+        bundleName = "form"
+        contentPath = file('src/main/web')
+        mode = 'development'
+ //      mode = 'production'
+    }
+
+    define "PRODUCTION", false
+
+    karma {
+        enableWebPack = true
+        reporters = ["spec"]
+        frameworks = ["qunit"]
+        plugins = ["karma-spec-reporter"]
+    }
+}
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "call"
+}
+
+compileTestKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/js-tests/${project.name}-tests.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "call"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

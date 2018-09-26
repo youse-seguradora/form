@@ -39,7 +39,7 @@ class ObservableValueTest {
         assertEquals(observableValue.value, 2)
         var expectedValue = 2
         var count = 0
-        observableValue.setValueListener(object : IForm.ObservableValue.ValueObserver<Int> {
+        observableValue.setValueListener(object : IForm.IObservableValue.ValueObserver<Int> {
             override fun onChange(value: Int) {
                 assertEquals(value, expectedValue)
                 count++

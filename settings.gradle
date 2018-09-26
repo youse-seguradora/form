@@ -1,9 +1,23 @@
 rootProject.name = 'forms'
 include ':app',
+
+        // common
         ':form-common',
         ':validators-common',
         ':formatters-common',
+
+        // jdk
         ':form-jdk',
         ':validators-jdk',
         ':formatters-jdk',
-        ':rxform'
+        ':rx-form-jdk',
+
+        // android
+        ':livedata-form',
+        ':databinding-livedata-form',
+        ':formatters-android'
+
+        // js
+        ':form-js'
+
+

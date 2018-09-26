@@ -25,7 +25,7 @@ package br.com.youse.forms.validators
 
 import br.com.youse.forms.validators.ValidationTypes.Companion.REQUIRED
 
-class RequiredValidator(val message: String) : Validator<CharSequence> {
+class RequiredValidator(val message: String) : Validator<String?> {
 
     private val validationMessage = ValidationMessage(message = message, validationType = REQUIRED)
 
@@ -33,7 +33,7 @@ class RequiredValidator(val message: String) : Validator<CharSequence> {
         return validationMessage
     }
 
-    override fun isValid(input: CharSequence): Boolean {
-        return input.isNotEmpty()
+    override fun isValid(input: String?): Boolean {
+        return !input.isNullOrEmpty()
     }
 }

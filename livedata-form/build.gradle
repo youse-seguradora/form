@@ -1,0 +1,31 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+
+archivesBaseName = 'form-livedata'
+android {
+    compileSdkVersion versions.compileSdk
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
+
+}
+dependencies {
+
+    api project(":form-jdk")
+
+    implementation deps.kotlin.stdlib.jdk
+    implementation deps.android.arch.lifecycle.extensions
+
+    testImplementation deps.kotlin.test.jdk
+    testImplementation deps.kotlin.test.annotations
+    testImplementation deps.android.arch.core.testing
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

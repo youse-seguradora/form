@@ -1,14 +1,16 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+repositories {
+    maven { url 'https://dl.bintray.com/musichin/maven' }
+}
 
 android {
     compileSdkVersion versions.compileSdk
 
     defaultConfig {
-        applicationId "br.com.youse.forms.rxformvalidator"
+        applicationId "br.com.youse.forms"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
         versionCode 1
@@ -22,6 +24,10 @@ android {
         }
     }
 
+    dataBinding {
+        enabled = true
+    }
+
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
@@ -30,8 +36,10 @@ android {
 }
 
 dependencies {
-
-    implementation project(":rxform")
+    implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
+    implementation 'com.github.musichin.reactivelivedata:reactivelivedata:0.14.0'
+    implementation project(':databinding-livedata-form')
+    implementation project(':rx-form-jdk')
     implementation project(":validators-jdk")
     implementation project(':formatters-jdk')
 
@@ -41,8 +49,12 @@ dependencies {
     implementation deps.android.support.constraintLayout
     implementation deps.rx.java
     implementation deps.rx.binding
+    implementation deps.android.arch.lifecycle.extensions
+    implementation deps.android.arch.lifecycle.reactivestreams
 
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     androidTestImplementation deps.junit
+
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

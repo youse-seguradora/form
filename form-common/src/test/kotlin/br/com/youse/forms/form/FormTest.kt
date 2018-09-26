@@ -29,6 +29,7 @@ import br.com.youse.forms.validators.ValidationType
 import br.com.youse.forms.validators.Validator
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 
@@ -128,7 +129,7 @@ class FormTest {
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
                         fail()
 
                     }
@@ -177,7 +178,7 @@ class FormTest {
                     }
                 })
                 .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any>>) {
+                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
                         if (!validate) {
                             fail()
                         }
@@ -224,5 +225,56 @@ class FormTest {
 
         assertEquals(onValidSubmitCounter, 1)
         assertEquals(onFailedSubmitCounter, 1)
+    }
+
+    @Test
+    fun shouldCallOnFieldValidationChangeDueFieldValidation() {
+        val emailObservable = IForm.ObservableValue("foo")
+        val firstMessage = "first error message"
+        val secondMessage = "second error message"
+        val emailValidators = listOf(object : Validator<CharSequence> {
+            override fun validationMessage(): ValidationMessage {
+                return ValidationMessage(firstMessage, VALID_EMAIL_TYPE)
+            }
+
+            override fun isValid(input: CharSequence): Boolean {
+                return input.isNotEmpty()
+            }
+        }, object : Validator<CharSequence> {
+            override fun validationMessage(): ValidationMessage {
+                return ValidationMessage(secondMessage, VALID_EMAIL_TYPE)
+            }
+
+            override fun isValid(input: CharSequence): Boolean {
+                return input.contains("@")
+            }
+        })
+
+        var lastMesasges = listOf<ValidationMessage>()
+
+        val form = Form.Builder<Int>()
+                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
+                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
+
+                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
+                        lastMesasges = validation.second
+                    }
+                })
+                .build()
+
+        emailObservable.value = ""
+
+        form.doSubmit()
+
+        assertEquals(lastMesasges.first().message, firstMessage)
+
+        emailObservable.value = " "
+
+        assertEquals(lastMesasges.first().message, secondMessage)
+
+        emailObservable.value = "@"
+
+        assertTrue(lastMesasges.isEmpty())
+
     }
 }
