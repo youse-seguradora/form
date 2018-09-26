@@ -56,8 +56,8 @@ class RxForm2<T>(
         var isBuilt = false
         val observableValues = mutableMapOf<T, IForm.ObservableValue<Any>>()
 
-
         fieldObservables.forEach { (key, observable) ->
+            val observableValue = IForm.DeferredObservableValue<Any?>()
 
             disposables.add(
                     observable.subscribe { value ->
