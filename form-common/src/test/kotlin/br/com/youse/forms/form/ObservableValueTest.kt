@@ -51,7 +51,7 @@ class ObservableValueTest {
         observableValue.value = 3
         assertEquals(count, 2)
 
-        // should not call onChange...
+        // should not call onFormValidationChange...
         observableValue.value = 3
         assertEquals(count, 2)
     }

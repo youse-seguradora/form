@@ -35,7 +35,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
               private val validSubmitListener: ValidSubmit<T>?,
               private val submitFailedListener: SubmitFailed<T>?,
               private val strategy: ValidationStrategy,
-              fieldValidations: Map<T, Pair<IObservableValue<*>, List<Validator<*>>>>) : IForm<T> {
+              fieldValidations: Map<T, Pair<IObservableValue<*>, List<Validator<*>>>>) : IForm {
 
 
     private val lastFieldsMessages = mutableMapOf<T, Pair<Any?, List<ValidationMessage>>>()
@@ -70,7 +70,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
                     if (notifyListener && hasFieldValidationChanged) {
                         // notify field validation changed
-                        fieldValidationListener?.onChange(Pair(key, messages))
+                        fieldValidationListener?.onFieldValidationChange(key, messages)
                     }
                     lastFieldsMessages[key] = Pair(value, messages)
 
@@ -82,7 +82,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
                     if (notifyListener && hasFormValidationChanged) {
                         // notify form validation changed
-                        formValidationListener?.onChange(areAllFieldsValid)
+                        formValidationListener?.onFormValidationChange(areAllFieldsValid)
                     }
                     isFormValid = areAllFieldsValid
                 }
@@ -105,11 +105,11 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
             lastFieldsMessages.forEach { it ->
                 val key = it.key
                 val values = it.value
-                fieldValidationListener?.onChange(Pair(key, values.second))
+                fieldValidationListener?.onFieldValidationChange(key, values.second)
             }
 
             // notify form validation changed
-            formValidationListener?.onChange(areAllFieldsValid)
+            formValidationListener?.onFormValidationChange(areAllFieldsValid)
         }
 
         if (areAllFieldsValid) {
@@ -122,7 +122,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         } else {
 
             // notify a not valid submit
-            submitFailedListener?.onValidationFailed(lastFieldsMessages
+            submitFailedListener?.onSubmitFailed(lastFieldsMessages
                     .filter { it.value.second.isNotEmpty() }
                     .map { (key, values) ->
                         Pair(key, values.second)
@@ -169,7 +169,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         }
 
 
-        override fun build(): IForm<T> {
+        override fun build(): IForm {
 
             return Form(fieldValidationListener = fieldValidationListener,
                     formValidationListener = formValidationListener,
