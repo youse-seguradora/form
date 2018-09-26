@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
@@ -100,9 +101,9 @@ class FormTest {
     @Test
     fun shouldValidateAllTheTime() {
 
-        val emailObservable = IForm.ObservableValue("foo")
-        val passwordObservable = IForm.ObservableValue("bar")
-        val ageObservable = IForm.ObservableValue(MIN_AGE_VALUE - 1)
+        val emailObservable = ObservableValue("foo")
+        val passwordObservable = ObservableValue("bar")
+        val ageObservable = ObservableValue(MIN_AGE_VALUE - 1)
 
         val validationsList = listOf(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
@@ -145,9 +146,9 @@ class FormTest {
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
-        val emailObservable = IForm.ObservableValue("foo")
-        val passwordObservable = IForm.ObservableValue("bar")
-        val ageObservable = IForm.ObservableValue(MIN_AGE_VALUE - 1)
+        val emailObservable = ObservableValue("foo")
+        val passwordObservable = ObservableValue("bar")
+        val ageObservable = ObservableValue(MIN_AGE_VALUE - 1)
 
         var validate = false
         var onFieldChangeCounter = 0
@@ -229,7 +230,7 @@ class FormTest {
 
     @Test
     fun shouldCallOnFieldValidationChangeDueFieldValidation() {
-        val emailObservable = IForm.ObservableValue("foo")
+        val emailObservable = ObservableValue("foo")
         val firstMessage = "first error message"
         val secondMessage = "second error message"
         val emailValidators = listOf(object : Validator<CharSequence> {
