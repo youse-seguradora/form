@@ -6,13 +6,13 @@ buildscript {
             'compileSdk'      : 28,
             'targetSdk'       : 28,
 
-            'kotlin'          : '1.2.60',
+            'kotlin'          : '1.2.71',
 
-            'androidPlugin'   : '3.1.4',
+            'androidPlugin'   : '3.2.0',
 
-            'supportLibrary'  : '27.1.1',
+            'supportLibrary'  : '28.0.0',
             'androidArch'     : '1.1.1',
-            'rxJava'          : '2.1.7',
+            'rxJava'          : '2.2.2',
             'rxBinding'       : '2.1.1',
             'constraintLayout': '1.1.2',
             'junit'           : '4.12'
@@ -20,7 +20,6 @@ buildscript {
 
     ext.deps = [
             androidPlugin      : "com.android.tools.build:gradle:${versions.androidPlugin}",
-            databindingCompiler: "com.android.databinding:compiler:${versions.androidPlugin}",
             kotlin             : [
                     stdlib: [
                             'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
@@ -52,7 +51,7 @@ buildscript {
                             core     : [testing: "android.arch.core:core-testing:${versions.androidArch}"]
                     ]
             ],
-            annotations        : 'org.jetbrains:annotations:16.0.1',
+            annotations        : 'org.jetbrains:annotations:16.0.3',
 
             junit              : "junit:junit:${versions.junit}"
     ]
@@ -66,7 +65,7 @@ buildscript {
 
     dependencies {
         classpath deps.androidPlugin
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
         classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.37"
     }
