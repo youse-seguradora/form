@@ -99,7 +99,7 @@ interface IForm<T> {
          */
         override fun setValueListener(valueObserver: IForm.IObservableValue.ValueObserver<T>) {
             listener = valueObserver
-            listener?.onChange(value)
+            valueObserver.onChange(value)
         }
     }
 
@@ -117,6 +117,9 @@ interface IForm<T> {
          */
         override fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>) {
             this.listener = valueObserver
+            if (value != null) {
+                valueObserver.onChange(value!!)
+            }
         }
 
         /**

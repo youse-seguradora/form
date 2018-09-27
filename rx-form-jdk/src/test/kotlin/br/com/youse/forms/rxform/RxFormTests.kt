@@ -32,9 +32,11 @@ import io.reactivex.subjects.PublishSubject
 import kotlin.test.Test
 
 
-abstract class RxFormTests {
-    abstract fun <T> getBuilder(submit: Observable<Unit>,
-                                strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT): IRxForm.Builder<T>
+class RxFormTests {
+    private fun <T> getBuilder(submit: Observable<Unit>,
+                               strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT): IRxForm.Builder<T> {
+        return RxForm.Builder(submit, strategy)
+    }
 
     companion object {
         private const val EMAIL_ID = 1
@@ -129,12 +131,6 @@ abstract class RxFormTests {
         )
 
         formSub.assertValue(false)
-
-        submitFailedSub.assertValue(listOf(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
-        ))
 
         validSubmitSub.assertNoValues().assertNoErrors()
 
