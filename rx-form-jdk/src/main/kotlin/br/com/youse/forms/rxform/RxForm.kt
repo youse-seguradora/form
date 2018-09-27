@@ -25,6 +25,7 @@ package br.com.youse.forms.rxform
 
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.DeferredObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -49,12 +50,12 @@ class RxForm<T>(
     init {
         val builder = Form.Builder<T>(strategy = strategy)
                 .setFieldValidationListener(object : FieldValidationChange<T> {
-                    override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
-                        fieldValidationChange.onNext(validation)
+                    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
+                        fieldValidationChange.onNext(Pair(key, validations))
                     }
                 })
                 .setFormValidationListener(object : FormValidationChange {
-                    override fun onChange(isValid: Boolean) {
+                    override fun onFormValidationChange(isValid: Boolean) {
                         formValidationChange.onNext(isValid)
                     }
                 })
@@ -64,7 +65,7 @@ class RxForm<T>(
                     }
                 })
                 .setSubmitFailedListener(object : SubmitFailed<T> {
-                    override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+                    override fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
                         submitFailed.onNext(validations)
                     }
                 })

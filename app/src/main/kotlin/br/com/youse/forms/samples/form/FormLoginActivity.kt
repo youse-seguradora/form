@@ -33,6 +33,7 @@ import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
@@ -101,18 +102,18 @@ class FormLoginActivity : AppCompatActivity(),
 
     }
 
-    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
-        val field = findViewById<TextInputLayout>(validation.first)
-        field.isErrorEnabled = validation.second.isNotEmpty()
-        field.error = validation.second.joinToString { it.message }
+    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
+        val field = findViewById<TextInputLayout>(key)
+        field.isErrorEnabled = validations.isNotEmpty()
+        field.error = validations.joinToString { it.message }
 
     }
 
-    override fun onChange(isValid: Boolean) {
+    override fun onFormValidationChange(isValid: Boolean) {
         submit.isEnabled = isValid
     }
 
-    override fun onValidationFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
+    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
         validations.firstOrNull()?.first?.let {
             // Scroll to this view to highlight the problem, or make the field blink
             // it's up to you. :-P

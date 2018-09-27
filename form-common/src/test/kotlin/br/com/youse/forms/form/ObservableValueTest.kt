@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import br.com.youse.forms.form.models.ObservableValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -32,14 +33,14 @@ class ObservableValueTest {
 
     @Test
     fun shouldUpdateValue() {
-        val observableValue = IForm.ObservableValue(1)
+        val observableValue = ObservableValue(1)
 
         assertEquals(observableValue.value, 1)
         observableValue.value = 2
         assertEquals(observableValue.value, 2)
         var expectedValue = 2
         var count = 0
-        observableValue.setValueListener(object : IForm.IObservableValue.ValueObserver<Int> {
+        observableValue.setValueListener(object : IObservableValue.ValueObserver<Int> {
             override fun onChange(value: Int) {
                 assertEquals(value, expectedValue)
                 count++
@@ -51,7 +52,7 @@ class ObservableValueTest {
         observableValue.value = 3
         assertEquals(count, 2)
 
-        // should not call onChange...
+        // should not call onFormValidationChange...
         observableValue.value = 3
         assertEquals(count, 2)
     }

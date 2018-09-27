@@ -29,6 +29,7 @@ import android.support.design.widget.TextInputLayout
 import android.widget.Toast
 import br.com.youse.forms.rxform.IRxForm
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import br.com.youse.forms.R
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
@@ -90,6 +91,7 @@ class RxLoginActivity : AppCompatActivity() {
 
                     //TODO: submit email and password to server
                     Toast.makeText(this@RxLoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
+                    Log.d("Debug", "email : $email, password: $$password")
 
                 })
     }

@@ -25,10 +25,9 @@ package br.com.youse.forms.form
 
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
-import kotlin.properties.Delegates
 
 
-interface IForm<T> {
+interface IForm {
 
     interface ValidSubmit<T> {
         /**
@@ -45,7 +44,7 @@ interface IForm<T> {
          * {@code validations} is an sorted list of {@link Pair}, each one with the field key and a list of validation messages.
          * This is useful in case you want to scroll or give focus to the first or last invalid field.
          */
-        fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>)
+        fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>)
     }
 
     interface FormValidationChange {
@@ -53,7 +52,7 @@ interface IForm<T> {
          * It's called every time the form validation changes.
          * {@code isValid} is boolean indicating if the form is valid (true) or not (false).
          */
-        fun onChange(isValid: Boolean)
+        fun onFormValidationChange(isValid: Boolean)
     }
 
     interface FieldValidationChange<T> {
@@ -62,76 +61,7 @@ interface IForm<T> {
          * {@code validation} contains the field key and a list of validation messages,
          * if the validation messages list is empty the field it valid.
          */
-        fun onChange(validation: Pair<T, List<ValidationMessage>>)
-    }
-
-    interface IObservableValue<T> {
-        interface ValueObserver<T> {
-            /**
-             * Notifies a value change.
-             */
-            fun onChange(value: T)
-        }
-
-        /**
-         * Sets a listener for {@code value} changes.s
-         */
-        fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>)
-    }
-
-    /**
-     * Class that notifies its listener every time the value changes.
-     * This class requires an {@code initialValue}, if one is not available, use {@Link DeferredObservableValue} class.
-     */
-    class ObservableValue<T>(initialValue: T) : IObservableValue<T> {
-
-        private var listener: IObservableValue.ValueObserver<T>? = null
-
-        var value: T by Delegates.observable(initialValue) { _, old, new ->
-            if (old != new) {
-                listener?.onChange(new)
-            }
-        }
-
-
-        /**
-         * Sets a listener for {@code value} changes.
-         */
-        override fun setValueListener(valueObserver: IForm.IObservableValue.ValueObserver<T>) {
-            listener = valueObserver
-            valueObserver.onChange(value)
-        }
-    }
-
-    /**
-     * Class that notifies its listener every time the value changes.
-     * This class uses a nullable {@code value}, if an initial value is available
-     * when the form is being build, use {@Link ObservableValue}.
-     */
-    class DeferredObservableValue<T> : IObservableValue<T> {
-        private var listener: IObservableValue.ValueObserver<T>? = null
-        private var value: T? = null
-
-        /**
-         * Sets a listener for {@code value} changes.
-         */
-        override fun setValueListener(valueObserver: IObservableValue.ValueObserver<T>) {
-            this.listener = valueObserver
-            if (value != null) {
-                valueObserver.onChange(value!!)
-            }
-        }
-
-        /**
-         *  Updates the current value if the new value is different.
-         *  Only calls the listener if the current value is updated.
-         */
-        fun setValue(value: T) {
-            if (value != this.value) {
-                this.value = value
-                this.listener?.onChange(value)
-            }
-        }
+        fun onFieldValidationChange(key: T, validations: List<ValidationMessage>)
     }
 
     /**
@@ -166,11 +96,11 @@ interface IForm<T> {
          * an {@code observableValue} that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T, observableValue: IForm.IObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
+        fun <R> addFieldValidations(key: T, observableValue: IObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
 
         /**
          * Builds the {@code IForm}.
          */
-        fun build(): IForm<T>
+        fun build(): IForm
     }
 }
