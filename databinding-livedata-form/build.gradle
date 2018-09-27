@@ -28,7 +28,6 @@ dependencies {
     implementation deps.kotlin.stdlib.jdk
     implementation deps.android.arch.lifecycle.extensions
     implementation deps.android.support.design
-    kapt deps.databindingCompiler
 
     testImplementation deps.kotlin.test.jdk
     testImplementation deps.kotlin.test.annotations
