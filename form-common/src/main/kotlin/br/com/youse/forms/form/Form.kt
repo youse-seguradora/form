@@ -24,6 +24,7 @@ SOFTWARE.
 package br.com.youse.forms.form
 
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -35,7 +36,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
               private val validSubmitListener: ValidSubmit<T>?,
               private val submitFailedListener: SubmitFailed<T>?,
               private val strategy: ValidationStrategy,
-              fieldValidations: Map<T, Pair<IObservableValue<*>, List<Validator<*>>>>) : IForm {
+              fields: List<FormField<T, *>>) : IForm {
 
 
     private val lastFieldsMessages = mutableMapOf<T, Pair<Any?, List<ValidationMessage>>>()
@@ -45,11 +46,11 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
     init {
 
-        fieldValidations.forEach { it ->
+        fields.forEach { it ->
             val key = it.key
-            val pair = it.value
-            val observableValue = pair.first as IObservableValue<Any?>
-            val validators = pair.second as List<Validator<Any?>>
+
+            val observableValue = it.input as IObservableValue<Any?>
+            val validators = it.validators as List<Validator<Any?>>
             val listener = object : IObservableValue.ValueObserver<Any?> {
                 override fun onChange(value: Any?) {
 
@@ -159,15 +160,21 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
             return this
         }
 
-        private val fieldValidations = mutableMapOf<T, Pair<IObservableValue<*>, List<Validator<*>>>>()
+        private val fields = mutableListOf<FormField<T, *>>()
 
-        override fun <R> addFieldValidations(key: T,
-                                             observableValue: IObservableValue<R>,
-                                             validators: List<Validator<R>>): IForm.Builder<T> {
-            fieldValidations[key] = Pair(observableValue, validators)
+        override fun <R> addField(key: T,
+                                  input: IObservableValue<R>,
+                                  validators: List<Validator<R>>): IForm.Builder<T> {
+            fields.add(FormField(key = key,
+                    input = input,
+                    validators = validators))
             return this
         }
 
+        override fun <R> addField(field: FormField<T, R>): IForm.Builder<T> {
+            fields.add(field)
+            return this
+        }
 
         override fun build(): IForm {
 
@@ -176,7 +183,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
                     validSubmitListener = validSubmitListener,
                     submitFailedListener = submitFailedListener,
                     strategy = strategy,
-                    fieldValidations = fieldValidations)
+                    fields = fields)
         }
 
     }

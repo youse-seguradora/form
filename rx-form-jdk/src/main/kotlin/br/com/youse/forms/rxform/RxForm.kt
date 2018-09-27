@@ -72,7 +72,7 @@ class RxForm<T>(
 
         fieldObservables.forEach { (key, observable, validators) ->
             val field = DeferredObservableValue<Any?>()
-            builder.addFieldValidations(key, field, validators)
+            builder.addField(key, field, validators)
             disposables.add(
                     observable.subscribe { value ->
                         field.setValue(value)
@@ -114,11 +114,11 @@ class RxForm<T>(
 
         @Suppress("UNCHECKED_CAST")
         override fun <R> addFieldValidations(key: T,
-                                             fieldObservable: Observable<R>,
+                                             input: Observable<R>,
                                              validators: List<Validator<R>>): IRxForm.Builder<T> {
             val triple = Triple(
                     key,
-                    fieldObservable as Observable<Any?>,
+                    input as Observable<Any?>,
                     validators as List<Validator<Any?>>
             )
             fieldObservables.add(triple)

@@ -28,6 +28,7 @@ import android.arch.lifecycle.MutableLiveData
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.models.DeferredObservableValue
+import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -74,7 +75,7 @@ class LiveDataForm<T>(
             val validators = entry.validators as List<Validator<Any?>>
             val value = DeferredObservableValue<Any?>()
             initialValues[fieldKey] = value
-            builder.addFieldValidations(fieldKey, value, validators)
+            builder.addField(fieldKey, value, validators)
         }
 
         fields.forEach { field ->

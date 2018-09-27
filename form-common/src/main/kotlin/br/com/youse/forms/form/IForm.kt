@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
@@ -93,11 +94,17 @@ interface IForm {
 
         /**
          * Adds a field to the builder, it takes a {@code key} to identify the field,
-         * an {@code observableValue} that emits the field value changes and a list
+         * an {@code input} that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T, observableValue: IObservableValue<R>, validators: List<Validator<R>>): IForm.Builder<T>
+        fun <R> addField(key: T,
+                         input: IObservableValue<R>,
+                         validators: List<Validator<R>>): IForm.Builder<T>
 
+        /**
+         * Adds a field to the builder, it takes a {@code field} of FormField type.
+         */
+        fun <R> addField(field: FormField<T, R>): IForm.Builder<T>
         /**
          * Builds the {@code IForm}.
          */

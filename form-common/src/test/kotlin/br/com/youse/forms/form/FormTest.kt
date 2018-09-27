@@ -110,9 +110,9 @@ class FormTest {
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
         Form.Builder<Int>(ValidationStrategy.ALL_TIME)
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addField(AGE_ID, ageObservable, ageValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
                     var index = 0
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -159,9 +159,9 @@ class FormTest {
         var onFailedSubmitCounter = 0
 
         val form = Form.Builder<Int>()
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addField(AGE_ID, ageObservable, ageValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -256,7 +256,7 @@ class FormTest {
         var lastMesasges = listOf<ValidationMessage>()
 
         val form = Form.Builder<Int>()
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {

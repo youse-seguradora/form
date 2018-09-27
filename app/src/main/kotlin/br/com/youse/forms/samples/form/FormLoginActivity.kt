@@ -89,9 +89,9 @@ class FormLoginActivity : AppCompatActivity(),
                 .setFormValidationListener(this)
                 .setValidSubmitListener(this)
                 .setSubmitFailedListener(this)
-                .addFieldValidations(emailContainer.id,
+                .addField(emailContainer.id,
                         emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id,
+                .addField(passwordContainer.id,
                         passwordChanges,
                         passwordValidations)
                 .build()
