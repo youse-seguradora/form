@@ -78,8 +78,13 @@ interface IRxForm<T> {
                          validators: List<Validator<R>>): Builder<T>
 
         /**
+         * Adds a field to the builder, it takes a {code field} of type RxField.
+         */
+        fun <R> addField(field: RxField<T, R>): Builder<T>
+        /**
          *  Builds the form.
          */
         fun build(): IRxForm<T>
+
     }
 }

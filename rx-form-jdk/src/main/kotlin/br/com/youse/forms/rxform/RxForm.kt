@@ -33,10 +33,11 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
+@Suppress("UNCHECKED_CAST")
 class RxForm<T>(
         submitObservable: Observable<Unit>,
         strategy: ValidationStrategy,
-        fieldObservables: List<Triple<T, Observable<Any?>, List<Validator<Any?>>>>
+        fields: List<RxField<T, *>>
 ) : IRxForm<T> {
 
     private val disposables = CompositeDisposable()
@@ -70,7 +71,10 @@ class RxForm<T>(
                     }
                 })
 
-        fieldObservables.forEach { (key, observable, validators) ->
+        fields.forEach { it ->
+            val key = it.key
+            val observable = it.input as Observable<Any?>
+            val validators = it.validators as List<Validator<Any?>>
             val field = DeferredObservableValue<Any?>()
             builder.addField(key, field, validators)
             disposables.add(
@@ -110,18 +114,23 @@ class RxForm<T>(
     class Builder<T>(private val submitObservable: Observable<Unit>,
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
-        private val fieldObservables = mutableListOf<Triple<T, Observable<Any?>, List<Validator<Any?>>>>()
+        private val fields = mutableListOf<RxField<T, *>>()
 
         @Suppress("UNCHECKED_CAST")
-        fun <R> addField(key: T,
-                         input: Observable<R>,
-                         validators: List<Validator<R>>): IRxForm.Builder<T> {
-            val triple = Triple(
+        override fun <R> addField(key: T,
+                                  input: Observable<R>,
+                                  validators: List<Validator<R>>): IRxForm.Builder<T> {
+            val field = RxField(
                     key,
                     input as Observable<Any?>,
                     validators as List<Validator<Any?>>
             )
-            fieldObservables.add(triple)
+            fields.add(field)
+            return this
+        }
+
+        override fun <R> addField(field: RxField<T, R>): IRxForm.Builder<T> {
+            fields.add(field)
             return this
         }
 
@@ -129,7 +138,7 @@ class RxForm<T>(
             return RxForm(
                     submitObservable = submitObservable,
                     strategy = strategy,
-                    fieldObservables = fieldObservables)
+                    fields = fields)
         }
     }
 }
