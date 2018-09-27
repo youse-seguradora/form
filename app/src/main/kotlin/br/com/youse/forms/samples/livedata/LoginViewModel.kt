@@ -64,8 +64,8 @@ class LoginViewModel : ViewModel() {
     val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
     val form = LiveDataForm.Builder<String>()
-            .addFieldValidations(email)
-            .addFieldValidations(password)
+            .addField(email)
+            .addField(password)
             .build()
 
 

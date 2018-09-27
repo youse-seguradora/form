@@ -109,9 +109,9 @@ class RxFormTests {
     @Test
     fun shouldValidateAllTheTime() {
         val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addField(AGE_ID, ageObservable, ageValidators)
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -139,9 +139,9 @@ class RxFormTests {
     @Test
     fun shouldExecuteValidationAfterSubmit() {
         val form = getBuilder<Int>(submit)
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addField(AGE_ID, ageObservable, ageValidators)
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -204,9 +204,9 @@ class RxFormTests {
     @Test
     fun shouldNotValidateBeforeSubmit() {
         val form = getBuilder<Int>(submit)
-                .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
-                .addFieldValidations(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addFieldValidations(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
+                .addField(AGE_ID, ageObservable, ageValidators)
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()

@@ -144,9 +144,9 @@ class LiveDataFormTest {
         val strategy = if (afterSubmit) ValidationStrategy.AFTER_SUBMIT else ValidationStrategy.ALL_TIME
 
         val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
-                .addFieldValidations(email)
-                .addFieldValidations(password)
-                .addFieldValidations(age)
+                .addField(email)
+                .addField(password)
+                .addField(age)
                 .build()
 
         var emailMessages: List<ValidationMessage>? = null

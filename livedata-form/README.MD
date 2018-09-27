@@ -6,7 +6,7 @@ LiveData version of `Form`
 How to `LiveDataForm`
 --------
 1) Create a `LiveDataForm.Builder<T>()` where `T` is the type of each field key;
-2) Call `builder.addFieldValidations()` as many LiveField`s in the form;
+2) Call `builder.addField()` as many LiveField`s in the form;
 3) Execute the `builder.build()` method to get a hold of a `LiveDataForm` instance;
 4) Observe the `form.onFormValidationChange` MediatorLiveData<Boolean>, this will bootstrap the form validation. Without it the form will not work!!
 5) Observe to the other LiveData available from the `LiveDataForm` instance methods;
@@ -24,8 +24,8 @@ val email = LiveField(key = EMAIL_ID, validators = emailValidators)
 val password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
 
 val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
-        .addFieldValidations(email)
-        .addFieldValidations(password)
+        .addField(email)
+        .addField(password)
         .build()
 ```
 

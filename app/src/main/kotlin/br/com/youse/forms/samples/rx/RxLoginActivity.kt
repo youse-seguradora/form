@@ -34,7 +34,6 @@ import br.com.youse.forms.R
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationMessage
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
@@ -66,8 +65,8 @@ class RxLoginActivity : AppCompatActivity() {
         val passwordChanges = password.textChanges().map { it.toString() }
 
         form = RxForm.Builder<Int>(submitHappens)
-                .addFieldValidations(emailContainer.id, emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id, passwordChanges, passwordValidations)
+                .addField(emailContainer.id, emailChanges, emailValidations)
+                .addField(passwordContainer.id, passwordChanges, passwordValidations)
                 .build()
 
         disposables.add(form.onFieldValidationChange()

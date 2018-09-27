@@ -97,7 +97,7 @@ class LiveDataForm<T>(
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
         private val fields = mutableListOf<LiveField<*, *>>()
 
-        fun <R> addFieldValidations(field: LiveField<T, R>): LiveDataForm.Builder<T> {
+        fun <R> addField(field: LiveField<T, R>): LiveDataForm.Builder<T> {
             fields.add(field)
             return this
         }

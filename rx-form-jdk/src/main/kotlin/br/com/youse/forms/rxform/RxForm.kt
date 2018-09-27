@@ -113,9 +113,9 @@ class RxForm<T>(
         private val fieldObservables = mutableListOf<Triple<T, Observable<Any?>, List<Validator<Any?>>>>()
 
         @Suppress("UNCHECKED_CAST")
-        override fun <R> addFieldValidations(key: T,
-                                             input: Observable<R>,
-                                             validators: List<Validator<R>>): IRxForm.Builder<T> {
+        fun <R> addField(key: T,
+                         input: Observable<R>,
+                         validators: List<Validator<R>>): IRxForm.Builder<T> {
             val triple = Triple(
                     key,
                     input as Observable<Any?>,

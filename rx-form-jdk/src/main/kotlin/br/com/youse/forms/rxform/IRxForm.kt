@@ -73,9 +73,9 @@ interface IRxForm<T> {
          * a field observable that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T,
-                                    input: Observable<R>,
-                                    validators: List<Validator<R>>): Builder<T>
+        fun <R> addField(key: T,
+                         input: Observable<R>,
+                         validators: List<Validator<R>>): Builder<T>
 
         /**
          *  Builds the form.
