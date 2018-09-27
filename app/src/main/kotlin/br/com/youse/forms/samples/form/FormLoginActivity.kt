@@ -32,6 +32,7 @@ import android.util.Log
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage

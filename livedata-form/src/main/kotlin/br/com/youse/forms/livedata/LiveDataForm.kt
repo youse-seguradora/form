@@ -27,7 +27,7 @@ import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
-import br.com.youse.forms.form.IForm.DeferredObservableValue
+import br.com.youse.forms.form.models.DeferredObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
