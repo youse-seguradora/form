@@ -27,7 +27,7 @@ import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
 
-interface IForm<T> {
+interface IForm {
 
     interface ValidSubmit<T> {
         /**
@@ -44,7 +44,7 @@ interface IForm<T> {
          * {@code validations} is an sorted list of {@link Pair}, each one with the field key and a list of validation messages.
          * This is useful in case you want to scroll or give focus to the first or last invalid field.
          */
-        fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>)
+        fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>)
     }
 
     interface FormValidationChange {
@@ -52,7 +52,7 @@ interface IForm<T> {
          * It's called every time the form validation changes.
          * {@code isValid} is boolean indicating if the form is valid (true) or not (false).
          */
-        fun onChange(isValid: Boolean)
+        fun onFormValidationChange(isValid: Boolean)
     }
 
     interface FieldValidationChange<T> {
@@ -61,7 +61,7 @@ interface IForm<T> {
          * {@code validation} contains the field key and a list of validation messages,
          * if the validation messages list is empty the field it valid.
          */
-        fun onChange(validation: Pair<T, List<ValidationMessage>>)
+        fun onFieldValidationChange(key: T, validations: List<ValidationMessage>)
     }
 
 
@@ -102,6 +102,6 @@ interface IForm<T> {
         /**
          * Builds the {@code IForm}.
          */
-        fun build(): IForm<T>
+        fun build(): IForm
     }
 }

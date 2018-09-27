@@ -26,6 +26,7 @@ package br.com.youse.forms.samples.rx
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import br.com.youse.forms.R
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
@@ -86,6 +87,7 @@ class RxLoginActivity : AppCompatActivity() {
                     val password = list.first { it.first == passwordContainer.id }.second.toString()
 
                     //TODO: submit email and password to server
+                    Log.d("Debug", "email : $email, password: $$password")
                 })
     }
 

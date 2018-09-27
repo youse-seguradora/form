@@ -115,14 +115,16 @@ class FormTest {
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
                     var index = 0
-                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
-                        assertEquals(validationsList[index], validation)
+                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
+                        assertEquals(validationsList[index].first, key)
+                        assertEquals(validationsList[index].second, validations)
+
                         index++
                     }
                 })
                 .setFormValidationListener(object : IForm.FormValidationChange {
                     var count = 0
-                    override fun onChange(isValid: Boolean) {
+                    override fun onFormValidationChange(isValid: Boolean) {
                         if (count > 0) {
                             fail()
                         }
@@ -136,7 +138,7 @@ class FormTest {
                     }
                 })
                 .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
-                    override fun onValidationFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
+                    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
                         assertEquals(validationsList, validations)
                     }
                 })
@@ -162,7 +164,7 @@ class FormTest {
                 .addFieldValidations(AGE_ID, ageObservable, ageValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
-                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
+                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
                         if (!validate) {
                             fail()
                         }
@@ -171,7 +173,7 @@ class FormTest {
                 })
                 .setFormValidationListener(object : IForm.FormValidationChange {
 
-                    override fun onChange(isValid: Boolean) {
+                    override fun onFormValidationChange(isValid: Boolean) {
                         if (!validate) {
                             fail()
                         }
@@ -187,7 +189,7 @@ class FormTest {
                     }
                 })
                 .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
-                    override fun onValidationFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
+                    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
                         if (!validate) {
                             fail()
                         }
@@ -257,8 +259,8 @@ class FormTest {
                 .addFieldValidations(EMAIL_ID, emailObservable, emailValidators)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
-                    override fun onChange(validation: Pair<Int, List<ValidationMessage>>) {
-                        lastMesasges = validation.second
+                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
+                        lastMesasges = validations
                     }
                 })
                 .build()
