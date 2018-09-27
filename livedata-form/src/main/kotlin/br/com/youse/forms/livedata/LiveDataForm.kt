@@ -42,23 +42,23 @@ class LiveDataForm<T>(
     val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
     val onValidSubmit = MutableLiveData<Unit>()
 
-    private var form: IForm<T>
+    private var form: IForm
 
     init {
 
         val builder = Form.Builder<T>(strategy = strategy)
                 .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
-                    override fun onChange(validation: Pair<T, List<ValidationMessage>>) {
-                        fields.firstOrNull { it.key == validation.first }?.errors?.value = validation.second
+                    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
+                        fields.firstOrNull { it.key == key }?.errors?.value = validations
                     }
                 })
                 .setFormValidationListener(object : IForm.FormValidationChange {
-                    override fun onChange(isValid: Boolean) {
+                    override fun onFormValidationChange(isValid: Boolean) {
                         onFormValidationChange.value = isValid
                     }
                 })
                 .setSubmitFailedListener(object : IForm.SubmitFailed<T> {
-                    override fun onValidationFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+                    override fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
                         onSubmitFailed.value = validations
                     }
                 })
