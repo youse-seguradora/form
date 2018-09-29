@@ -25,7 +25,9 @@ package br.com.youse.forms.rxform
 
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.IObservableValidation
 import br.com.youse.forms.form.models.DeferredObservableValue
+import br.com.youse.forms.form.models.ObservableValidation
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -71,12 +73,26 @@ class RxForm<T>(
                     }
                 })
 
-        fields.forEach { it ->
-            val key = it.key
-            val observable = it.input as Observable<Any?>
-            val validators = it.validators as List<Validator<Any?>>
+        fields.forEach { rxField ->
+            val key = rxField.key
+            val observable = rxField.input as Observable<Any?>
+            val validators = rxField.validators as List<Validator<Any?>>
             val field = DeferredObservableValue<Any?>()
-            builder.addField(key, field, validators)
+            val validationTriggers = mutableListOf<IObservableValidation>()
+
+            rxField.validationTriggers.forEach { observableTrigger ->
+
+                val validationTrigger = ObservableValidation()
+                validationTriggers.add(validationTrigger)
+
+                disposables.add(observableTrigger.subscribe {
+                    validationTrigger.onValidate()
+                })
+
+            }
+
+            builder.addField(key, field, validators, validationTriggers.toList())
+
             disposables.add(
                     observable.subscribe { value ->
                         field.setValue(value)
@@ -119,11 +135,13 @@ class RxForm<T>(
         @Suppress("UNCHECKED_CAST")
         override fun <R> addField(key: T,
                                   input: Observable<R>,
-                                  validators: List<Validator<R>>): IRxForm.Builder<T> {
+                                  validators: List<Validator<R>>,
+                                  validationTriggers: List<Observable<Unit>>): IRxForm.Builder<T> {
             val field = RxField(
                     key,
                     input as Observable<Any?>,
-                    validators as List<Validator<Any?>>
+                    validators as List<Validator<Any?>>,
+                    validationTriggers
             )
             fields.add(field)
             return this
