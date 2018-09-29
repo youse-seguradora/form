@@ -13,7 +13,7 @@ dependencies {
 }
 
 kotlinFrontend {
-    downloadNodeJsVersion = "latest"
+    downloadNodeJsVersion = "10.11.0"
 
     npm {
         dependency "style-loader"
