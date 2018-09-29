@@ -25,7 +25,7 @@ package br.com.youse.forms.validators
 
 import br.com.youse.forms.validators.ValidationTypes.Companion.REQUIRED
 
-class RequiredValidator(val message: String) : Validator<String?> {
+class RequiredValidator(val message: String) : Validator<String> {
 
     private val validationMessage = ValidationMessage(message = message, validationType = REQUIRED)
 
