@@ -57,7 +57,7 @@ class FormTest {
 
 
     private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String): Boolean {
+        override fun isValid(input: String?): Boolean {
             return VALID_EMAIL == input
         }
 
@@ -66,8 +66,8 @@ class FormTest {
         }
     })
 
-    private val passwordValidators: List<Validator<CharSequence>> = listOf(object : Validator<CharSequence> {
-        override fun isValid(input: CharSequence): Boolean {
+    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
+        override fun isValid(input: String?): Boolean {
             return VALID_PASSWORD == input
         }
 
@@ -78,8 +78,8 @@ class FormTest {
 
     private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input >= MIN_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input!= null && input >= MIN_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -88,8 +88,8 @@ class FormTest {
 
     }, object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input <= MAX_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input!= null && input <= MAX_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -110,9 +110,9 @@ class FormTest {
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
         Form.Builder<Int>(ValidationStrategy.ALL_TIME)
-                .addField(EMAIL_ID, emailObservable, emailValidators)
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addField(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
+                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
                     var index = 0
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -159,9 +159,9 @@ class FormTest {
         var onFailedSubmitCounter = 0
 
         val form = Form.Builder<Int>()
-                .addField(EMAIL_ID, emailObservable, emailValidators)
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addField(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
+                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -235,28 +235,28 @@ class FormTest {
         val emailObservable = ObservableValue("foo")
         val firstMessage = "first error message"
         val secondMessage = "second error message"
-        val emailValidators = listOf(object : Validator<CharSequence> {
+        val emailValidators = listOf(object : Validator<String> {
             override fun validationMessage(): ValidationMessage {
                 return ValidationMessage(firstMessage, VALID_EMAIL_TYPE)
             }
 
-            override fun isValid(input: CharSequence): Boolean {
-                return input.isNotEmpty()
+            override fun isValid(input: String?): Boolean {
+                return input != null && input.isNotEmpty()
             }
-        }, object : Validator<CharSequence> {
+        }, object : Validator<String> {
             override fun validationMessage(): ValidationMessage {
                 return ValidationMessage(secondMessage, VALID_EMAIL_TYPE)
             }
 
-            override fun isValid(input: CharSequence): Boolean {
-                return input.contains("@")
+            override fun isValid(input: String?): Boolean {
+                return input != null &&  input.contains("@")
             }
         })
 
         var lastMesasges = listOf<ValidationMessage>()
 
         val form = Form.Builder<Int>()
-                .addField(EMAIL_ID, emailObservable, emailValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {

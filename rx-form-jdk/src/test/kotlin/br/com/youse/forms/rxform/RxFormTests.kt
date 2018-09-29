@@ -61,11 +61,11 @@ class RxFormTests {
 
     private val submit = PublishSubject.create<Unit>()
     private val emailObservable = PublishSubject.create<String>()
-    private val passwordObservable = PublishSubject.create<CharSequence>()
+    private val passwordObservable = PublishSubject.create<String>()
     private val ageObservable = PublishSubject.create<Int>()
 
     private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String): Boolean {
+        override fun isValid(input: String?): Boolean {
             return VALID_EMAIL == input
         }
 
@@ -74,8 +74,8 @@ class RxFormTests {
         }
     })
 
-    private val passwordValidators: List<Validator<CharSequence>> = listOf(object : Validator<CharSequence> {
-        override fun isValid(input: CharSequence): Boolean {
+    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
+        override fun isValid(input: String?): Boolean {
             return VALID_PASSWORD == input
         }
 
@@ -86,8 +86,8 @@ class RxFormTests {
 
     private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input >= MIN_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input != null && input >= MIN_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -96,8 +96,8 @@ class RxFormTests {
 
     }, object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input <= MAX_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input != null && input <= MAX_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -109,15 +109,14 @@ class RxFormTests {
     @Test
     fun shouldValidateAllTheTime() {
         val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
-                .addField(EMAIL_ID, emailObservable, emailValidators)
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addField(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
+                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
         val formSub = form.onFormValidationChange().test()
         val validSubmitSub = form.onValidSubmit().test()
-        val submitFailedSub = form.onSubmitFailed().test()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
@@ -139,9 +138,9 @@ class RxFormTests {
     @Test
     fun shouldExecuteValidationAfterSubmit() {
         val form = getBuilder<Int>(submit)
-                .addField(EMAIL_ID, emailObservable, emailValidators)
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addField(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
+                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -204,9 +203,9 @@ class RxFormTests {
     @Test
     fun shouldNotValidateBeforeSubmit() {
         val form = getBuilder<Int>(submit)
-                .addField(EMAIL_ID, emailObservable, emailValidators)
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators)
-                .addField(AGE_ID, ageObservable, ageValidators)
+                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
+                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
