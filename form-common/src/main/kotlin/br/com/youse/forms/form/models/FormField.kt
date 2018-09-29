@@ -23,9 +23,11 @@ SOFTWARE.
  */
 package br.com.youse.forms.form.models
 
+import br.com.youse.forms.form.IObservableValidation
 import br.com.youse.forms.form.IObservableValue
 import br.com.youse.forms.validators.Validator
 
 class FormField<T, R>(val key: T,
                       val input: IObservableValue<R>,
-                      val validators: List<Validator<R>>)
+                      val validators: List<Validator<R>>,
+                      val validationTriggers: List<IObservableValidation> = emptyList())
