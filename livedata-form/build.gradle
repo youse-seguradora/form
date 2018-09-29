@@ -21,7 +21,7 @@ dependencies {
     api project(":form-jdk")
 
     implementation deps.kotlin.stdlib.jdk
-    implementation deps.android.arch.lifecycle.extensions
+    implementation deps.android.arch.lifecycle.livedata
 
     testImplementation deps.kotlin.test.jdk
     testImplementation deps.kotlin.test.annotations
