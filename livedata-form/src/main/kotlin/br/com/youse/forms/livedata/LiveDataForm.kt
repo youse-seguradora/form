@@ -23,11 +23,13 @@ SOFTWARE.
  */
 package br.com.youse.forms.livedata
 
-import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.MediatorLiveData
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
+import br.com.youse.forms.form.IObservableValidation
 import br.com.youse.forms.form.models.DeferredObservableValue
+import br.com.youse.forms.form.models.ObservableValidation
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -69,21 +71,30 @@ class LiveDataForm<T>(
                     }
                 })
 
-        val initialValues = mutableMapOf<T, DeferredObservableValue<Any?>>()
-        fields.forEach { entry ->
-            val fieldKey = entry.key as T
-            val validators = entry.validators as List<Validator<Any?>>
+
+        fields.forEach { liveField ->
+            val key = liveField.key as T
+            val validators = liveField.validators as List<Validator<Any?>>
             val value = DeferredObservableValue<Any?>()
-            initialValues[fieldKey] = value
-            builder.addField(fieldKey, value, validators)
-        }
 
-        fields.forEach { field ->
-            val key = field.key
-            val ld = field.input
+            val validationTriggers = mutableListOf<IObservableValidation>()
 
-            this.onFormValidationChange.addSource(ld) {
-                initialValues[key]?.setValue(it)
+            liveField.validationTriggers.forEach { liveTrigger ->
+
+                val validationTrigger = ObservableValidation()
+                validationTriggers.add(validationTrigger)
+
+                onFormValidationChange.addSource(liveTrigger) {
+                    validationTrigger.onValidate()
+                }
+            }
+
+            builder.addField(key, value, validators, validationTriggers.toList())
+
+            val liveData = liveField.input as MutableLiveData<Any?>
+
+            onFormValidationChange.addSource(liveData) { it ->
+                value.setValue(it)
             }
         }
 
