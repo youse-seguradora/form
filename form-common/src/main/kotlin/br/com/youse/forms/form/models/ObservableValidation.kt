@@ -21,13 +21,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.livedata
+package br.com.youse.forms.form.models
 
-import android.arch.lifecycle.MutableLiveData
-import br.com.youse.forms.validators.ValidationMessage
-import br.com.youse.forms.validators.Validator
+import br.com.youse.forms.form.IObservableValidation
+import br.com.youse.forms.form.IObservableValidation.ValidationObserver
 
-class LiveField<T, R>(val key: T,
-                      val input: MutableLiveData<R> = MutableLiveData(),
-                      val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
-                      val validators: List<Validator<R>>)
+open class ObservableValidation : IObservableValidation {
+    private val validationObservers = mutableListOf<ValidationObserver>()
+
+    override fun addValidationListener(validationObserver: ValidationObserver) {
+        validationObservers.add(validationObserver)
+    }
+
+    fun onValidate(){
+        validationObservers.forEach { it.requestValidation() }
+    }
+}

@@ -25,7 +25,9 @@ package br.com.youse.forms.rxform
 
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.IObservableValidation
 import br.com.youse.forms.form.models.DeferredObservableValue
+import br.com.youse.forms.form.models.ObservableValidation
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -33,10 +35,11 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
+@Suppress("UNCHECKED_CAST")
 class RxForm<T>(
         submitObservable: Observable<Unit>,
         strategy: ValidationStrategy,
-        fieldObservables: List<Triple<T, Observable<Any?>, List<Validator<Any?>>>>
+        fields: List<RxField<T, *>>
 ) : IRxForm<T> {
 
     private val disposables = CompositeDisposable()
@@ -70,9 +73,26 @@ class RxForm<T>(
                     }
                 })
 
-        fieldObservables.forEach { (key, observable, validators) ->
+        fields.forEach { rxField ->
+            val key = rxField.key
+            val observable = rxField.input as Observable<Any?>
+            val validators = rxField.validators as List<Validator<Any?>>
             val field = DeferredObservableValue<Any?>()
-            builder.addFieldValidations(key, field, validators)
+            val validationTriggers = mutableListOf<IObservableValidation>()
+
+            rxField.validationTriggers.forEach { observableTrigger ->
+
+                val validationTrigger = ObservableValidation()
+                validationTriggers.add(validationTrigger)
+
+                disposables.add(observableTrigger.subscribe {
+                    validationTrigger.onValidate()
+                })
+
+            }
+
+            builder.addField(key, field, validators, validationTriggers.toList())
+
             disposables.add(
                     observable.subscribe { value ->
                         field.setValue(value)
@@ -110,18 +130,25 @@ class RxForm<T>(
     class Builder<T>(private val submitObservable: Observable<Unit>,
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
-        private val fieldObservables = mutableListOf<Triple<T, Observable<Any?>, List<Validator<Any?>>>>()
+        private val fields = mutableListOf<RxField<T, *>>()
 
         @Suppress("UNCHECKED_CAST")
-        override fun <R> addFieldValidations(key: T,
-                                             fieldObservable: Observable<R>,
-                                             validators: List<Validator<R>>): IRxForm.Builder<T> {
-            val triple = Triple(
+        override fun <R> addField(key: T,
+                                  input: Observable<R>,
+                                  validators: List<Validator<R>>,
+                                  validationTriggers: List<Observable<Unit>>): IRxForm.Builder<T> {
+            val field = RxField(
                     key,
-                    fieldObservable as Observable<Any?>,
-                    validators as List<Validator<Any?>>
+                    input as Observable<Any?>,
+                    validators as List<Validator<Any?>>,
+                    validationTriggers
             )
-            fieldObservables.add(triple)
+            fields.add(field)
+            return this
+        }
+
+        override fun <R> addField(field: RxField<T, R>): IRxForm.Builder<T> {
+            fields.add(field)
             return this
         }
 
@@ -129,7 +156,7 @@ class RxForm<T>(
             return RxForm(
                     submitObservable = submitObservable,
                     strategy = strategy,
-                    fieldObservables = fieldObservables)
+                    fields = fields)
         }
     }
 }

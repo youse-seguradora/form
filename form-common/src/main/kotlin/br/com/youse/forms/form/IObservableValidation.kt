@@ -23,37 +23,16 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
-import br.com.youse.forms.form.models.ObservableValue
-import kotlin.test.Test
-import kotlin.test.assertEquals
-
-
-class ObservableValueTest {
-
-
-    @Test
-    fun shouldUpdateValue() {
-        val observableValue = ObservableValue(1)
-
-        assertEquals(observableValue.value, 1)
-        observableValue.value = 2
-        assertEquals(observableValue.value, 2)
-        var expectedValue = 2
-        var count = 0
-        observableValue.setValueListener(object : IObservableValue.ValueObserver<Int> {
-            override fun onChange(value: Int?) {
-                assertEquals(value, expectedValue)
-                count++
-            }
-        })
-        assertEquals(count, 1)
-        expectedValue = 3
-
-        observableValue.value = 3
-        assertEquals(count, 2)
-
-        // should not call onFormValidationChange...
-        observableValue.value = 3
-        assertEquals(count, 2)
+interface IObservableValidation {
+    interface ValidationObserver {
+        /**
+         * Notifies a validation was requested.
+         */
+        fun requestValidation()
     }
+
+    /**
+     * Sets a listener for when a validation is triggered
+     */
+    fun addValidationListener(validationObserver: ValidationObserver)
 }

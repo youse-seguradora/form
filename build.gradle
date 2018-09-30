@@ -19,8 +19,8 @@ buildscript {
     ]
 
     ext.deps = [
-            androidPlugin      : "com.android.tools.build:gradle:${versions.androidPlugin}",
-            kotlin             : [
+            androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
+            kotlin       : [
                     stdlib: [
                             'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
                             'jdk'   : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
@@ -33,11 +33,11 @@ buildscript {
                             'js'         : "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
                     ],
             ],
-            rx                 : [
+            rx           : [
                     java   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
                     binding: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
             ],
-            android            : [
+            android      : [
                     support: [
                             appcompat       : "com.android.support:appcompat-v7:${versions.supportLibrary}",
                             design          : "com.android.support:design:${versions.supportLibrary}",
@@ -45,15 +45,16 @@ buildscript {
                     ],
                     arch   : [
                             lifecycle: [
+                                    livedata       : "android.arch.lifecycle:livedata:${versions.androidArch}",
                                     extensions     : "android.arch.lifecycle:extensions:${versions.androidArch}",
                                     reactivestreams: "android.arch.lifecycle:reactivestreams:${versions.androidArch}"
                             ],
                             core     : [testing: "android.arch.core:core-testing:${versions.androidArch}"]
                     ]
             ],
-            annotations        : 'org.jetbrains:annotations:16.0.3',
+            annotations  : 'org.jetbrains:annotations:16.0.3',
 
-            junit              : "junit:junit:${versions.junit}"
+            junit        : "junit:junit:${versions.junit}"
     ]
 
     repositories {

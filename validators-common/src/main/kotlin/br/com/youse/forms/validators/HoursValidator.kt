@@ -30,7 +30,10 @@ class HoursValidator(val message: String, val divider: String) : Validator<Strin
         return ValidationMessage(message = message, validationType = HOUR_FORMAT)
     }
 
-    override fun isValid(input: String): Boolean {
+    override fun isValid(input: String?): Boolean {
+
+        input ?: return false
+
         return try {
             val parts = input.split(divider)
             val hours = parts.firstOrNull()?.toInt() ?: -1

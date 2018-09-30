@@ -32,7 +32,7 @@ interface Validator<in T> {
      *  Validates if the input is a valid value.
      *  Returns true if the input is valid, false otherwise.
      */
-    fun isValid(input: T): Boolean
+    fun isValid(input: T?): Boolean
 
     /**
      * Returns a validation message, it is used only when isValid method returns false.

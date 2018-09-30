@@ -6,16 +6,16 @@ Reactive version of `Form`
 How to `RxForm`
 --------
 1) Create a `RxForm.Builder<T>(submitObservable)` where `T` is the type of each field key and `submitObservable` and Observable that emits at every submit event;
-2) Call `addFieldValidations()` as many fields in the screen using as parameters a key, an `Observable` and a list of validators;
+2) Call `addField()` as many fields in the screen using as parameters a key, an `Observable` and a list of validators;
 3) Execute the `build()` method to get a hold of a `RxForm` instance;
 4) Subscribe to the Observables available from the `RxForm` instance methods;
 
 
 ``` kotlin
 val form = RxForm.Builder<Int>(submit.clicks())
-        .addFieldValidations(emailContainer.id,
+        .addField(emailContainer.id,
                 email.textChanges(), emailValidations)
-        .addFieldValidations(passwordContainer.id,
+        .addField(passwordContainer.id,
                 password.textChanges(),
                 passwordValidations)
         .build()

@@ -25,16 +25,15 @@ package br.com.youse.forms.samples.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
-
-import android.widget.Toast
-import br.com.youse.forms.rxform.IRxForm
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.Toast
 import br.com.youse.forms.R
+import br.com.youse.forms.rxform.IRxForm
+import br.com.youse.forms.rxform.RxField
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationMessage
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
@@ -65,9 +64,12 @@ class RxLoginActivity : AppCompatActivity() {
         val emailChanges = email.textChanges().map { it.toString() }
         val passwordChanges = password.textChanges().map { it.toString() }
 
+        val emailField = RxField(emailContainer.id, emailChanges, emailValidations)
+        val passwordField = RxField(passwordContainer.id, passwordChanges, passwordValidations)
+
         form = RxForm.Builder<Int>(submitHappens)
-                .addFieldValidations(emailContainer.id, emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id, passwordChanges, passwordValidations)
+                .addField(emailField)
+                .addField(passwordField)
                 .build()
 
         disposables.add(form.onFieldValidationChange()

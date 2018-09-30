@@ -26,7 +26,7 @@ package br.com.youse.forms.samples.livedata
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.livedata.LiveDataForm
-import br.com.youse.forms.livedata.LiveField
+import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import com.github.musichin.reactivelivedata.ReactiveLiveData
@@ -64,8 +64,8 @@ class LoginViewModel : ViewModel() {
     val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
     val form = LiveDataForm.Builder<String>()
-            .addFieldValidations(email)
-            .addFieldValidations(password)
+            .addField(email)
+            .addField(password)
             .build()
 
 

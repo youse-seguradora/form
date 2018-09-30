@@ -33,6 +33,7 @@ import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
@@ -83,17 +84,24 @@ class FormLoginActivity : AppCompatActivity(),
         email.addTextChangedListener(getTextWatcher(emailChanges))
         password.addTextChangedListener(getTextWatcher(passwordChanges))
 
+        val emailField = FormField(
+                emailContainer.id,
+                emailChanges, emailValidations
+        )
+
+        val passwordField = FormField(
+                passwordContainer.id,
+                passwordChanges,
+                passwordValidations
+        )
 
         val form = Form.Builder<Int>()
                 .setFieldValidationListener(this)
                 .setFormValidationListener(this)
                 .setValidSubmitListener(this)
                 .setSubmitFailedListener(this)
-                .addFieldValidations(emailContainer.id,
-                        emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id,
-                        passwordChanges,
-                        passwordValidations)
+                .addField(emailField)
+                .addField(passwordField)
                 .build()
 
         submit.setOnClickListener {

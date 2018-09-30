@@ -21,39 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.form
+package br.com.youse.forms.livedata.models
 
-import br.com.youse.forms.form.models.ObservableValue
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import android.arch.lifecycle.MutableLiveData
+import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.Validator
 
-
-class ObservableValueTest {
-
-
-    @Test
-    fun shouldUpdateValue() {
-        val observableValue = ObservableValue(1)
-
-        assertEquals(observableValue.value, 1)
-        observableValue.value = 2
-        assertEquals(observableValue.value, 2)
-        var expectedValue = 2
-        var count = 0
-        observableValue.setValueListener(object : IObservableValue.ValueObserver<Int> {
-            override fun onChange(value: Int?) {
-                assertEquals(value, expectedValue)
-                count++
-            }
-        })
-        assertEquals(count, 1)
-        expectedValue = 3
-
-        observableValue.value = 3
-        assertEquals(count, 2)
-
-        // should not call onFormValidationChange...
-        observableValue.value = 3
-        assertEquals(count, 2)
-    }
-}
+class LiveField<T, R>(val key: T,
+                      val input: MutableLiveData<R> = MutableLiveData(),
+                      val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
+                      val validators: List<Validator<R>>,
+                      val validationTriggers: List<MutableLiveData<Unit>> = emptyList())

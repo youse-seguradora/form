@@ -19,9 +19,9 @@ private val emailValidations ...
 private val passwordValidations ...
 
 val form = LiveDataForm.Builder<String>()
-        .addFieldValidations(EMAIL_KEY,
+        .addField(EMAIL_KEY,
                 email, emailValidations)
-        .addFieldValidations(PASSWORD_KEY,
+        .addField(PASSWORD_KEY,
                 password,
                 passwordValidations)
         .build()

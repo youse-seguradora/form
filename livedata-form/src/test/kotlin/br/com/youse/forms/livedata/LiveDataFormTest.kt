@@ -26,6 +26,7 @@ package br.com.youse.forms.livedata
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
@@ -60,7 +61,7 @@ class LiveDataFormTest {
 
 
     private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String): Boolean {
+        override fun isValid(input: String?): Boolean {
             return VALID_EMAIL == input
         }
 
@@ -69,8 +70,8 @@ class LiveDataFormTest {
         }
     })
 
-    private val passwordValidators: List<Validator<CharSequence>> = listOf(object : Validator<CharSequence> {
-        override fun isValid(input: CharSequence): Boolean {
+    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
+        override fun isValid(input: String?): Boolean {
             return VALID_PASSWORD == input
         }
 
@@ -81,8 +82,8 @@ class LiveDataFormTest {
 
     private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input >= MIN_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input !=null && input >= MIN_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -91,8 +92,8 @@ class LiveDataFormTest {
 
     }, object : Validator<Int> {
 
-        override fun isValid(input: Int): Boolean {
-            return input <= MAX_AGE_VALUE
+        override fun isValid(input: Int?): Boolean {
+            return input != null && input <= MAX_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -143,9 +144,9 @@ class LiveDataFormTest {
         val strategy = if (afterSubmit) ValidationStrategy.AFTER_SUBMIT else ValidationStrategy.ALL_TIME
 
         val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
-                .addFieldValidations(email)
-                .addFieldValidations(password)
-                .addFieldValidations(age)
+                .addField(email)
+                .addField(password)
+                .addField(age)
                 .build()
 
         var emailMessages: List<ValidationMessage>? = null
@@ -204,7 +205,7 @@ class LiveDataFormTest {
             assertNull(currentFormValidation)
             assertNull(validSubmitContents)
         } else {
-            // validate fields all the time
+            // requestValidation fields all the time
             assertNotNull(emailMessages)
             assertNotNull(passwordMessages)
             assertNotNull(ageMessages)

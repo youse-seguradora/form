@@ -12,7 +12,7 @@ How to Form
 --------
 1) Create a `Form.Builder<T>()` where `T` is the type of each field key;
 2) Set the callbacks for the validation events, like `builder.setFieldValidationListener()` or `builder.setValidSubmitListener()`;
-3) Call `builder.addFieldValidations()` as many fields in the form using the parameters:
+3) Call `builder.addField()` as many fields in the form using the parameters:
    - a key of type T;
    - an `IForm.ObservableValue<R>` or `IForm.DeferredObservableValue<R>`;
    - a list of Validator<R>;
@@ -36,9 +36,9 @@ val form = Form.Builder<Int>()
         .setValidSubmitListener(this)
         .setSubmitFailedListener(this)
 
-        .addFieldValidations(emailContainer.id,
+        .addField(emailContainer.id,
                 emailChanges, emailValidations)
-        .addFieldValidations(passwordContainer.id,
+        .addField(passwordContainer.id,
                 passwordChanges,
                 passwordValidations)
         .build()

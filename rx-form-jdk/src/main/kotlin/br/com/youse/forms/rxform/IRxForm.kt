@@ -73,11 +73,20 @@ interface IRxForm<T> {
          * a field observable that emits the field value changes and a list
          * of validators for that field.
          */
-        fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): Builder<T>
+        fun <R> addField(key: T,
+                         input: Observable<R>,
+                         validators: List<Validator<R>>,
+                         validationTriggers: List<Observable<Unit>>): Builder<T>
+
+        /**
+         * Adds a field to the builder, it takes a {code field} of type RxField.
+         */
+        fun <R> addField(field: RxField<T, R>): Builder<T>
 
         /**
          *  Builds the form.
          */
         fun build(): IRxForm<T>
+
     }
 }
