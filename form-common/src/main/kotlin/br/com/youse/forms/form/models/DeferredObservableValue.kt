@@ -46,7 +46,6 @@ class DeferredObservableValue<T> : ObservableValidation(), IObservableValue<T> {
         if (hasChanged) {
             valueObserver.onChange(value)
             onValidate()
-
         }
     }
 
