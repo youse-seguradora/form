@@ -25,12 +25,11 @@ package br.com.youse.forms.samples.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
-
-import android.widget.Toast
-import br.com.youse.forms.rxform.IRxForm
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.Toast
 import br.com.youse.forms.R
+import br.com.youse.forms.rxform.IRxForm
 import br.com.youse.forms.rxform.RxField
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
@@ -67,7 +66,7 @@ class RxLoginActivity : AppCompatActivity() {
 
         val emailField = RxField(emailContainer.id, emailChanges, emailValidations)
         val passwordField = RxField(passwordContainer.id, passwordChanges, passwordValidations)
-        
+
         form = RxForm.Builder<Int>(submitHappens)
                 .addField(emailField)
                 .addField(passwordField)
