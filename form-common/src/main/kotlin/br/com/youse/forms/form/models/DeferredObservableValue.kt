@@ -35,12 +35,14 @@ class DeferredObservableValue<T> : ObservableValidation(), IObservableValue<T> {
     private var listener: ValueObserver<T>? = null
     private var value: T? = null
 
+    private var hasChanged = false
+
     /**
      * Sets a listener for {@code value} changes.
      */
     override fun setValueListener(valueObserver: ValueObserver<T>) {
         this.listener = valueObserver
-        if (value != null) {
+        if (hasChanged) {
             valueObserver.onChange(value!!)
             onValidate()
         }
@@ -53,6 +55,7 @@ class DeferredObservableValue<T> : ObservableValidation(), IObservableValue<T> {
     fun setValue(value: T) {
         if (value != this.value) {
             this.value = value
+            this.hasChanged = true
             this.listener?.onChange(value)
         }
     }
