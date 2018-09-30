@@ -28,7 +28,7 @@ interface IObservableValue<T> {
         /**
          * Notifies a value change.
          */
-        fun onChange(value: T)
+        fun onChange(value: T?)
     }
 
     /**

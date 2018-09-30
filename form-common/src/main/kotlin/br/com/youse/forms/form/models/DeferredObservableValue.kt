@@ -42,9 +42,11 @@ class DeferredObservableValue<T> : ObservableValidation(), IObservableValue<T> {
      */
     override fun setValueListener(valueObserver: ValueObserver<T>) {
         this.listener = valueObserver
+
         if (hasChanged) {
-            valueObserver.onChange(value!!)
+            valueObserver.onChange(value)
             onValidate()
+
         }
     }
 
@@ -52,7 +54,7 @@ class DeferredObservableValue<T> : ObservableValidation(), IObservableValue<T> {
      *  Updates the current value if the new value is different.
      *  Only calls the listener if the current value is updated.
      */
-    fun setValue(value: T) {
+    fun setValue(value: T?) {
         if (value != this.value) {
             this.value = value
             this.hasChanged = true
