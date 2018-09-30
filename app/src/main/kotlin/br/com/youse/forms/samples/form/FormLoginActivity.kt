@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
@@ -129,6 +130,9 @@ class FormLoginActivity : AppCompatActivity(),
 
         //TODO: submit email and password to server
         Log.d("Debug", "email : $email, password: $$password")
+
+        Toast.makeText(this@FormLoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
+
     }
 
 }

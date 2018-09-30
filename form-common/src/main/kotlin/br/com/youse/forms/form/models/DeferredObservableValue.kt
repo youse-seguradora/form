@@ -17,6 +17,9 @@ class DeferredObservableValue<T> : IObservableValue<T> {
      */
     override fun setValueListener(valueObserver: ValueObserver<T>) {
         this.listener = valueObserver
+        if (value != null) {
+            valueObserver.onChange(value!!)
+        }
     }
 
     /**

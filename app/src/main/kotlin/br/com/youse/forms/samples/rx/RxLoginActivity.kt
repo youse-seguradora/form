@@ -25,12 +25,16 @@ package br.com.youse.forms.samples.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+
+import android.widget.Toast
+import br.com.youse.forms.rxform.IRxForm
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import br.com.youse.forms.R
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
+import br.com.youse.forms.validators.ValidationMessage
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
@@ -51,6 +55,8 @@ class RxLoginActivity : AppCompatActivity() {
                 MIN_PASSSWORD_LENGTH))
     }
 
+    private lateinit var form: IRxForm<Int>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -59,19 +65,16 @@ class RxLoginActivity : AppCompatActivity() {
         val emailChanges = email.textChanges().map { it.toString() }
         val passwordChanges = password.textChanges().map { it.toString() }
 
-        val form = RxForm.Builder<Int>(submitHappens)
-                .addFieldValidations(emailContainer.id,
-                        emailChanges, emailValidations)
-                .addFieldValidations(passwordContainer.id,
-                        passwordChanges,
-                        passwordValidations)
+        form = RxForm.Builder<Int>(submitHappens)
+                .addFieldValidations(emailContainer.id, emailChanges, emailValidations)
+                .addFieldValidations(passwordContainer.id, passwordChanges, passwordValidations)
                 .build()
 
         disposables.add(form.onFieldValidationChange()
-                .subscribe {
-                    val field = findViewById<TextInputLayout>(it.first)
-                    field.isErrorEnabled = it.second.isNotEmpty()
-                    field.error = it.second.joinToString { it.message }
+                .subscribe { pair ->
+                    val field = findViewById<TextInputLayout>(pair.first)
+                    field.isErrorEnabled = pair.second.isNotEmpty()
+                    field.error = pair.second.joinToString { it.message }
                 })
 
         disposables.add(form.onFormValidationChange()
@@ -80,18 +83,21 @@ class RxLoginActivity : AppCompatActivity() {
                 })
 
         disposables.add(form.onValidSubmit()
-                .subscribe { list ->
-                    println(list)
+                .subscribe { fields ->
+                    println(fields)
 
-                    val email = list.first { it.first == emailContainer.id }.second.toString()
-                    val password = list.first { it.first == passwordContainer.id }.second.toString()
+                    val email = fields.first { it.first == emailContainer.id }.second.toString()
+                    val password = fields.first { it.first == passwordContainer.id }.second.toString()
 
                     //TODO: submit email and password to server
+                    Toast.makeText(this@RxLoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
                     Log.d("Debug", "email : $email, password: $$password")
+
                 })
     }
 
     override fun onDestroy() {
+        form.dispose()
         disposables.clear()
         super.onDestroy()
     }

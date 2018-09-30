@@ -64,7 +64,6 @@ interface IForm {
         fun onFieldValidationChange(key: T, validations: List<ValidationMessage>)
     }
 
-
     /**
      * Used to indicate that the form should be submitted.
      */

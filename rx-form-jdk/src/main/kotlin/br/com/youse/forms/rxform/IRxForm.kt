@@ -47,14 +47,20 @@ interface IRxForm<T> {
      * Emits a list of Pairs, each one with the field key and the current value of that field.
      * NOTE: As each field can be of a different type we need to use Any here.
      */
-    fun onValidSubmit(): Observable<List<Pair<T, Any>>>
+    fun onValidSubmit(): Observable<List<Pair<T, Any?>>>
 
     /**
      * Emits every time a submit validation fails and return only failed fields keys and validations.
      *  This is useful to scroll or give focus to the given field.
      */
     fun onSubmitFailed(): Observable<List<Pair<T, List<ValidationMessage>>>>
-    
+
+
+    /**
+     * Dispose internal subscriptions
+     */
+    fun dispose()
+
 
     /**
      * Builder to create an RxForm, it takes a submit observable that emits when the user submits the form

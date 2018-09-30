@@ -44,7 +44,7 @@ interface Validator<in T> {
  * A ValidationType represented why validation failed.
  * Multiple Validators can have the same ValidationType.
  */
-interface ValidationType {}
+interface ValidationType
 
 /**
  * Holds a validation failed message and the validation type.

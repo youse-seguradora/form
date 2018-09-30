@@ -23,102 +23,113 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
+import br.com.youse.forms.form.Form
+import br.com.youse.forms.form.IForm.*
+import br.com.youse.forms.form.models.DeferredObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 
-class RxForm<T>(private val submit: Observable<Unit>,
-                private val fieldsValidations: List<Observable<Triple<T, Any, List<ValidationMessage>>>>) : IRxForm<T> {
+class RxForm<T>(
+        submitObservable: Observable<Unit>,
+        strategy: ValidationStrategy,
+        fieldObservables: List<Triple<T, Observable<Any?>, List<Validator<Any?>>>>
+) : IRxForm<T> {
+
+    private val disposables = CompositeDisposable()
+
+    private val submitFailed = PublishSubject.create<List<Pair<T, List<ValidationMessage>>>>()
+    private val fieldValidationChange = PublishSubject.create<Pair<T, List<ValidationMessage>>>()
+    private val formValidationChange = PublishSubject.create<Boolean>()
+    private val validSubmit = PublishSubject.create<List<Pair<T, Any?>>>()
+
+
+    init {
+        val builder = Form.Builder<T>(strategy = strategy)
+                .setFieldValidationListener(object : FieldValidationChange<T> {
+                    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
+                        fieldValidationChange.onNext(Pair(key, validations))
+                    }
+                })
+                .setFormValidationListener(object : FormValidationChange {
+                    override fun onFormValidationChange(isValid: Boolean) {
+                        formValidationChange.onNext(isValid)
+                    }
+                })
+                .setValidSubmitListener(object : ValidSubmit<T> {
+                    override fun onValidSubmit(fields: List<Pair<T, Any?>>) {
+                        validSubmit.onNext(fields)
+                    }
+                })
+                .setSubmitFailedListener(object : SubmitFailed<T> {
+                    override fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+                        submitFailed.onNext(validations)
+                    }
+                })
+
+        fieldObservables.forEach { (key, observable, validators) ->
+            val field = DeferredObservableValue<Any?>()
+            builder.addFieldValidations(key, field, validators)
+            disposables.add(
+                    observable.subscribe { value ->
+                        field.setValue(value)
+                    })
+        }
+
+        val form = builder.build()
+        disposables.add(
+                submitObservable.subscribe {
+                    form.doSubmit()
+                }
+        )
+    }
 
     override fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
-        return Observable.merge(fieldsValidations
-                .map {
-                    it.map { Pair(it.first, it.third) }
-                })
-                .distinctUntilChanged()
+        return fieldValidationChange
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onFormValidationChange(): Observable<Boolean> {
-        if (fieldsValidations.isEmpty()) {
-            return submit
-                    .map { true }
-                    .distinctUntilChanged()
-        }
-        return Observable.combineLatest(fieldsValidations)
-        { args -> args.map { it as Triple<T, Any, List<ValidationMessage>> } }
-                .map { it.filter { it.third.isNotEmpty() } }
-                .map { it.isEmpty() }
-                .distinctUntilChanged()
+        return formValidationChange
     }
 
-    override fun onValidSubmit(): Observable<List<Pair<T, Any>>> {
-        if (fieldsValidations.isEmpty()) {
-            return submit
-                    .map { emptyList<Pair<T, Any>>() }
-        }
-        return submit.withLatestFrom(onFormValidationChange(),
-                BiFunction { _: Unit, isValidForm: Boolean -> isValidForm })
-                .filter { it }
-                .map { Unit }
-                .withLatestFrom(
-                        Observable.combineLatest(fieldsValidations.map {
-                            it.map { Pair(it.first, it.second) }
-                        }) { list: Array<Any> ->
-                            list.filterIsInstance<Pair<T, Any>>()
-                        }, BiFunction { _: Unit, formData: List<Pair<T, Any>> -> formData }
-                )
+    override fun onValidSubmit(): Observable<List<Pair<T, Any?>>> {
+        return validSubmit
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onSubmitFailed(): Observable<List<Pair<T, List<ValidationMessage>>>> {
-        val combined = Observable.combineLatest(fieldsValidations)
-        { args -> args.map { it as Triple<T, Any, List<ValidationMessage>> } }
-                .map { it.filter { it.third.isNotEmpty() } }
-                .filter { !it.isEmpty() }
-                .map { list -> list.map { Pair(it.first, it.third) } }
-                .distinctUntilChanged()
-        return submit
-                .startWith(Unit)
-                .switchMap { combined }
+        return submitFailed
     }
 
-    class Builder<T>(submitObservable: Observable<Unit>,
-                     strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
+    override fun dispose() {
+        disposables.dispose()
+    }
 
-        private val fieldsValidations = mutableListOf<Observable<Triple<T, Any, List<ValidationMessage>>>>()
+    class Builder<T>(private val submitObservable: Observable<Unit>,
+                     private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
-        private val submit = if (strategy == ValidationStrategy.ALL_TIME)
-            submitObservable.share().startWith(Unit)
-        else
-            submitObservable.share()
+        private val fieldObservables = mutableListOf<Triple<T, Observable<Any?>, List<Validator<Any?>>>>()
 
-
-        override fun <R> addFieldValidations(key: T, fieldObservable: Observable<R>, validators: List<Validator<R>>): IRxForm.Builder<T> {
-
-            val fieldValidationObservable = Observable.combineLatest(fieldObservable, submit,
-                    BiFunction { t1: R, _: Unit ->
-                        t1
-                    })
-                    .map { value ->
-                        val messages = mutableListOf<ValidationMessage>()
-                        for (validator in validators) {
-                            if (!validator.isValid(value)) {
-                                messages += validator.validationMessage()
-                            }
-                        }
-                        Triple(key, value as Any, messages.toList())
-                    }
-
-            fieldsValidations.add(fieldValidationObservable)
+        @Suppress("UNCHECKED_CAST")
+        override fun <R> addFieldValidations(key: T,
+                                             fieldObservable: Observable<R>,
+                                             validators: List<Validator<R>>): IRxForm.Builder<T> {
+            val triple = Triple(
+                    key,
+                    fieldObservable as Observable<Any?>,
+                    validators as List<Validator<Any?>>
+            )
+            fieldObservables.add(triple)
             return this
         }
 
         override fun build(): IRxForm<T> {
-            return RxForm(submit, fieldsValidations)
+            return RxForm(
+                    submitObservable = submitObservable,
+                    strategy = strategy,
+                    fieldObservables = fieldObservables)
         }
     }
-
 }
