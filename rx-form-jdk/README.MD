@@ -6,26 +6,31 @@ Reactive version of `Form`
 How to `RxForm`
 --------
 1) Create a `RxForm.Builder<T>(submitObservable)` where `T` is the type of each field key and `submitObservable` and Observable that emits at every submit event;
-2) Call `addField()` as many fields in the screen using as parameters a key, an `Observable` and a list of validators;
-3) Execute the `build()` method to get a hold of a `RxForm` instance;
-4) Subscribe to the Observables available from the `RxForm` instance methods;
+2) Call `addField()` as many fields you would like to have in form;
+3) Execute the `build()` method to get a hold of a `IRxForm` instance;
+4) Subscribe to the Observables available from the `IRxForm` instance methods;
 
 
 ``` kotlin
-val form = RxForm.Builder<Int>(submit.clicks())
-        .addField(emailContainer.id,
-                email.textChanges(), emailValidations)
-        .addField(passwordContainer.id,
-                password.textChanges(),
-                passwordValidations)
+val submitObservable = submit.clicks()
+val emailChanges = email.textChanges().map { it.toString() }
+val passwordChanges = password.textChanges().map { it.toString() }
+
+val emailField = RxField(emailContainer.id, emailChanges, emailValidations)
+val passwordField = RxField(passwordContainer.id, passwordChanges, passwordValidations)
+
+form = RxForm.Builder<Int>(submitObservable)
+        .addField(emailField)
+        .addField(passwordField)
         .build()
 
 disposables.add(form.onFieldValidationChange()
-        .subscribe {
-            val field = findViewById<TextInputLayout>(it.first)
-            field.isErrorEnabled = it.second.isNotEmpty()
-            field.error = it.second.joinToString { it.message }
+        .subscribe { pair ->
+            val field = findViewById<TextInputLayout>(pair.first)
+            field.isErrorEnabled = pair.second.isNotEmpty()
+            field.error = pair.second.joinToString { it.message }
         })
+
 disposables.add(form.onFormValidationChange()
         .subscribe {
             submit.isEnabled = it
@@ -33,6 +38,21 @@ disposables.add(form.onFormValidationChange()
 ```
 
 Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/rx/RxLoginActivity.kt)
+
+RxField<T,R> properties
+--------
+## RxField.key`<T>`
+ - It's an ID to identify uniquely the field in a form. Of type `T`.
+
+## RxField.input`<R>`
+ - It's an `Observable<R>` used to feed the field value change events to the form.
+
+## RxField.validators`<R>`
+  - It's a list of `Validator<R>`.
+
+## RxField.validationTriggers
+ - It's a list of `Observable<Unit>` used to force a round of validation to happen to this field.
+
 
 Download
 --------
