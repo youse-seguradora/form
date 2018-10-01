@@ -40,9 +40,9 @@ class ObservableValueTest {
         assertEquals(observableValue.value, 2)
         var expectedValue = 2
         var count = 0
-        observableValue.setValueListener(object : IObservableValue.ValueObserver<Int> {
-            override fun onChange(value: Int?) {
-                assertEquals(value, expectedValue)
+        observableValue.addChangeListener(object : IObservableChange.ChangeObserver {
+            override fun onChange() {
+                assertEquals(observableValue.value, expectedValue)
                 count++
             }
         })

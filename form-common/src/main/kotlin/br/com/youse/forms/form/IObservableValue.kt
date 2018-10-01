@@ -23,16 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
-interface IObservableValue<T> {
-    interface ValueObserver<T> {
-        /**
-         * Notifies a value change.
-         */
-        fun onChange(value: T?)
-    }
+interface IObservableValue<T> : IObservableChange {
 
-    /**
-     * Sets a listener for {@code value} changes.s
-     */
-    fun setValueListener(valueObserver: ValueObserver<T>)
+    var value: T?
 }

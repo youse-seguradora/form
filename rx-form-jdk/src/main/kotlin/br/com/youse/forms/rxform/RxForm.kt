@@ -25,9 +25,9 @@ package br.com.youse.forms.rxform
 
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
-import br.com.youse.forms.form.IObservableValidation
-import br.com.youse.forms.form.models.DeferredObservableValue
-import br.com.youse.forms.form.models.ObservableValidation
+import br.com.youse.forms.form.IObservableChange
+import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.form.models.ObservableChange
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -77,16 +77,16 @@ class RxForm<T>(
             val key = rxField.key
             val observable = rxField.input as Observable<Any?>
             val validators = rxField.validators as List<Validator<Any?>>
-            val field = DeferredObservableValue<Any?>()
-            val validationTriggers = mutableListOf<IObservableValidation>()
+            val field = ObservableValue<Any?>()
+            val validationTriggers = mutableListOf<IObservableChange>()
 
             rxField.validationTriggers.forEach { observableTrigger ->
 
-                val validationTrigger = ObservableValidation()
+                val validationTrigger = ObservableChange()
                 validationTriggers.add(validationTrigger)
 
                 disposables.add(observableTrigger.subscribe {
-                    validationTrigger.onValidate()
+                    validationTrigger.notifyChange()
                 })
 
             }
@@ -94,8 +94,8 @@ class RxForm<T>(
             builder.addField(key, field, validators, validationTriggers.toList())
 
             disposables.add(
-                    observable.subscribe { value ->
-                        field.setValue(value)
+                    observable.subscribe { newValue ->
+                        field.value = newValue
                     })
         }
 

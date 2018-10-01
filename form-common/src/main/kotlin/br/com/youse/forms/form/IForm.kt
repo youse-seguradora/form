@@ -100,7 +100,7 @@ interface IForm {
         fun <R> addField(key: T,
                          input: IObservableValue<R>,
                          validators: List<Validator<R>>,
-                         validationTriggers: List<IObservableValidation>): IForm.Builder<T>
+                         validationTriggers: List<IObservableChange>): IForm.Builder<T>
 
         /**
          * Adds a field to the builder, it takes a {@code field} of FormField type.
