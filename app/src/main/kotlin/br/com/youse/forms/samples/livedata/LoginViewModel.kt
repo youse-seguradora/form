@@ -68,7 +68,6 @@ class LoginViewModel : ViewModel() {
             .addField(password)
             .build()
 
-
     val submitData = MutableLiveEvent<LoginState>()
 
     val onSubmit = form.onValidSubmit

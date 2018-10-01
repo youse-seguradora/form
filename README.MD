@@ -12,10 +12,7 @@ How to Form
 --------
 1) Create a `Form.Builder<T>()` where `T` is the type of each field key;
 2) Set the callbacks for the validation events, like `builder.setFieldValidationListener()` or `builder.setValidSubmitListener()`;
-3) Call `builder.addField()` as many fields in the form using the parameters:
-   - a key of type T;
-   - an `IForm.ObservableValue<R>` or `IForm.DeferredObservableValue<R>`;
-   - a list of Validator<R>;
+3) Call `builder.addField()` as many fields you would like to have in form;
 4) Execute the `builder.build()` method to get a hold of a `Form` instance;
 5) Every time the user requests to submit the form, call the method `form.doSubmit()`;
 
@@ -29,6 +26,17 @@ val passwordChanges = ObservableValue(password.text.toString())
 email.addTextChangedListener(getTextWatcher(emailChanges))
 password.addTextChangedListener(getTextWatcher(passwordChanges))
 
+val emailField = FormField(
+        emailContainer.id,
+        emailChanges,
+        emailValidations
+)
+
+val passwordField = FormField(
+        passwordContainer.id,
+        passwordChanges,
+        passwordValidations
+)
 
 val form = Form.Builder<Int>()
         .setFieldValidationListener(this)
@@ -36,16 +44,15 @@ val form = Form.Builder<Int>()
         .setValidSubmitListener(this)
         .setSubmitFailedListener(this)
 
-        .addField(emailContainer.id,
-                emailChanges, emailValidations)
-        .addField(passwordContainer.id,
-                passwordChanges,
-                passwordValidations)
+        .addField(emailField)
+        .addField(passwordField)
+
         .build()
 
 submit.setOnClickListener {
     form.doSubmit()
 }
+
 ```
 Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/form/FormLoginActivity.kt)
 
@@ -57,26 +64,40 @@ How to LiveDataForm
 --------
 LiveDataForm [README](https://github.com/youse-seguradora/form/blob/master/livedata-form/README.MD)
 
-VALIDATION CALLBACKS
+FormField<T,R> properties
+--------
+## FormField.key`<T>`
+ - It's an ID to identify uniquely the field in a form. Of type `T`.
+
+## FormField.input`<R>`
+ - It's an `IObservableValue<R>` used to feed the field value change events to the form.
+
+## FormField.validators`<R>`
+  - It's a list of `Validator<R>`.
+
+## FormField.validationTriggers
+ - It's a list of `IObservableValidation` used to force a round of validation to happen to this field.
+
+Form events
 --------
 There are four standard callbacks in every flavor of Form, depending on the form flavor you choose to use the events are delivered as a pure Kotlin callbacks, an `Observable` emissions or `LiveData` events.
 Does not matter the flavor, the behavior and naming should be consistent enough to understand what is happening.
 
 ### FieldValidationChange
- - Is triggered when a given field validation state change. This callback gives access to a `List<ValidationMessage>` that if it is empty, the field is valid.
- This callback allows you to set/unset a error message for each field in the form.
+ - It's triggered when a given field validation state change. This callback gives access to a `List<ValidationMessage>` that if it is empty, the field is valid.
+ - This callback allows you to set/unset a error message for each screen field of a form.
 
 ### FormValidationChange
- - Is triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
- This callback allow you to enable or disable a submit button or hint the user about the form state.
+ - It's triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
+ - This callback allow you to enable or disable a submit button or hint the user about the form state.
 
 ### ValidSubmit
- - Is triggered when a valid submit happens. This callback gives access to a `List<Pair<T, Any>>` where `T` is a field key, and the `Any` is that field current value.
- This callback is called to allow you to send the form data to your server.
+ - It's triggered when a valid submit happens. This callback gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any?` is that field current value.
+ - This callback is called to allow you to send the form data to your server.
 
 ### SubmitFailed
- - Is triggered when a submit happens but the form is not valid. This callback gives access to a `List<Pair<T, List<ValidationMesage>>>` where `T` is a field key and `List<ValidationMessage>` indicates how many validations failed for that given field.
- This callback is used when you need to scroll to a invalid field after a submit.
+ - It's triggered when a submit happens, but the form is not valid. This callback gives access to a `List<Pair<T, List<ValidationMesage>>>` where `T` is a field key and `List<ValidationMessage>` indicates how many validations failed for that given field.
+ - This callback is used when you need to scroll to a invalid field after a submit.
 
 
 VALIDATION
@@ -84,11 +105,12 @@ VALIDATION
 As an optional dependency we offer the possibility to use our validators module.
 
 A form validation is related to each field validation,
-so we need to define a list of validations for each field in the form.
+so we need to define a list of validators for each field in the form.
 You can define your own validators by implementing the `Validator<T>` interface,
-in the sample below we define an `HoursValidator` and a `ValidationMessage`. It takes a `message` to be shown
-to the user when the validation fails and a `ValidationType` that was created to
-specify which type of validation failed (you can have multiple validators with the same `ValidationType`).
+in the sample below we define an `HoursValidator` and a `ValidationMessage`.
+A ValidationMessage` takes a `message` to be shown to the user when the validation
+fails and a `ValidationType` that was created to specify which type of validation failed
+(you can have multiple validators with the same `ValidationType`).
 
 Note that your form can validate any type of input, here we used `String`,
 but your implementation can be of any class that you define and implements the `isValid` method.
@@ -99,7 +121,10 @@ class HoursValidator(val message: String, val divider: String) : Validator<Strin
         return ValidationMessage(message = message, validationType = HOUR_FORMAT)
     }
 
-    override fun isValid(input: String): Boolean {
+    override fun isValid(input: String?): Boolean {
+
+        input ?: return false
+
         return try {
             val parts = input.split(divider)
             val hours = parts.firstOrNull()?.toInt() ?: -1
@@ -128,9 +153,9 @@ So a given formatter is used together with a given validator.
 class HoursFormatter(val divider: String) : TextFormatter {
     private val digitsOnlyRegex = "[^0-9]".toRegex()
 
-    override fun getCursorPosition(previous: CharSequence, input: CharSequence, output: CharSequence) = output.length
+    override fun getCursorPosition(previous: String, input: String, output: String) = output.length
 
-    override fun format(input: CharSequence): CharSequence {
+    override fun format(input: String): String {
         val clearText = input.toDigitsOnly()
 
         return when (clearText.length) {
@@ -140,7 +165,7 @@ class HoursFormatter(val divider: String) : TextFormatter {
         }
     }
 
-    private fun CharSequence.toDigitsOnly(): String {
+    private fun String.toDigitsOnly(): String {
         return replace(digitsOnlyRegex, "")
     }
 }

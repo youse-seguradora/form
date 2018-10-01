@@ -60,14 +60,14 @@ class RxLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val submitHappens = submit.clicks()
+        val submitObservable = submit.clicks()
         val emailChanges = email.textChanges().map { it.toString() }
         val passwordChanges = password.textChanges().map { it.toString() }
 
         val emailField = RxField(emailContainer.id, emailChanges, emailValidations)
         val passwordField = RxField(passwordContainer.id, passwordChanges, passwordValidations)
 
-        form = RxForm.Builder<Int>(submitHappens)
+        form = RxForm.Builder<Int>(submitObservable)
                 .addField(emailField)
                 .addField(passwordField)
                 .build()
