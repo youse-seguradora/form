@@ -63,7 +63,7 @@ class FormLoginActivity : AppCompatActivity(),
     private fun getTextWatcher(observableValue: ObservableValue<String>): TextWatcher {
         return object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
-                observableValue.value = p0?.toString() ?: ""
+                observableValue.value = p0?.toString()
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

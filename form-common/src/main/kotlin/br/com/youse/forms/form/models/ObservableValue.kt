@@ -23,32 +23,45 @@ SOFTWARE.
  */
 package br.com.youse.forms.form.models
 
-
+import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.IObservableValue
-import br.com.youse.forms.form.IObservableValue.ValueObserver
-import kotlin.properties.Delegates
 
 /**
- * Class that notifies its listener every time the value changes.
- * This class requires an {@code initialValue}, if one is not available, use {@Link DeferredObservableValue} class.
+ * Class that notifies its listeners every time the value changes.
  */
-class ObservableValue<T>(initialValue: T) : ObservableValidation(), IObservableValue<T> {
+class ObservableValue<T> : ObservableChange, IObservableValue<T> {
 
-    private var listener: ValueObserver<T>? = null
+    private var hasChanged = false
 
-    var value: T by Delegates.observable(initialValue) { _, old, new ->
-        if (old != new) {
-            listener?.onChange(new)
-            onValidate()
+    /**
+     *  Updates the current realValue if the newValue is different.
+     *  Only calls the notifyChange() if the current value is updated.
+     */
+    private var realValue: T? = null
+
+    override var value: T?
+        set(newValue) {
+            if (newValue != this.realValue) {
+                realValue = newValue
+                hasChanged = true
+                notifyChange()
+            }
+        }
+        get() {
+            return realValue
+        }
+
+    constructor() : super()
+
+    constructor(value: T) : super() {
+        this.value = value
+    }
+
+    override fun addChangeListener(observer: IObservableChange.ChangeObserver) {
+        super.addChangeListener(observer)
+        if (hasChanged) {
+            observer.onChange()
         }
     }
 
-    /**
-     * Sets a listener for {@code value} changes.
-     */
-    override fun setValueListener(valueObserver: ValueObserver<T>) {
-        listener = valueObserver
-        listener?.onChange(value)
-    }
 }
-    

@@ -21,19 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.form.models
+package br.com.youse.forms.form
 
-import br.com.youse.forms.form.IObservableValidation
-import br.com.youse.forms.form.IObservableValidation.ValidationObserver
-
-open class ObservableValidation : IObservableValidation {
-    private val validationObservers = mutableListOf<ValidationObserver>()
-
-    override fun addValidationListener(validationObserver: ValidationObserver) {
-        validationObservers.add(validationObserver)
+interface IObservableChange {
+    interface ChangeObserver {
+        /**
+         * Notifies a happened.
+         */
+        fun onChange()
     }
 
-    fun onValidate(){
-        validationObservers.forEach { it.requestValidation() }
-    }
+    /**
+     * Sets a listener for when a change is triggered
+     */
+    fun addChangeListener(observer: ChangeObserver)
 }

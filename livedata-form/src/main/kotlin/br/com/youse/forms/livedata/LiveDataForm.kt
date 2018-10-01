@@ -27,9 +27,9 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.MediatorLiveData
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
-import br.com.youse.forms.form.IObservableValidation
-import br.com.youse.forms.form.models.DeferredObservableValue
-import br.com.youse.forms.form.models.ObservableValidation
+import br.com.youse.forms.form.IObservableChange
+import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.form.models.ObservableChange
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -75,17 +75,17 @@ class LiveDataForm<T>(
         fields.forEach { liveField ->
             val key = liveField.key as T
             val validators = liveField.validators as List<Validator<Any?>>
-            val value = DeferredObservableValue<Any?>()
+            val value = ObservableValue<Any?>()
 
-            val validationTriggers = mutableListOf<IObservableValidation>()
+            val validationTriggers = mutableListOf<IObservableChange>()
 
             liveField.validationTriggers.forEach { liveTrigger ->
 
-                val validationTrigger = ObservableValidation()
+                val validationTrigger = ObservableChange()
                 validationTriggers.add(validationTrigger)
 
                 onFormValidationChange.addSource(liveTrigger) {
-                    validationTrigger.onValidate()
+                    validationTrigger.notifyChange()
                 }
             }
 
@@ -93,8 +93,8 @@ class LiveDataForm<T>(
 
             val liveData = liveField.input as MutableLiveData<Any?>
 
-            onFormValidationChange.addSource(liveData) { it ->
-                value.setValue(it)
+            onFormValidationChange.addSource(liveData) { newValue ->
+                value.value = newValue
             }
         }
 

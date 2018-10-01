@@ -71,7 +71,7 @@ LiveField<T,R> properties
  - Usually bound to DataBinding in layout.
 
 ## LiveField.errors
- - It's a `List<ValidationMessage>` if the list is empty, then the field will be valid.
+ - It's a `List<ValidationMessage>` if the list is empty, the field it valid.
  - It's usually used to show or remove a validation error.
  - Usually bound to DataBinding in layout.
 
@@ -89,7 +89,7 @@ LiveDataForm events
  - This `LiveData` allow you to enable or disable a submit button.
 
 ## LiveDataForm.onValidSubmit
- - It emits when a valid submit happens. This `LiveData` gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any?` is that field current value.
+ - It emits when a valid submit happens.
  - This `LiveData` is called to inform you when to send the form data to your server.
 
 ## LiveDataForm.onSubmitFailed

@@ -83,7 +83,7 @@ class LiveDataFormTest {
     private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
         override fun isValid(input: Int?): Boolean {
-            return input !=null && input >= MIN_AGE_VALUE
+            return input != null && input >= MIN_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -150,26 +150,25 @@ class LiveDataFormTest {
                 .build()
 
         var emailMessages: List<ValidationMessage>? = null
-        val emailValidation = email.errors
-        setupCountableOnChange(emailValidation, 2) {
+        setupCountableOnChange(email.errors, 2) {
             emailMessages = it
         }
 
         var passwordMessages: List<ValidationMessage>? = null
-        val passwordValidation = password.errors
-        setupCountableOnChange(passwordValidation, 2) {
+
+        setupCountableOnChange(password.errors, 2) {
             passwordMessages = it
         }
 
         var ageMessages: List<ValidationMessage>? = null
-        val ageValidation = age.errors
-        setupCountableOnChange(ageValidation, 2) {
+
+        setupCountableOnChange(age.errors, 2) {
             ageMessages = it
         }
 
-
         val failedSubmit = form.onSubmitFailed
         var submitFailedMessages: List<Pair<Int, List<ValidationMessage>>>? = null
+
         setupCountableOnChange(failedSubmit, 1) {
             submitFailedMessages = it
         }
@@ -205,7 +204,7 @@ class LiveDataFormTest {
             assertNull(currentFormValidation)
             assertNull(validSubmitContents)
         } else {
-            // requestValidation fields all the time
+            // validate fields all the time
             assertNotNull(emailMessages)
             assertNotNull(passwordMessages)
             assertNotNull(ageMessages)
