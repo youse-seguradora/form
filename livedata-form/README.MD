@@ -24,7 +24,7 @@ private val passwordValidations ...
 val email = LiveField(key = EMAIL_ID, validators = emailValidators)
 val password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
 
-val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
+val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>()
         .addField(email)
         .addField(password)
         .build()
@@ -71,7 +71,7 @@ LiveField<T,R> properties
  - Usually bound to DataBinding in layout.
 
 ## LiveField.errors
- - It's a `List<ValidationMessage>` if the list is empty, the field it valid.
+ - It's a `List<ValidationMessage>` if the list is empty, then the field will be valid.
  - It's usually used to show or remove a validation error.
  - Usually bound to DataBinding in layout.
 
@@ -116,5 +116,3 @@ or Gradle:
 ```groovy
 implementation 'br.com.youse.forms:livedata-form:0.0.1'
 ```
-
-
