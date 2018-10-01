@@ -24,7 +24,7 @@ private val passwordValidations ...
 val email = LiveField(key = EMAIL_ID, validators = emailValidators)
 val password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
 
-val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
+val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>()
         .addField(email)
         .addField(password)
         .build()
@@ -89,7 +89,7 @@ LiveDataForm events
  - This `LiveData` allow you to enable or disable a submit button.
 
 ## LiveDataForm.onValidSubmit
- - It emits when a valid submit happens. This `LiveData` gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any?` is that field current value.
+ - It emits when a valid submit happens.
  - This `LiveData` is called to inform you when to send the form data to your server.
 
 ## LiveDataForm.onSubmitFailed
@@ -116,5 +116,3 @@ or Gradle:
 ```groovy
 implementation 'br.com.youse.forms:livedata-form:0.0.1'
 ```
-
-
