@@ -34,251 +34,208 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
+class TestFieldValidationChange<T> : IForm.FieldValidationChange<T> {
+    private val validationsList: MutableList<Pair<T, List<ValidationMessage>>> = mutableListOf()
 
-class FormTest {
-    companion object {
-        private const val EMAIL_ID = 1
-        private const val PASSWORD_ID = 2
-        private const val AGE_ID = 3
-        private const val VALID_EMAIL = "some_email_@some_domain.com"
-        private const val VALID_PASSWORD = "12345678"
-        private const val MIN_AGE_VALUE = 21
-        private const val MAX_AGE_VALUE = 100
-
-        private val VALID_EMAIL_TYPE: ValidationType = object : ValidationType {}
-        private val VALID_PASSWORD_TYPE: ValidationType = object : ValidationType {}
-        private val MIN_VALUE_TYPE: ValidationType = object : ValidationType {}
-        private val MAX_VALUE_TYPE: ValidationType = object : ValidationType {}
-
-        val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
-        val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
-        val TOO_LARGE_MESSAGE = ValidationMessage("input is too large", MAX_VALUE_TYPE)
-        val TOO_SMALL_MESSAGE = ValidationMessage("input is too small", MIN_VALUE_TYPE)
+    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
+        validationsList.add(Pair(key, validations))
     }
 
+    fun assertKeyAt(index: Int, key: T) {
+        assertEquals(validationsList[index].first, key)
+    }
 
-    private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_EMAIL == input
-        }
+    fun assertValidationsAt(index: Int, validations: List<ValidationMessage>) {
+        assertEquals(validationsList[index].second, validations)
+    }
 
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_EMAIL_MESSAGE
-        }
-    })
+    fun assertValidationPair(index: Int, validations: Pair<T, List<ValidationMessage>>): TestFieldValidationChange<T> {
+        assertKeyAt(index, validations.first)
+        assertValidationsAt(index, validations.second)
+        return this
+    }
 
-    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_PASSWORD == input
-        }
+    fun assertSize(size: Int): TestFieldValidationChange<T> {
+        assertEquals(validationsList.size, size)
+        return this
+    }
+}
 
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_PASSWORD_MESSAGE
-        }
-    })
 
-    private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
+class TestFormValidationChange : IForm.FormValidationChange {
+    private val changes = mutableListOf<Boolean>()
+    override fun onFormValidationChange(isValid: Boolean) {
+        changes.add(isValid)
+    }
 
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input >= MIN_AGE_VALUE
-        }
+    fun assertChange(index: Int, isValid: Boolean): TestFormValidationChange {
+        assertEquals(changes[index], isValid)
+        return this
+    }
 
-        override fun validationMessage(): ValidationMessage {
-            return TOO_SMALL_MESSAGE
-        }
+    fun assertSize(size: Int): TestFormValidationChange {
+        assertEquals(changes.size, size)
+        return this
+    }
+}
 
-    }, object : Validator<Int> {
+class TestValidSubmit<T> : IForm.ValidSubmit<T> {
+    private val submits = mutableListOf<List<Pair<T, Any?>>>()
+    override fun onValidSubmit(fields: List<Pair<T, Any?>>) {
+        submits.add(fields)
+    }
 
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input <= MAX_AGE_VALUE
-        }
+    fun assertSize(size: Int): TestValidSubmit<T> {
+        assertEquals(submits.size, size)
+        return this
+    }
+}
 
-        override fun validationMessage(): ValidationMessage {
-            return TOO_LARGE_MESSAGE
-        }
+class TestSubmitFailed<T> : IForm.SubmitFailed<T> {
+    private val failedSubmits = mutableListOf<List<Pair<T, List<ValidationMessage>>>>()
+    override fun onSubmitFailed(validations: List<Pair<T, List<ValidationMessage>>>) {
+        failedSubmits.add(validations)
+    }
 
-    })
+    fun assertValidations(index: Int, validations: List<Pair<T, List<ValidationMessage>>>): TestSubmitFailed<T> {
+        assertEquals(failedSubmits[index], validations)
+        return this
+    }
+
+    fun assertSize(size: Int): TestSubmitFailed<T> {
+        assertEquals(failedSubmits.size, size)
+        return this
+    }
+}
+
+class FormTest {
+
+    val emailObservable = ObservableValue<String>()
+    val passwordObservable = ObservableValue<String>()
+    val ageObservable = ObservableValue<Int>()
+
+    private fun getBuilderWithFields(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT, email: String, password: String, age: Int): IForm.Builder<Int> {
+        emailObservable.value = email
+        passwordObservable.value = password
+        ageObservable.value = age
+
+        return Form.Builder<Int>(strategy)
+                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
+                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
+                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
+
+    }
 
     @Test
     fun shouldValidateAllTheTime() {
-
-        val emailObservable = ObservableValue("foo")
-        val passwordObservable = ObservableValue("bar")
-        val ageObservable = ObservableValue(MIN_AGE_VALUE - 1)
 
         val validationsList = listOf(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
-        Form.Builder<Int>(ValidationStrategy.ALL_TIME)
-                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
-                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
-                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
-                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
-                    var index = 0
-                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
-                        assertEquals(validationsList[index].first, key)
-                        assertEquals(validationsList[index].second, validations)
+        val fieldChange = TestFieldValidationChange<Int>()
+        val formChange = TestFormValidationChange()
+        val validSubmit = TestValidSubmit<Int>()
+        val failedSubmit = TestSubmitFailed<Int>()
 
-                        index++
-                    }
-                })
-                .setFormValidationListener(object : IForm.FormValidationChange {
-                    var count = 0
-                    override fun onFormValidationChange(isValid: Boolean) {
-                        if (count > 0) {
-                            fail()
-                        }
-                        count++
-                    }
-                })
-                .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
-                        fail()
-
-                    }
-                })
-                .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
-                    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
-                        assertEquals(validationsList, validations)
-                    }
-                })
+        getBuilderWithFields(ValidationStrategy.ALL_TIME, "foo", "bar", MIN_AGE_VALUE - 1)
+                .setFieldValidationListener(fieldChange)
+                .setFormValidationListener(formChange)
+                .setValidSubmitListener(validSubmit)
+                .setSubmitFailedListener(failedSubmit)
                 .build()
+
+
+        validationsList.forEachIndexed { index, pair ->
+            fieldChange.assertValidationPair(index, pair)
+        }
+
+        fieldChange.assertSize(validationsList.size)
+
+        formChange
+                .assertChange(0, false)
+                .assertSize(1)
+
+        validSubmit.assertSize(0)
+
+        failedSubmit.assertSize(0)
 
     }
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
-        val emailObservable = ObservableValue("foo")
-        val passwordObservable = ObservableValue("bar")
-        val ageObservable = ObservableValue(MIN_AGE_VALUE - 1)
 
-        var validate = false
-        var onFieldChangeCounter = 0
-        var onFormValidationChangeCounter = 0
-        var onValidSubmitCounter = 0
-        var onFailedSubmitCounter = 0
+        val fieldChange = TestFieldValidationChange<Int>()
+        val formChange = TestFormValidationChange()
+        val validSubmit = TestValidSubmit<Int>()
+        val failedSubmit = TestSubmitFailed<Int>()
 
-        val form = Form.Builder<Int>()
-                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
-                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
-                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
-                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
-
-                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
-                        if (!validate) {
-                            fail()
-                        }
-                        onFieldChangeCounter++
-                    }
-                })
-                .setFormValidationListener(object : IForm.FormValidationChange {
-
-                    override fun onFormValidationChange(isValid: Boolean) {
-                        if (!validate) {
-                            fail()
-                        }
-                        onFormValidationChangeCounter++
-                    }
-                })
-                .setValidSubmitListener(object : IForm.ValidSubmit<Int> {
-                    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
-                        if (!validate) {
-                            fail()
-                        }
-                        onValidSubmitCounter++
-                    }
-                })
-                .setSubmitFailedListener(object : IForm.SubmitFailed<Int> {
-                    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
-                        if (!validate) {
-                            fail()
-                        }
-                        onFailedSubmitCounter++
-                    }
-                })
+        val form = getBuilderWithFields(
+                ValidationStrategy.AFTER_SUBMIT,
+                "foo",
+                "bar",
+                MIN_AGE_VALUE - 1)
+                .setFieldValidationListener(fieldChange)
+                .setFormValidationListener(formChange)
+                .setValidSubmitListener(validSubmit)
+                .setSubmitFailedListener(failedSubmit)
                 .build()
 
         emailObservable.value = "bar"
         passwordObservable.value = "foo"
         ageObservable.value = MAX_AGE_VALUE + 1
-        assertEquals(onFieldChangeCounter, 0)
-        assertEquals(onFormValidationChangeCounter, 0)
-        assertEquals(onValidSubmitCounter, 0)
-        assertEquals(onFailedSubmitCounter, 0)
 
-        validate = true
+        fieldChange.assertSize(0)
+        formChange.assertSize(0)
+        failedSubmit.assertSize(0)
+        validSubmit.assertSize(0)
+
         form.doSubmit()
 
-
-        assertEquals(onFieldChangeCounter, 3)
-        assertEquals(onFormValidationChangeCounter, 1)
-        assertEquals(onValidSubmitCounter, 0)
-        assertEquals(onFailedSubmitCounter, 1)
+        fieldChange.assertSize(3)
+        formChange.assertSize(1)
+        formChange.assertChange(0, false)
+        failedSubmit.assertSize(1)
+        validSubmit.assertSize(0)
 
         emailObservable.value = VALID_EMAIL
         passwordObservable.value = VALID_PASSWORD
         ageObservable.value = MIN_AGE_VALUE
 
-        assertEquals(onFieldChangeCounter, 6)
-        assertEquals(onFormValidationChangeCounter, 2)
-        assertEquals(onValidSubmitCounter, 0)
-        assertEquals(onFailedSubmitCounter, 1)
+        fieldChange.assertSize(6)
+        formChange.assertSize(2)
+        failedSubmit.assertSize(1)
+        validSubmit.assertSize(0)
 
         form.doSubmit()
 
-        assertEquals(onValidSubmitCounter, 1)
-        assertEquals(onFailedSubmitCounter, 1)
+        failedSubmit.assertSize(1)
+        validSubmit.assertSize(1)
     }
 
     @Test
     fun shouldCallOnFieldValidationChangeDueFieldValidation() {
-        val emailObservable = ObservableValue("foo")
-        val firstMessage = "first error message"
-        val secondMessage = "second error message"
-        val emailValidators = listOf(object : Validator<String> {
-            override fun validationMessage(): ValidationMessage {
-                return ValidationMessage(firstMessage, VALID_EMAIL_TYPE)
-            }
-
-            override fun isValid(input: String?): Boolean {
-                return input != null && input.isNotEmpty()
-            }
-        }, object : Validator<String> {
-            override fun validationMessage(): ValidationMessage {
-                return ValidationMessage(secondMessage, VALID_EMAIL_TYPE)
-            }
-
-            override fun isValid(input: String?): Boolean {
-                return input != null && input.contains("@")
-            }
-        })
-
-        var lastMessages = listOf<ValidationMessage>()
-
+        val fieldChanges = TestFieldValidationChange<Int>()
         val form = Form.Builder<Int>()
-                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
-                .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
-
-                    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
-                        lastMessages = validations
-                    }
-                })
+                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
+                .setFieldValidationListener(fieldChanges)
                 .build()
 
-        emailObservable.value = ""
+        ageObservable.value = MIN_AGE_VALUE - 1
 
         form.doSubmit()
 
-        assertEquals(lastMessages.first().message, firstMessage)
+        fieldChanges.assertValidationsAt(0, listOf(TOO_SMALL_MESSAGE))
 
-        emailObservable.value = " "
+        ageObservable.value = MAX_AGE_VALUE + 1
 
-        assertEquals(lastMessages.first().message, secondMessage)
+        fieldChanges.assertValidationsAt(1, listOf(TOO_LARGE_MESSAGE))
 
-        emailObservable.value = "@"
+        ageObservable.value = MIN_AGE_VALUE
 
-        assertTrue(lastMessages.isEmpty())
+        fieldChanges.assertValidationsAt(2, listOf())
+
+        fieldChanges.assertSize(3)
 
     }
 }
