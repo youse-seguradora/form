@@ -25,7 +25,6 @@ package br.com.youse.forms.form
 
 import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.validators.ValidationMessage
-import br.com.youse.forms.validators.Validator
 
 
 interface IForm {
@@ -75,32 +74,22 @@ interface IForm {
         /**
          * Sets a field validation listener.
          */
-        fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): Builder<T>
+        fun setFieldValidationListener(listener: FieldValidationChange<T>): Builder<T>
 
         /**
          * Sets a form validation listener.
          */
-        fun setFormValidationListener(listener: IForm.FormValidationChange): Builder<T>
+        fun setFormValidationListener(listener: FormValidationChange): Builder<T>
 
         /**
          * Sets a valid submit listener.
          */
-        fun setValidSubmitListener(listener: IForm.ValidSubmit<T>): Builder<T>
+        fun setValidSubmitListener(listener: ValidSubmit<T>): Builder<T>
 
         /**
          * Sets a failed submit listener
          */
-        fun setSubmitFailedListener(listener: IForm.SubmitFailed<T>): Builder<T>
-
-        /**
-         * Adds a field to the builder, it takes a {@code key} to identify the field,
-         * an {@code input} that emits the field value changes and a list
-         * of validators for that field.
-         */
-        fun <R> addField(key: T,
-                         input: IObservableValue<R>,
-                         validators: List<Validator<R>>,
-                         validationTriggers: List<IObservableChange>): IForm.Builder<T>
+        fun setSubmitFailedListener(listener: SubmitFailed<T>): Builder<T>
 
         /**
          * Adds a field to the builder, it takes a {@code field} of FormField type.

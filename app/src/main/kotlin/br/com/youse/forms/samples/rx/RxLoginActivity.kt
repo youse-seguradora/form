@@ -34,6 +34,7 @@ import br.com.youse.forms.rxform.RxField
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
+import br.com.youse.forms.validators.ValidationStrategy
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
@@ -64,10 +65,17 @@ class RxLoginActivity : AppCompatActivity() {
         val emailChanges = email.textChanges().map { it.toString() }
         val passwordChanges = password.textChanges().map { it.toString() }
 
-        val emailField = RxField(emailContainer.id, emailChanges, emailValidations)
-        val passwordField = RxField(passwordContainer.id, passwordChanges, passwordValidations)
+        val emailField = RxField(
+                key = emailContainer.id,
+                input = emailChanges,
+                validators = emailValidations)
 
-        form = RxForm.Builder<Int>(submitObservable)
+        val passwordField = RxField(
+                key = passwordContainer.id,
+                input = passwordChanges,
+                validators = passwordValidations)
+
+        form = RxForm.Builder<Int>(submitObservable, strategy = ValidationStrategy.ALL_TIME)
                 .addField(emailField)
                 .addField(passwordField)
                 .build()

@@ -23,13 +23,15 @@ SOFTWARE.
  */
 package br.com.youse.forms.livedata
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
+import br.com.youse.forms.form.FieldValidationChange
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IObservableChange
-import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableChange
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -38,23 +40,30 @@ import br.com.youse.forms.validators.Validator
 
 @Suppress("UNCHECKED_CAST")
 class LiveDataForm<T>(
-        val onFormValidationChange: MediatorLiveData<Boolean>,
+        override val onFormValidationChange: MediatorLiveData<Boolean>,
         strategy: ValidationStrategy,
-        fields: List<LiveField<*, *>>) {
+        private val fields: List<LiveField<T, *>>) : ILiveDataForm<T> {
 
-    val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
-    val onValidSubmit = MutableLiveData<Unit>()
+    override val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
+    override val onValidSubmit = MutableLiveData<Unit>()
+    override val onFieldValidationChange: MutableLiveData<Pair<T, List<ValidationMessage>>>
+        get() {
+            val mediator = MediatorLiveData<Pair<T, List<ValidationMessage>>>()
+            fields.forEach { liveField ->
+                mediator.addSource(liveField.errors) { validations ->
+                    validations?.let {
+                        mediator.value = Pair(liveField.key, validations)
+                    }
+                }
+            }
+            return mediator
+        }
 
     private var form: IForm
 
     init {
 
         val builder = Form.Builder<T>(strategy = strategy)
-                .setFieldValidationListener(object : IForm.FieldValidationChange<T> {
-                    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
-                        fields.firstOrNull { it.key == key }?.errors?.value = validations
-                    }
-                })
                 .setFormValidationListener(object : IForm.FormValidationChange {
                     override fun onFormValidationChange(isValid: Boolean) {
                         onFormValidationChange.value = isValid
@@ -73,11 +82,17 @@ class LiveDataForm<T>(
 
 
         fields.forEach { liveField ->
-            val key = liveField.key as T
+            val key = liveField.key
             val validators = liveField.validators as List<Validator<Any?>>
-            val value = ObservableValue<Any?>()
-
+            val observableValue = ObservableValue<Any?>()
+            val input = liveField.input as MutableLiveData<Any?>
             val validationTriggers = mutableListOf<IObservableChange>()
+
+            val errors = object : FieldValidationChange<T> {
+                override fun onFieldValidationChange(validations: List<ValidationMessage>) {
+                    liveField.errors.value = validations
+                }
+            }
 
             liveField.validationTriggers.forEach { liveTrigger ->
 
@@ -89,12 +104,16 @@ class LiveDataForm<T>(
                 }
             }
 
-            builder.addField(key, value, validators, validationTriggers.toList())
+            val formField = FormField(key = key,
+                    input = observableValue,
+                    errors = errors,
+                    validators = validators,
+                    validationTriggers = validationTriggers.toList())
 
-            val liveData = liveField.input as MutableLiveData<Any?>
+            builder.addField(formField)
 
-            onFormValidationChange.addSource(liveData) { newValue ->
-                value.value = newValue
+            onFormValidationChange.addSource(input) { newValue ->
+                observableValue.value = newValue
             }
         }
 
@@ -102,18 +121,18 @@ class LiveDataForm<T>(
 
     }
 
-    fun doSubmit() = form.doSubmit()
+    override fun doSubmit() = form.doSubmit()
 
     class Builder<T>(private val submit: MediatorLiveData<Boolean> = MediatorLiveData(),
-                     private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
-        private val fields = mutableListOf<LiveField<*, *>>()
+                     private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : ILiveDataForm.Builder<T> {
+        private val fields = mutableListOf<LiveField<T, *>>()
 
-        fun <R> addField(field: LiveField<T, R>): LiveDataForm.Builder<T> {
+        override fun <R> addField(field: LiveField<T, R>): LiveDataForm.Builder<T> {
             fields.add(field)
             return this
         }
 
-        fun build(): LiveDataForm<T> {
+        override fun build(): ILiveDataForm<T> {
             return LiveDataForm(submit, strategy, fields)
         }
     }

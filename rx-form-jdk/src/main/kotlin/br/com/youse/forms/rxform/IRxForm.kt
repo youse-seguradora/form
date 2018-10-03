@@ -24,7 +24,6 @@ SOFTWARE.
 package br.com.youse.forms.rxform
 
 import br.com.youse.forms.validators.ValidationMessage
-import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
 
 interface IRxForm<T> {
@@ -67,16 +66,6 @@ interface IRxForm<T> {
      * and optionally a validation strategy (AFTER_SUBMIT by default).
      */
     interface Builder<T> {
-
-        /**
-         * Adds a field to the builder, it takes a key to identify the field,
-         * a field observable that emits the field value changes and a list
-         * of validators for that field.
-         */
-        fun <R> addField(key: T,
-                         input: Observable<R>,
-                         validators: List<Validator<R>>,
-                         validationTriggers: List<Observable<Unit>>): Builder<T>
 
         /**
          * Adds a field to the builder, it takes a {code field} of type RxField.
