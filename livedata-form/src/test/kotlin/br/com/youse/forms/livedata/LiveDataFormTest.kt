@@ -35,72 +35,42 @@ import org.junit.Rule
 import org.junit.rules.TestRule
 import kotlin.test.*
 
+class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
+    private val changes = mutableListOf<T?>()
+    override fun onChanged(t: T?) {
+        changes.add(t)
+    }
+
+    fun observe(): TestObserver<T> {
+        ld.observeForever(this)
+        return this
+    }
+
+    fun dispose(): TestObserver<T> {
+        ld.removeObserver(this)
+        return this
+    }
+
+    fun assertNoValues(): TestObserver<T> {
+        assertEquals(changes.size, 0)
+        return this
+    }
+
+    fun assertAnyValue(): TestObserver<T> {
+        assertTrue(changes.size > 0)
+        return this
+    }
+
+    fun assertValue(t: T): TestObserver<T> {
+        assertEquals(changes.last(), t)
+        return this
+    }
+}
+
 class LiveDataFormTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    companion object {
-        private const val EMAIL_ID = 1
-        private const val PASSWORD_ID = 2
-        private const val AGE_ID = 3
-        private const val VALID_EMAIL = "some_email_@some_domain.com"
-        private const val VALID_PASSWORD = "12345678"
-        private const val MIN_AGE_VALUE = 21
-        private const val MAX_AGE_VALUE = 100
-
-        private val VALID_EMAIL_TYPE: ValidationType = object : ValidationType {}
-        private val VALID_PASSWORD_TYPE: ValidationType = object : ValidationType {}
-        private val MIN_VALUE_TYPE: ValidationType = object : ValidationType {}
-        private val MAX_VALUE_TYPE: ValidationType = object : ValidationType {}
-
-        val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
-        val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
-        val TOO_LARGE_MESSAGE = ValidationMessage("input is too large", MAX_VALUE_TYPE)
-        val TOO_SMALL_MESSAGE = ValidationMessage("input is too small", MIN_VALUE_TYPE)
-    }
-
-
-    private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_EMAIL == input
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_EMAIL_MESSAGE
-        }
-    })
-
-    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_PASSWORD == input
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_PASSWORD_MESSAGE
-        }
-    })
-
-    private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
-
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input >= MIN_AGE_VALUE
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return TOO_SMALL_MESSAGE
-        }
-
-    }, object : Validator<Int> {
-
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input <= MAX_AGE_VALUE
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return TOO_LARGE_MESSAGE
-        }
-
-    })
 
     private lateinit var email: LiveField<Int, String>
     private lateinit var password: LiveField<Int, String>
@@ -114,34 +84,20 @@ class LiveDataFormTest {
         age = LiveField(key = AGE_ID, validators = ageValidators)
     }
 
-    private fun <T> setupCountableOnChange(ld: MutableLiveData<T>, count: Int, callback: (T?) -> Unit): Observer<T> {
-        val obs = object : Observer<T> {
-            var times = 0
-            override fun onChanged(t: T?) {
-                callback(t)
-                times += 1
-                if (times >= count) {
-                    ld.removeObserver(this)
-                }
-            }
-        }
-        ld.observeForever(obs)
-        return obs
-    }
 
     @Test
     fun shouldValidateAfterSubmit() {
-        validate(true)
+        validate(ValidationStrategy.AFTER_SUBMIT)
     }
 
     @Test
     fun shouldValidateAllTime() {
-        validate(false)
+        validate(ValidationStrategy.ALL_TIME)
     }
 
 
-    private fun validate(afterSubmit: Boolean) {
-        val strategy = if (afterSubmit) ValidationStrategy.AFTER_SUBMIT else ValidationStrategy.ALL_TIME
+    private fun validate(strategy: ValidationStrategy) {
+
 
         val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
@@ -149,106 +105,72 @@ class LiveDataFormTest {
                 .addField(age)
                 .build()
 
-        var emailMessages: List<ValidationMessage>? = null
-        setupCountableOnChange(email.errors, 2) {
-            emailMessages = it
-        }
+        val emailErrorsSub = TestObserver(email.errors).observe()
 
-        var passwordMessages: List<ValidationMessage>? = null
+        val passwordErrorsSub = TestObserver(password.errors).observe()
 
-        setupCountableOnChange(password.errors, 2) {
-            passwordMessages = it
-        }
+        val ageErrorsSub = TestObserver(age.errors).observe()
 
-        var ageMessages: List<ValidationMessage>? = null
+        val failedSubmitSub = TestObserver(form.onSubmitFailed).observe()
 
-        setupCountableOnChange(age.errors, 2) {
-            ageMessages = it
-        }
 
-        val failedSubmit = form.onSubmitFailed
-        var submitFailedMessages: List<Pair<Int, List<ValidationMessage>>>? = null
+        val formValidationSub = TestObserver(form.onFormValidationChange).observe()
 
-        setupCountableOnChange(failedSubmit, 1) {
-            submitFailedMessages = it
-        }
 
-        val formValidation = form.onFormValidationChange
-        var currentFormValidation: Boolean? = null
-        setupCountableOnChange(formValidation, 2) {
-            currentFormValidation = it
-        }
-        val validSubmit = form.onValidSubmit
-        var validSubmitContents: Unit? = null
-        setupCountableOnChange(validSubmit, 1) {
-            validSubmitContents = it
-        }
+        val validSubmitSub = TestObserver(form.onValidSubmit).observe()
 
-        assertNull(emailMessages)
-        assertNull(passwordMessages)
-        assertNull(ageMessages)
-        assertNull(submitFailedMessages)
-        assertNull(currentFormValidation)
-        assertNull(validSubmitContents)
+        val fieldSubs = listOf(emailErrorsSub, passwordErrorsSub, ageErrorsSub)
+        val allSubs = fieldSubs + listOf(failedSubmitSub, formValidationSub, validSubmitSub)
+
+        allSubs.forEach { it.assertNoValues() }
 
         email.input.value = ""
         password.input.value = ""
         age.input.value = MIN_AGE_VALUE - 1
 
-        if (afterSubmit) {
+        if (strategy == ValidationStrategy.AFTER_SUBMIT) {
             // nothing should be initialized yet
-            assertNull(emailMessages)
-            assertNull(passwordMessages)
-            assertNull(ageMessages)
-            assertNull(submitFailedMessages)
-            assertNull(currentFormValidation)
-            assertNull(validSubmitContents)
+            allSubs.forEach { it.assertNoValues() }
         } else {
             // validate fields all the time
-            assertNotNull(emailMessages)
-            assertNotNull(passwordMessages)
-            assertNotNull(ageMessages)
+            fieldSubs.forEach { it.assertAnyValue() }
 
             // form state is invalid
-            assertNotNull(currentFormValidation)
-            assertFalse(currentFormValidation!!)
+            formValidationSub.assertValue(false)
 
             // did not call the submit related callbacks
-            assertNull(submitFailedMessages)
-            assertNull(validSubmitContents)
+            failedSubmitSub.assertNoValues()
+            validSubmitSub.assertNoValues()
         }
 
         form.doSubmit()
 
         // field validation was triggered
-        assertNotNull(emailMessages)
-        assertNotNull(passwordMessages)
-        assertNotNull(ageMessages)
+        fieldSubs.forEach { it.assertAnyValue() }
 
         // form state validation was triggered
-        assertNotNull(currentFormValidation)
+        formValidationSub.assertAnyValue()
 
-        // the submit caused an evalution and the form submission failed
-        assertNotNull(submitFailedMessages)
-        assertNull(validSubmitContents)
+        // the submit caused an evaluation and the form submission failed
+        failedSubmitSub.assertAnyValue()
+        validSubmitSub.assertNoValues()
 
         // checking fields validation messages
-        assertEquals(emailMessages!!.first(), INVALID_EMAIL_MESSAGE)
-        assertEquals(passwordMessages!!.first(), INVALID_PASSWORD_MESSAGE)
-        assertEquals(ageMessages!!.first(), TOO_SMALL_MESSAGE)
+        emailErrorsSub.assertValue(listOf(INVALID_EMAIL_MESSAGE))
+        passwordErrorsSub.assertValue(listOf(INVALID_PASSWORD_MESSAGE))
+        ageErrorsSub.assertValue(listOf(TOO_SMALL_MESSAGE))
 
         // the form is not valid
-        assertFalse(currentFormValidation!!)
+        formValidationSub.assertValue(false)
 
         // the failed submit messages
-        assertEquals(submitFailedMessages, listOf(
+        failedSubmitSub.assertValue(listOf(
                 Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
-        )
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))))
 
-        // still not triggered
-        assertNull(validSubmitContents)
+        // valid submit still not triggered
+        validSubmitSub.assertNoValues()
 
 
         // valid form
@@ -257,12 +179,12 @@ class LiveDataFormTest {
         age.input.value = MIN_AGE_VALUE
 
         // all messages are empty
-        assertTrue(emailMessages!!.isEmpty())
-        assertTrue(passwordMessages!!.isEmpty())
-        assertTrue(ageMessages!!.isEmpty())
+        fieldSubs.forEach { it.assertValue(emptyList()) }
 
         // the form is valid
-        assertTrue(currentFormValidation!!)
+        formValidationSub.assertValue(true)
+
+        allSubs.forEach { it.dispose() }
     }
 
 }
