@@ -2,7 +2,7 @@ package br.com.youse.forms.form
 
 import br.com.youse.forms.validators.ValidationMessage
 
-interface FieldValidationChange<T> {
+interface FieldValidationChange {
     /**
      * It's called every time a field validation changes.
      * {@code validation} contains a list of validation messages,

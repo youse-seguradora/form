@@ -30,6 +30,6 @@ import br.com.youse.forms.validators.Validator
 
 class FormField<T, R>(val key: T,
                       val input: IObservableValue<R> = ObservableValue(),
-                      val errors: FieldValidationChange<T>? = null,
+                      val errors: FieldValidationChange? = null,
                       val validators: List<Validator<R>> = emptyList(),
                       val validationTriggers: List<IObservableChange> = emptyList())

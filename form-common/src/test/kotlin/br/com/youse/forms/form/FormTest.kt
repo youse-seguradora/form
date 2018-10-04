@@ -27,12 +27,10 @@ import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.ValidationType
-import br.com.youse.forms.validators.Validator
 import kotlin.test.Test
+import kotlin.test.BeforeTest
+
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class TestFieldValidationChange<T> : IForm.FieldValidationChange<T> {
     private val validationsList: MutableList<Pair<T, List<ValidationMessage>>> = mutableListOf()
@@ -110,19 +108,30 @@ class TestSubmitFailed<T> : IForm.SubmitFailed<T> {
 
 class FormTest {
 
-    val emailObservable = ObservableValue<String>()
-    val passwordObservable = ObservableValue<String>()
-    val ageObservable = ObservableValue<Int>()
+    private lateinit var emailObservable: ObservableValue<String>
+    private lateinit var passwordObservable: ObservableValue<String>
+    private lateinit var ageObservable: ObservableValue<Int>
 
-    private fun getBuilderWithFields(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT, email: String, password: String, age: Int): IForm.Builder<Int> {
+    @BeforeTest
+    fun setup() {
+        emailObservable = ObservableValue()
+        passwordObservable = ObservableValue()
+        ageObservable = ObservableValue()
+    }
+
+    private fun getBuilderWithFields(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT,
+                                     email: String,
+                                     password: String,
+                                     age: Int): IForm.Builder<Int> {
+
         emailObservable.value = email
         passwordObservable.value = password
         ageObservable.value = age
 
         return Form.Builder<Int>(strategy)
-                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
-                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
-                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
+                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators))
+                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
+                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators))
 
     }
 

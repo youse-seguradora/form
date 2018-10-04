@@ -61,6 +61,10 @@ class RxLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
+        val strategy = ValidationStrategy.valueOf(param)
+
+
         val submitObservable = submit.clicks()
         val emailChanges = email.textChanges().map { it.toString() }
         val passwordChanges = password.textChanges().map { it.toString() }
@@ -75,7 +79,7 @@ class RxLoginActivity : AppCompatActivity() {
                 input = passwordChanges,
                 validators = passwordValidations)
 
-        form = RxForm.Builder<Int>(submitObservable, strategy = ValidationStrategy.ALL_TIME)
+        form = RxForm.Builder<Int>(submitObservable, strategy = strategy)
                 .addField(emailField)
                 .addField(passwordField)
                 .build()

@@ -32,6 +32,7 @@ import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.databinding.LiveDataActivityBinding
 import br.com.youse.forms.samples.home.HomeActivity
+import br.com.youse.forms.validators.ValidationStrategy
 
 class LiveDataLoginActivity : AppCompatActivity() {
 
@@ -39,9 +40,13 @@ class LiveDataLoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
+        val strategy = ValidationStrategy.valueOf(param)
+
         val binding: LiveDataActivityBinding = DataBindingUtil.setContentView(this, R.layout.live_data_activity)
 
         val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        vm.createForm(strategy)
         binding.vm = vm
         binding.setLifecycleOwner(this)
 
