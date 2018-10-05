@@ -109,9 +109,9 @@ class RxFormTests {
     @Test
     fun shouldValidateAllTheTime() {
         val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
-                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
+                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
+                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
+                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -133,14 +133,16 @@ class RxFormTests {
 
         validSubmitSub.assertNoValues().assertNoErrors()
 
+        form.dispose()
+
     }
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
         val form = getBuilder<Int>(submit)
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
-                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
+                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
+                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
+                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -198,14 +200,15 @@ class RxFormTests {
                 Pair(AGE_ID, MIN_AGE_VALUE)
         ))
 
+        form.dispose()
     }
 
     @Test
     fun shouldNotValidateBeforeSubmit() {
         val form = getBuilder<Int>(submit)
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
-                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
+                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
+                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
+                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -245,6 +248,7 @@ class RxFormTests {
         submitFailedSub.assertNoValues()
                 .assertNoErrors()
 
+        form.dispose()
     }
 
     @Test
@@ -269,5 +273,7 @@ class RxFormTests {
 
         submitFailedSub.assertNoValues()
                 .assertNoErrors()
+
+        form.dispose()
     }
 }

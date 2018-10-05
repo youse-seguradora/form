@@ -32,6 +32,7 @@ import android.util.Log
 import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
+import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
@@ -41,7 +42,7 @@ import br.com.youse.forms.validators.ValidationMessage
 import kotlinx.android.synthetic.main.activity_main.*
 
 class FormLoginActivity : AppCompatActivity(),
-        FieldValidationChange<Int>,
+        IForm.FieldValidationChange<Int>,
         FormValidationChange,
         ValidSubmit<Int>,
         SubmitFailed<Int> {
@@ -85,14 +86,15 @@ class FormLoginActivity : AppCompatActivity(),
         password.addTextChangedListener(getTextWatcher(passwordChanges))
 
         val emailField = FormField(
-                emailContainer.id,
-                emailChanges, emailValidations
+                key = emailContainer.id,
+                input = emailChanges,
+                validators = emailValidations
         )
 
         val passwordField = FormField(
-                passwordContainer.id,
-                passwordChanges,
-                passwordValidations
+                key = passwordContainer.id,
+                input = passwordChanges,
+                validators = passwordValidations
         )
 
         val form = Form.Builder<Int>()
@@ -114,7 +116,6 @@ class FormLoginActivity : AppCompatActivity(),
         val field = findViewById<TextInputLayout>(key)
         field.isErrorEnabled = validations.isNotEmpty()
         field.error = validations.joinToString { it.message }
-
     }
 
     override fun onFormValidationChange(isValid: Boolean) {

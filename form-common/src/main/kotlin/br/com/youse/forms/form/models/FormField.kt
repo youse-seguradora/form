@@ -23,11 +23,13 @@ SOFTWARE.
  */
 package br.com.youse.forms.form.models
 
+import br.com.youse.forms.form.FieldValidationChange
 import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.IObservableValue
 import br.com.youse.forms.validators.Validator
 
 class FormField<T, R>(val key: T,
-                      val input: IObservableValue<R>,
-                      val validators: List<Validator<R>>,
+                      val input: IObservableValue<R> = ObservableValue(),
+                      val errors: FieldValidationChange<T>? = null,
+                      val validators: List<Validator<R>> = emptyList(),
                       val validationTriggers: List<IObservableChange> = emptyList())

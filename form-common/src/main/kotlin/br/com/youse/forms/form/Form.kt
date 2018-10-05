@@ -31,7 +31,7 @@ import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 
 @Suppress("UNCHECKED_CAST")
-class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
+class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
               private val formValidationListener: FormValidationChange?,
               private val validSubmitListener: ValidSubmit<T>?,
               private val submitFailedListener: SubmitFailed<T>?,
@@ -48,18 +48,14 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
         fields.forEach { field ->
 
-            val key = field.key
-            val validators = field.validators as List<Validator<Any?>>
             val validationTriggers = listOf<IObservableChange>(field.input) + field.validationTriggers
 
             val validationObserver = object : ChangeObserver {
 
                 override fun onChange() {
 
-                    val value = field.input.value
-
                     if (shouldValidate()) {
-                        validateField(key, value, validators)
+                        validateField(field)
                         notifyFormValidationChangedIfChanged()
                     }
                 }
@@ -90,7 +86,10 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         isFormValid = areAllFieldsValid
     }
 
-    private fun validateField(key: T, value: Any?, validators: List<Validator<Any?>>) {
+    private fun validateField(field: FormField<T, *>) {
+        val key = field.key
+        val value = field.input.value
+        val validators = field.validators as List<Validator<Any?>>
 
         val messages = mutableListOf<ValidationMessage>()
 
@@ -105,6 +104,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
         if (hasFieldValidationChanged) {
             // notify field validation changed
+            field.errors?.onFieldValidationChange(messages)
             fieldValidationListener?.onFieldValidationChange(key, messages)
         }
 
@@ -121,11 +121,8 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
     private fun validateAllFields() {
 
         fields.forEach { field ->
-            val key = field.key
-            val validators = field.validators as List<Validator<Any?>>
-            val value = field.input.value
 
-            validateField(key, value, validators)
+            validateField(field)
         }
     }
 
@@ -172,12 +169,12 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
     class Builder<T>(private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IForm.Builder<T> {
 
-        private var fieldValidationListener: FieldValidationChange<T>? = null
+        private var fieldValidationListener: IForm.FieldValidationChange<T>? = null
         private var formValidationListener: FormValidationChange? = null
         private var validSubmitListener: ValidSubmit<T>? = null
         private var submitFailedListener: SubmitFailed<T>? = null
 
-        override fun setFieldValidationListener(listener: FieldValidationChange<T>): IForm.Builder<T> {
+        override fun setFieldValidationListener(listener: IForm.FieldValidationChange<T>): IForm.Builder<T> {
             fieldValidationListener = listener
             return this
         }
@@ -198,17 +195,6 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         }
 
         private val fields = mutableListOf<FormField<T, *>>()
-
-        override fun <R> addField(key: T,
-                                  input: IObservableValue<R>,
-                                  validators: List<Validator<R>>,
-                                  validationTriggers: List<IObservableChange>): IForm.Builder<T> {
-            fields.add(FormField(key = key,
-                    input = input,
-                    validators = validators,
-                    validationTriggers = validationTriggers))
-            return this
-        }
 
         override fun <R> addField(field: FormField<T, R>): IForm.Builder<T> {
             fields.add(field)

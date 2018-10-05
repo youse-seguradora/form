@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form
 
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -79,7 +80,7 @@ class FormTest {
     private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
 
         override fun isValid(input: Int?): Boolean {
-            return input!= null && input >= MIN_AGE_VALUE
+            return input != null && input >= MIN_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -89,7 +90,7 @@ class FormTest {
     }, object : Validator<Int> {
 
         override fun isValid(input: Int?): Boolean {
-            return input!= null && input <= MAX_AGE_VALUE
+            return input != null && input <= MAX_AGE_VALUE
         }
 
         override fun validationMessage(): ValidationMessage {
@@ -110,9 +111,9 @@ class FormTest {
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
         Form.Builder<Int>(ValidationStrategy.ALL_TIME)
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
-                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
+                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
+                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
+                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
                     var index = 0
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -159,9 +160,9 @@ class FormTest {
         var onFailedSubmitCounter = 0
 
         val form = Form.Builder<Int>()
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
-                .addField(PASSWORD_ID, passwordObservable, passwordValidators, emptyList())
-                .addField(AGE_ID, ageObservable, ageValidators, emptyList())
+                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
+                .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators, validationTriggers = emptyList()))
+                .addField(FormField(AGE_ID, ageObservable, validators = ageValidators, validationTriggers = emptyList()))
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
@@ -249,18 +250,18 @@ class FormTest {
             }
 
             override fun isValid(input: String?): Boolean {
-                return input != null &&  input.contains("@")
+                return input != null && input.contains("@")
             }
         })
 
-        var lastMesasges = listOf<ValidationMessage>()
+        var lastMessages = listOf<ValidationMessage>()
 
         val form = Form.Builder<Int>()
-                .addField(EMAIL_ID, emailObservable, emailValidators, emptyList())
+                .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators, validationTriggers = emptyList()))
                 .setFieldValidationListener(object : IForm.FieldValidationChange<Int> {
 
                     override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
-                        lastMesasges = validations
+                        lastMessages = validations
                     }
                 })
                 .build()
@@ -269,15 +270,15 @@ class FormTest {
 
         form.doSubmit()
 
-        assertEquals(lastMesasges.first().message, firstMessage)
+        assertEquals(lastMessages.first().message, firstMessage)
 
         emailObservable.value = " "
 
-        assertEquals(lastMesasges.first().message, secondMessage)
+        assertEquals(lastMessages.first().message, secondMessage)
 
         emailObservable.value = "@"
 
-        assertTrue(lastMesasges.isEmpty())
+        assertTrue(lastMessages.isEmpty())
 
     }
 }

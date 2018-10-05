@@ -143,7 +143,7 @@ class LiveDataFormTest {
     private fun validate(afterSubmit: Boolean) {
         val strategy = if (afterSubmit) ValidationStrategy.AFTER_SUBMIT else ValidationStrategy.ALL_TIME
 
-        val form: LiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
+        val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
                 .addField(password)
                 .addField(age)

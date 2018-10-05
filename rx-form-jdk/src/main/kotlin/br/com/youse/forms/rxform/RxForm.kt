@@ -23,40 +23,36 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
+import br.com.youse.forms.form.FieldValidationChange
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.IObservableChange
-import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableChange
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.BehaviorSubject
 
 @Suppress("UNCHECKED_CAST")
 class RxForm<T>(
         submitObservable: Observable<Unit>,
         strategy: ValidationStrategy,
-        fields: List<RxField<T, *>>
+        private val fields: List<RxField<T, *>>
 ) : IRxForm<T> {
 
     private val disposables = CompositeDisposable()
 
-    private val submitFailed = PublishSubject.create<List<Pair<T, List<ValidationMessage>>>>()
-    private val fieldValidationChange = PublishSubject.create<Pair<T, List<ValidationMessage>>>()
-    private val formValidationChange = PublishSubject.create<Boolean>()
-    private val validSubmit = PublishSubject.create<List<Pair<T, Any?>>>()
+    private val submitFailed = BehaviorSubject.create<List<Pair<T, List<ValidationMessage>>>>()
+    private val formValidationChange = BehaviorSubject.create<Boolean>()
+    private val validSubmit = BehaviorSubject.create<List<Pair<T, Any?>>>()
 
 
     init {
         val builder = Form.Builder<T>(strategy = strategy)
-                .setFieldValidationListener(object : FieldValidationChange<T> {
-                    override fun onFieldValidationChange(key: T, validations: List<ValidationMessage>) {
-                        fieldValidationChange.onNext(Pair(key, validations))
-                    }
-                })
                 .setFormValidationListener(object : FormValidationChange {
                     override fun onFormValidationChange(isValid: Boolean) {
                         formValidationChange.onNext(isValid)
@@ -75,10 +71,16 @@ class RxForm<T>(
 
         fields.forEach { rxField ->
             val key = rxField.key
-            val observable = rxField.input as Observable<Any?>
             val validators = rxField.validators as List<Validator<Any?>>
-            val field = ObservableValue<Any?>()
+            val observableValue = ObservableValue<Any?>()
+            val input = rxField.input as Observable<Any?>
             val validationTriggers = mutableListOf<IObservableChange>()
+
+            val errors = object : FieldValidationChange<T> {
+                override fun onFieldValidationChange(validations: List<ValidationMessage>) {
+                    rxField.errors.onNext(validations)
+                }
+            }
 
             rxField.validationTriggers.forEach { observableTrigger ->
 
@@ -90,16 +92,22 @@ class RxForm<T>(
                 })
 
             }
+            val formField = FormField(key = key,
+                    input = observableValue,
+                    errors = errors,
+                    validators = validators,
+                    validationTriggers = validationTriggers.toList())
 
-            builder.addField(key, field, validators, validationTriggers.toList())
+            builder.addField(formField)
 
             disposables.add(
-                    observable.subscribe { newValue ->
-                        field.value = newValue
+                    input.subscribe { newValue ->
+                        observableValue.value = newValue
                     })
         }
 
         val form = builder.build()
+
         disposables.add(
                 submitObservable.subscribe {
                     form.doSubmit()
@@ -108,7 +116,12 @@ class RxForm<T>(
     }
 
     override fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
-        return fieldValidationChange
+        return Observable.merge(fields
+                .map { field ->
+                    field.errors.map { validations ->
+                        Pair(field.key, validations)
+                    }
+                })
     }
 
     override fun onFormValidationChange(): Observable<Boolean> {
@@ -132,20 +145,6 @@ class RxForm<T>(
 
         private val fields = mutableListOf<RxField<T, *>>()
 
-        @Suppress("UNCHECKED_CAST")
-        override fun <R> addField(key: T,
-                                  input: Observable<R>,
-                                  validators: List<Validator<R>>,
-                                  validationTriggers: List<Observable<Unit>>): IRxForm.Builder<T> {
-            val field = RxField(
-                    key,
-                    input as Observable<Any?>,
-                    validators as List<Validator<Any?>>,
-                    validationTriggers
-            )
-            fields.add(field)
-            return this
-        }
 
         override fun <R> addField(field: RxField<T, R>): IRxForm.Builder<T> {
             fields.add(field)
