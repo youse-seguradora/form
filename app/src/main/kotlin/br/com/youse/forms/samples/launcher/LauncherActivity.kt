@@ -10,6 +10,7 @@ import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.samples.form.FormLoginActivity
 import br.com.youse.forms.samples.livedata.LiveDataLoginActivity
+import br.com.youse.forms.samples.registration.RegistrationActivity
 import br.com.youse.forms.samples.rx.RxLoginActivity
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -107,6 +108,12 @@ class LauncherActivity : Activity() {
 
         submitButton.setOnClickListener {
             form.doSubmit()
+        }
+
+
+        registrationButton.setOnClickListener {
+            val intent = Intent(this, RegistrationActivity::class.java)
+            startActivity(intent)
         }
     }
 

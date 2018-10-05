@@ -9,7 +9,6 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-
         <activity
                 android:name=".samples.launcher.LauncherActivity"
                 android:label="@string/title_activity_launcher">
@@ -25,14 +24,14 @@
         <activity
                 android:name=".samples.form.FormLoginActivity"
                 android:label="@string/title_activity_form"/>
-
         <activity
                 android:name=".samples.rx.RxLoginActivity"
                 android:label="@string/title_activity_rx_form"/>
-
         <activity
                 android:name=".samples.livedata.LiveDataLoginActivity"
                 android:label="@string/title_activity_live_data"/>
+        <activity android:name=".samples.registration.RegistrationActivity"
+                  android:label="@string/title_activity_registration_form"/>
     </application>
 
 </manifest>
