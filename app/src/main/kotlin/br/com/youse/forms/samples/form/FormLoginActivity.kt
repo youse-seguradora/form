@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
@@ -39,6 +40,7 @@ import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.ValidationStrategy
 import kotlinx.android.synthetic.main.activity_main.*
 
 class FormLoginActivity : AppCompatActivity(),
@@ -78,6 +80,8 @@ class FormLoginActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
+        val strategy = ValidationStrategy.valueOf(param)
 
         val emailChanges = ObservableValue(email.text.toString())
         val passwordChanges = ObservableValue(password.text.toString())
@@ -97,7 +101,7 @@ class FormLoginActivity : AppCompatActivity(),
                 validators = passwordValidations
         )
 
-        val form = Form.Builder<Int>()
+        val form = Form.Builder<Int>(strategy = strategy)
                 .setFieldValidationListener(this)
                 .setFormValidationListener(this)
                 .setValidSubmitListener(this)
@@ -126,10 +130,6 @@ class FormLoginActivity : AppCompatActivity(),
         validations.firstOrNull()?.first?.let {
             // Scroll to this view to highlight the problem, or make the field blink
             // it's up to you. :-P
-            findViewById<TextInputLayout>(it).error = """
-                               Hey, look over here,
-                               I am the first field with validations problem
-                               """.trimIndent()
         }
     }
 

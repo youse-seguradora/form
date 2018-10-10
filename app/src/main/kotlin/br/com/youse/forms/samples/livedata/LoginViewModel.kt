@@ -23,12 +23,15 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.livedata
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import br.com.youse.forms.livedata.ILiveDataForm
 import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
+import br.com.youse.forms.validators.ValidationStrategy
 import com.github.musichin.reactivelivedata.ReactiveLiveData
 import com.snakydesign.livedataextensions.OnNextAction
 import com.snakydesign.livedataextensions.doAfterNext
@@ -63,39 +66,49 @@ class LoginViewModel : ViewModel() {
     val email = LiveField(key = EMAIL_KEY, validators = emailValidations)
     val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
-    val form = LiveDataForm.Builder<String>()
-            .addField(email)
-            .addField(password)
-            .build()
+    lateinit var form: ILiveDataForm<String>
+
+    // TODO: remove this method and pass the strategy by DI in the constructor
+    fun createForm(strategy: ValidationStrategy) {
+        form = LiveDataForm.Builder<String>(strategy = strategy)
+                .addField(email)
+                .addField(password)
+                .build()
+
+        onSubmit = form.onValidSubmit
+                .doBeforeNext(OnNextAction {
+                    loading.value = true
+                })
+                .doAfterNext(OnNextAction {
+                    disposables.add(submitFormToApi()
+                            .subscribe({ response ->
+                                submitData.postEvent(LoginState(data = response))
+                            }, { error ->
+                                submitData.postEvent(LoginState(error = error))
+                            }))
+                })
+                .switchMap {
+                    submitData
+                }
+                .doAfterNext(OnNextAction {
+                    loading.value = false
+                })
+
+        formEnabled = ReactiveLiveData.combineLatest(form.onFormValidationChange, loading) { isValidForm, isLoading ->
+            if (isLoading == true) {
+                false
+            } else {
+                isValidForm != false
+            }
+        }
+
+    }
 
     val submitData = MutableLiveEvent<LoginState>()
 
-    val onSubmit = form.onValidSubmit
-            .doBeforeNext(OnNextAction {
-                loading.value = true
-            })
-            .doAfterNext(OnNextAction {
-                disposables.add(submitFormToApi()
-                        .subscribe({ response ->
-                            submitData.postEvent(LoginState(data = response))
-                        }, { error ->
-                            submitData.postEvent(LoginState(error = error))
-                        }))
-            })
-            .switchMap {
-                submitData
-            }
-            .doAfterNext(OnNextAction {
-                loading.value = false
-            })
+    lateinit var onSubmit: MutableLiveData<LiveEvent<LoginState>>
 
-    val formEnabled = ReactiveLiveData.combineLatest(form.onFormValidationChange, loading) { isValidForm, isLoading ->
-        if (isLoading == true) {
-            false
-        } else {
-            isValidForm != false
-        }
-    }
+    lateinit var formEnabled : LiveData<Boolean>
 
     init {
         loading.value = false

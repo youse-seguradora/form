@@ -30,6 +30,7 @@ import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationStrategy
 import org.junit.Rule
 import org.junit.rules.TestRule
+import kotlin.test.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -89,7 +90,6 @@ class LiveDataFormTest {
         age = LiveField(key = AGE_ID, validators = ageValidators)
     }
 
-
     @Test
     fun shouldValidateAfterSubmit() {
         validate(ValidationStrategy.AFTER_SUBMIT)
@@ -104,6 +104,7 @@ class LiveDataFormTest {
     private fun validate(strategy: ValidationStrategy) {
 
         val isAfterSubmit = strategy == ValidationStrategy.AFTER_SUBMIT
+
         val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
                 .addField(password)

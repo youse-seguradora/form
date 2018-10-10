@@ -76,7 +76,8 @@ class RxForm<T>(
             val input = rxField.input as Observable<Any?>
             val validationTriggers = mutableListOf<IObservableChange>()
 
-            val errors = object : FieldValidationChange<T> {
+            val errors = object : FieldValidationChange {
+
                 override fun onFieldValidationChange(validations: List<ValidationMessage>) {
                     rxField.errors.onNext(validations)
                 }
