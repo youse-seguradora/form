@@ -104,7 +104,6 @@ class LiveDataFormTest {
     private fun validate(strategy: ValidationStrategy) {
 
         val isAfterSubmit = strategy == ValidationStrategy.AFTER_SUBMIT
-
         val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
                 .addField(password)

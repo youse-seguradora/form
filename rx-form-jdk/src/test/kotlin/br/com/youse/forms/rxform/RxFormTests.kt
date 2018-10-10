@@ -81,6 +81,9 @@ class RxFormTests {
         formSub.assertValue(false)
 
         validSubmitSub.assertNoValues().assertNoErrors()
+        submitFailedSub.assertNoValues().assertNoErrors()
+
+        form.dispose()
 
         submitFailedSub.assertNoValues().assertNoErrors()
 

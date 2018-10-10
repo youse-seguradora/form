@@ -27,12 +27,8 @@ import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.ValidationType
-import br.com.youse.forms.validators.Validator
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class TestFieldValidationChange<T> : IForm.FieldValidationChange<T> {
     private val validationsList: MutableList<Pair<T, List<ValidationMessage>>> = mutableListOf()
