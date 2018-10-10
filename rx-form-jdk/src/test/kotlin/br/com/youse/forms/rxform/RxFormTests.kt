@@ -23,12 +23,11 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
-import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.ValidationType
-import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import org.junit.Before
 import kotlin.test.Test
 
 
@@ -38,111 +37,31 @@ class RxFormTests {
         return RxForm.Builder(submit, strategy)
     }
 
-    companion object {
-        private const val EMAIL_ID = 1
-        private const val PASSWORD_ID = 2
-        private const val AGE_ID = 3
-        private const val VALID_EMAIL = "some_email_@some_domain.com"
-        private const val VALID_PASSWORD = "12345678"
-        private const val MIN_AGE_VALUE = 21
-        private const val MAX_AGE_VALUE = 100
-
-        private val VALID_EMAIL_TYPE: ValidationType = object : ValidationType {}
-        private val VALID_PASSWORD_TYPE: ValidationType = object : ValidationType {}
-        private val MIN_VALUE_TYPE: ValidationType = object : ValidationType {}
-        private val MAX_VALUE_TYPE: ValidationType = object : ValidationType {}
-
-        val INVALID_EMAIL_MESSAGE = ValidationMessage("input is not VALID_EMAIL", VALID_EMAIL_TYPE)
-        val INVALID_PASSWORD_MESSAGE = ValidationMessage("input is not VALID_PASSWORD", VALID_PASSWORD_TYPE)
-        val TOO_LARGE_MESSAGE = ValidationMessage("input is too large", MAX_VALUE_TYPE)
-        val TOO_SMALL_MESSAGE = ValidationMessage("input is too small", MIN_VALUE_TYPE)
-    }
-
 
     private val submit = PublishSubject.create<Unit>()
-    private val emailObservable = PublishSubject.create<String>()
-    private val passwordObservable = PublishSubject.create<String>()
-    private val ageObservable = PublishSubject.create<Int>()
+    private val emailObservable = BehaviorSubject.create<String>()
+    private val passwordObservable = BehaviorSubject.create<String>()
+    private val ageObservable = BehaviorSubject.create<Int>()
 
-    private val emailValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_EMAIL == input
-        }
+    val emailField = RxField(EMAIL_ID, emailObservable, validators = emailValidators)
+    val passwordField = RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators)
+    val ageField = RxField(AGE_ID, ageObservable, validators = ageValidators)
 
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_EMAIL_MESSAGE
-        }
-    })
 
-    private val passwordValidators: List<Validator<String>> = listOf(object : Validator<String> {
-        override fun isValid(input: String?): Boolean {
-            return VALID_PASSWORD == input
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return INVALID_PASSWORD_MESSAGE
-        }
-    })
-
-    private val ageValidators: List<Validator<Int>> = listOf(object : Validator<Int> {
-
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input >= MIN_AGE_VALUE
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return TOO_SMALL_MESSAGE
-        }
-
-    }, object : Validator<Int> {
-
-        override fun isValid(input: Int?): Boolean {
-            return input != null && input <= MAX_AGE_VALUE
-        }
-
-        override fun validationMessage(): ValidationMessage {
-            return TOO_LARGE_MESSAGE
-        }
-
-    })
+    @Before
+    fun setup() {
+        emailObservable.onNext("")
+        passwordObservable.onNext("")
+        ageObservable.onNext(0)
+    }
 
     @Test
     fun shouldValidateAllTheTime() {
+
         val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
-                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
-                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
-                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
-                .build()
-
-        val fieldsSub = form.onFieldValidationChange().test()
-        val formSub = form.onFormValidationChange().test()
-        val validSubmitSub = form.onValidSubmit().test()
-
-        emailObservable.onNext("foo")
-        passwordObservable.onNext("bar")
-        ageObservable.onNext(MIN_AGE_VALUE - 1)
-
-
-        fieldsSub.assertValues(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
-        )
-
-        formSub.assertValue(false)
-
-        validSubmitSub.assertNoValues().assertNoErrors()
-
-        form.dispose()
-
-    }
-
-    @Test
-    fun shouldExecuteValidationAfterSubmit() {
-        val form = getBuilder<Int>(submit)
-                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
-                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
-                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
+                .addField(emailField)
+                .addField(passwordField)
+                .addField(ageField)
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
@@ -153,13 +72,44 @@ class RxFormTests {
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
         ageObservable.onNext(MIN_AGE_VALUE - 1)
+
+
+        fieldsSub.assertValues(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
+
+        formSub.assertValue(false)
+
+        validSubmitSub.assertNoValues().assertNoErrors()
+        submitFailedSub.assertNoValues().assertNoErrors()
+
+        form.dispose()
+
+    }
+
+    @Test
+    fun shouldExecuteValidationAfterSubmit() {
+
+        val form = getBuilder<Int>(submit)
+                .addField(emailField)
+                .addField(passwordField)
+                .addField(ageField)
+                .build()
+
+        val fieldsSub = form.onFieldValidationChange().test()
+        val formSub = form.onFormValidationChange().test()
+        val validSubmitSub = form.onValidSubmit().test()
+        val submitFailedSub = form.onSubmitFailed().test()
+
+        emailObservable.onNext("foo")
+        passwordObservable.onNext("bar")
+        ageObservable.onNext(MIN_AGE_VALUE - 1)
+
         submit.onNext(Unit)
 
-        fieldsSub.assertValues(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+        fieldsSub.assertValues(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
-        )
+                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
         formSub.assertValue(false)
 
@@ -206,9 +156,9 @@ class RxFormTests {
     @Test
     fun shouldNotValidateBeforeSubmit() {
         val form = getBuilder<Int>(submit)
-                .addField(RxField(EMAIL_ID, emailObservable, validators = emailValidators))
-                .addField(RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
-                .addField(RxField(AGE_ID, ageObservable, validators = ageValidators))
+                .addField(emailField)
+                .addField(passwordField)
+                .addField(ageField)
                 .build()
 
         val fieldsSub = form.onFieldValidationChange().test()
