@@ -85,6 +85,10 @@ class RxFormTests {
 
         form.dispose()
 
+        submitFailedSub.assertNoValues().assertNoErrors()
+
+        form.dispose()
+
     }
 
     @Test
