@@ -89,6 +89,7 @@ class LiveDataForm<T>(
             val validationTriggers = mutableListOf<IObservableChange>()
 
             val errors = object : FieldValidationChange {
+
                 override fun onFieldValidationChange(validations: List<ValidationMessage>) {
                     liveField.errors.value = validations
                 }

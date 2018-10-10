@@ -27,13 +27,14 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import br.com.youse.forms.livedata.models.LiveField
-import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.ValidationType
-import br.com.youse.forms.validators.Validator
 import org.junit.Rule
 import org.junit.rules.TestRule
 import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
     private val changes = mutableListOf<T?>()
@@ -65,6 +66,11 @@ class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
         assertEquals(changes.last(), t)
         return this
     }
+
+    fun assertSize(size: Int): TestObserver<T> {
+        assertEquals(changes.size, size)
+        return this
+    }
 }
 
 class LiveDataFormTest {
@@ -84,7 +90,6 @@ class LiveDataFormTest {
         age = LiveField(key = AGE_ID, validators = ageValidators)
     }
 
-
     @Test
     fun shouldValidateAfterSubmit() {
         validate(ValidationStrategy.AFTER_SUBMIT)
@@ -98,6 +103,7 @@ class LiveDataFormTest {
 
     private fun validate(strategy: ValidationStrategy) {
 
+        val isAfterSubmit = strategy == ValidationStrategy.AFTER_SUBMIT
 
         val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
@@ -128,12 +134,12 @@ class LiveDataFormTest {
         password.input.value = ""
         age.input.value = MIN_AGE_VALUE - 1
 
-        if (strategy == ValidationStrategy.AFTER_SUBMIT) {
+        if (isAfterSubmit) {
             // nothing should be initialized yet
             allSubs.forEach { it.assertNoValues() }
         } else {
             // validate fields all the time
-            fieldSubs.forEach { it.assertAnyValue() }
+            fieldSubs.forEach { it.assertSize(1) }
 
             // form state is invalid
             formValidationSub.assertValue(false)
@@ -143,10 +149,12 @@ class LiveDataFormTest {
             validSubmitSub.assertNoValues()
         }
 
+        // doSubmit will not change the field validations size if
+        // strategy ALL_TIME, but it will for AFTER_SUBMIT
         form.doSubmit()
 
         // field validation was triggered
-        fieldSubs.forEach { it.assertAnyValue() }
+        fieldSubs.forEach { it.assertSize(1) }
 
         // form state validation was triggered
         formValidationSub.assertAnyValue()
