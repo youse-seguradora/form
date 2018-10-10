@@ -65,6 +65,11 @@ class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
         assertEquals(changes.last(), t)
         return this
     }
+
+    fun assertSize(size: Int): TestObserver<T> {
+        assertEquals(changes.size, size)
+        return this
+    }
 }
 
 class LiveDataFormTest {
@@ -98,6 +103,7 @@ class LiveDataFormTest {
 
     private fun validate(strategy: ValidationStrategy) {
 
+        val isAfterSubmit = strategy == ValidationStrategy.AFTER_SUBMIT
 
         val form: ILiveDataForm<Int> = LiveDataForm.Builder<Int>(strategy = strategy)
                 .addField(email)
@@ -128,12 +134,12 @@ class LiveDataFormTest {
         password.input.value = ""
         age.input.value = MIN_AGE_VALUE - 1
 
-        if (strategy == ValidationStrategy.AFTER_SUBMIT) {
+        if (isAfterSubmit) {
             // nothing should be initialized yet
             allSubs.forEach { it.assertNoValues() }
         } else {
             // validate fields all the time
-            fieldSubs.forEach { it.assertAnyValue() }
+            fieldSubs.forEach { it.assertSize(1) }
 
             // form state is invalid
             formValidationSub.assertValue(false)
@@ -143,10 +149,12 @@ class LiveDataFormTest {
             validSubmitSub.assertNoValues()
         }
 
+        // doSubmit will not change the field validations size if
+        // strategy ALL_TIME, but it will for AFTER_SUBMIT
         form.doSubmit()
 
         // field validation was triggered
-        fieldSubs.forEach { it.assertAnyValue() }
+        fieldSubs.forEach { it.assertSize(1) }
 
         // form state validation was triggered
         formValidationSub.assertAnyValue()

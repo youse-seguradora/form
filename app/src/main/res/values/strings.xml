@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">Form Sample</string>
-    <string name="empty_email_validation_message">Email não pode ficar em
-        branco
-    </string>
-    <string name="min_password_length_validation_message">Tamanho minimo de %1$d
-        letras
-    </string>
+
+    <string name="empty_email_validation_message">Email não pode ficar em branco</string>
+
+    <string name="min_password_length_validation_message">Tamanho minimo de %1$d letras</string>
+
     <string name="title_activity_form">Form</string>
 
     <string name="title_activity_rx_form">Rx Form</string>
