@@ -27,6 +27,22 @@ import br.com.youse.forms.form.models.ObservableValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+class TestChangeObserver<T>(private val observableValue: ObservableValue<T>) : IObservableChange.ChangeObserver {
+    val changes = mutableListOf<T>()
+    override fun onChange() {
+        changes.add(observableValue.value!!)
+    }
+
+    fun assertChange(index: Int, change: T): TestChangeObserver<T> {
+        assertEquals(changes[index], change)
+        return this
+    }
+
+    fun assertSize(size: Int): TestChangeObserver<T> {
+        assertEquals(changes.size, size)
+        return this
+    }
+}
 
 class ObservableValueTest {
 
@@ -38,22 +54,23 @@ class ObservableValueTest {
         assertEquals(observableValue.value, 1)
         observableValue.value = 2
         assertEquals(observableValue.value, 2)
-        var expectedValue = 2
-        var count = 0
-        observableValue.addChangeListener(object : IObservableChange.ChangeObserver {
-            override fun onChange() {
-                assertEquals(observableValue.value, expectedValue)
-                count++
-            }
-        })
-        assertEquals(count, 1)
-        expectedValue = 3
+
+        val changeObserver = TestChangeObserver(observableValue)
+
+        observableValue.addChangeListener(changeObserver)
+
+        changeObserver.assertSize(1)
+                .assertChange(0, 2)
+
 
         observableValue.value = 3
-        assertEquals(count, 2)
+        changeObserver.assertSize(2)
+                .assertChange(1, 3)
 
         // should not call onFormValidationChange...
         observableValue.value = 3
-        assertEquals(count, 2)
+        changeObserver.assertSize(2)
+                .assertChange(1, 3)
+
     }
 }
