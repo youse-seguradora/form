@@ -57,6 +57,11 @@ class TestFieldValidationChange<T> : IForm.FieldValidationChange<T> {
         assertEquals(validationsList.size, size)
         return this
     }
+
+    fun assertNoValue(): TestFieldValidationChange<T> {
+        assertSize(0)
+        return this
+    }
 }
 
 
@@ -75,6 +80,11 @@ class TestFormValidationChange : IForm.FormValidationChange {
         assertEquals(changes.size, size)
         return this
     }
+
+    fun assertNoValue(): TestFormValidationChange {
+        assertSize(0)
+        return this
+    }
 }
 
 class TestValidSubmit<T> : IForm.ValidSubmit<T> {
@@ -85,6 +95,11 @@ class TestValidSubmit<T> : IForm.ValidSubmit<T> {
 
     fun assertSize(size: Int): TestValidSubmit<T> {
         assertEquals(submits.size, size)
+        return this
+    }
+
+    fun assertNoValue(): TestValidSubmit<T> {
+        assertSize(0)
         return this
     }
 }
@@ -102,6 +117,10 @@ class TestSubmitFailed<T> : IForm.SubmitFailed<T> {
 
     fun assertSize(size: Int): TestSubmitFailed<T> {
         assertEquals(failedSubmits.size, size)
+        return this
+    }
+    fun assertNoValue(): TestSubmitFailed<T> {
+        assertSize(0)
         return this
     }
 }
@@ -138,7 +157,7 @@ class FormTest {
     @Test
     fun shouldValidateAllTheTime() {
 
-        val validationsList = listOf(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
+        val validations = listOf(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
                 Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
                 Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
 
@@ -155,19 +174,19 @@ class FormTest {
                 .build()
 
 
-        validationsList.forEachIndexed { index, pair ->
+        validations.forEachIndexed { index, pair ->
             fieldChange.assertValidationPair(index, pair)
         }
 
-        fieldChange.assertSize(validationsList.size)
+        fieldChange.assertSize(validations.size)
 
         formChange
                 .assertChange(0, false)
                 .assertSize(1)
 
-        validSubmit.assertSize(0)
+        validSubmit.assertNoValue()
 
-        failedSubmit.assertSize(0)
+        failedSubmit.assertNoValue()
 
     }
 
@@ -194,10 +213,10 @@ class FormTest {
         passwordObservable.value = "foo"
         ageObservable.value = MAX_AGE_VALUE + 1
 
-        fieldChange.assertSize(0)
-        formChange.assertSize(0)
-        failedSubmit.assertSize(0)
-        validSubmit.assertSize(0)
+        fieldChange.assertNoValue()
+        formChange.assertNoValue()
+        failedSubmit.assertNoValue()
+        validSubmit.assertNoValue()
 
         form.doSubmit()
 
@@ -205,7 +224,7 @@ class FormTest {
         formChange.assertSize(1)
         formChange.assertChange(0, false)
         failedSubmit.assertSize(1)
-        validSubmit.assertSize(0)
+        validSubmit.assertNoValue()
 
         emailObservable.value = VALID_EMAIL
         passwordObservable.value = VALID_PASSWORD
@@ -214,7 +233,7 @@ class FormTest {
         fieldChange.assertSize(6)
         formChange.assertSize(2)
         failedSubmit.assertSize(1)
-        validSubmit.assertSize(0)
+        validSubmit.assertNoValue()
 
         form.doSubmit()
 
