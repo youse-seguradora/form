@@ -39,6 +39,7 @@ val passwordField = FormField(
 )
 
 val form = Form.Builder<Int>()
+
         .setFieldValidationListener(this)
         .setFormValidationListener(this)
         .setValidSubmitListener(this)
@@ -66,17 +67,28 @@ LiveDataForm [README](https://github.com/youse-seguradora/form/blob/master/lived
 
 FormField<T,R> properties
 --------
+
 ## FormField.key`<T>`
  - It's an ID to identify uniquely the field in a form. Of type `T`.
 
 ## FormField.input`<R>`
  - It's an `IObservableValue<R>` used to feed the field value change events to the form.
 
-## FormField.validators`<R>`
-  - It's a list of `Validator<R>`.
+ ## FormField.errors`<List<ValidationMessage>>`
+ - It's an `IObservableValue<List<ValidationMessage>>`, call `IObservableValue.addChangeListener()` to add a `ChangeObserver`.
+ This is where the form will deliver the validation changes events for this field.
 
-## FormField.validationTriggers
- - It's a list of `IObservableValidation` used to force a round of validation to happen to this field.
+ ## FormField.enabled`<Boolean>`
+ - It's an `IObservableValue<Boolean>`, use this to enable or disable the form validation and submission for this field.
+ - Setting it with `True` will cause a field validation if the form strategy allows.
+ - Setting it with `False` will cause the `FormField.errors` to be called with an emptyList<ValidationMessage> if the form strategy validation allows.
+ - Setting it with `False` or `null` will stop calling its validators and remove this field from the form submission data.
+
+## FormField.validators`<R>`
+  - It's a list of `Validator<R>`. Each validator will be called in order to process a round of validation for this field.
+
+## FormField.validationTriggers`<Unit>`
+ - It's a list of `IObservableChange<Unit>` used to force a round of validation to happen to this field if the form strategy allows.
 
 Form events
 --------
@@ -84,20 +96,22 @@ There are four standard callbacks in every flavor of Form, depending on the form
 Does not matter the flavor, the behavior and naming should be consistent enough to understand what is happening.
 
 ### FieldValidationChange
- - It's triggered when a given field validation state change. This callback gives access to a `List<ValidationMessage>` that if it is empty, the field is valid.
+ - It's triggered when a given field validation state change. This callback gives access to a `Pair<T,List<ValidationMessage>>` if the list is empty, the field identified by the key `T` is valid.
  - This callback allows you to set/unset a error message for each screen field of a form.
+ - It has the same behavior of `FormField.errors`.
 
 ### FormValidationChange
  - It's triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
- - This callback allow you to enable or disable a submit button or hint the user about the form state.
+ - This callback allows you to enable or disable a submit button or hint the user about the form state.
 
 ### ValidSubmit
  - It's triggered when a valid submit happens. This callback gives access to a `List<Pair<T, Any?>>` where `T` is a field key, and the `Any?` is that field current value.
  - This callback is called to allow you to send the form data to your server.
+ - You also can use `FormField.input.value` to read the current value of a field when submitting.
 
 ### SubmitFailed
  - It's triggered when a submit happens, but the form is not valid. This callback gives access to a `List<Pair<T, List<ValidationMesage>>>` where `T` is a field key and `List<ValidationMessage>` indicates how many validations failed for that given field.
- - This callback is used when you need to scroll to a invalid field after a submit.
+ - This callback can be used to scroll to a invalid field after a submit.
 
 
 VALIDATION

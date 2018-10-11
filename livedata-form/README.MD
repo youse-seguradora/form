@@ -71,9 +71,16 @@ LiveField<T,R> properties
  - Usually bound to DataBinding in layout.
 
 ## LiveField.errors
+ - It's an `MutableLiveData<List<ValidationMessage>>` where you observe to receive this field validation change events.
  - It's a `List<ValidationMessage>` if the list is empty, the field it valid.
  - It's usually used to show or remove a validation error.
  - Usually bound to DataBinding in layout.
+
+## LiveField.enabled`<Boolean>`
+ - It's a `MutableLiveData<Boolean>` used to feed the field status change events to the form.
+ - Posting a `True` will cause a field validation if the form strategy allows.
+ - Posting a `False` will cause the `FormField.errors` to be called with an empty List of validations if the form validation allows.
+ - Posting a `False` will remove this field from the form submission data.
 
 ## LiveField.validators`<R>`
  - It's a list of `Validator<R>`.

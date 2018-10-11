@@ -47,6 +47,15 @@ RxField<T,R> properties
 ## RxField.input`<R>`
  - It's an `Observable<R>` used to feed the field value change events to the form.
 
+## RxField.errors`List<ValidationMessage`
+ - It's an `Observable<List<ValidationMessage>>` where you subscribe to receive this field validation change events.
+
+## RxField.enabled`<Boolean>`
+ - It's an `Observable<Boolean>` used to feed the field status change events to the form.
+ - Emitting a `True` will cause a field validation if the form strategy allows.
+ - Emitting a `False` will cause the `FormField.errors` to be called with an empty List of validations if the form validation allows.
+ - Emitting a `False` will remove this field from the form submission data.
+
 ## RxField.validators`<R>`
   - It's a list of `Validator<R>`.
 
