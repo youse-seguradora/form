@@ -23,16 +23,17 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-class ValidationTypes {
-    companion object {
-        val REQUIRED = object : ValidationType {}
+import br.com.youse.forms.validators.ValidationTypes.Companion.MIN_VALUE
 
-        val MIN_LENGTH = object : ValidationType {}
+class MinValueValidator<T : Number>(val message: String, private val minLength: T) : Validator<T> {
 
-        val LENGTH = object : ValidationType {}
+    private val validationMessage = ValidationMessage(message = message, validationType = MIN_VALUE)
 
-        val MIN_VALUE = object : ValidationType {}
+    override fun validationMessage(): ValidationMessage {
+        return validationMessage
+    }
 
-        val HOUR_FORMAT = object : ValidationType {}
+    override fun isValid(input: T?): Boolean {
+        return input != null && input.toDouble() >= minLength.toDouble()
     }
 }

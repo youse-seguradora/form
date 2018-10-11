@@ -47,6 +47,7 @@ class RxFormTests {
     val passwordField = RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators)
     val ageField = RxField(AGE_ID, ageObservable, validators = ageValidators)
 
+
     @Before
     fun setup() {
         emailObservable.onNext("")
@@ -80,13 +81,6 @@ class RxFormTests {
         formSub.assertValue(false)
 
         validSubmitSub.assertNoValues().assertNoErrors()
-        submitFailedSub.assertNoValues().assertNoErrors()
-
-        form.dispose()
-
-        submitFailedSub.assertNoValues().assertNoErrors()
-
-        form.dispose()
 
         submitFailedSub.assertNoValues().assertNoErrors()
 

@@ -27,14 +27,13 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import br.com.youse.forms.livedata.models.LiveField
+import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
+import br.com.youse.forms.validators.ValidationType
+import br.com.youse.forms.validators.Validator
 import org.junit.Rule
 import org.junit.rules.TestRule
 import kotlin.test.*
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
     private val changes = mutableListOf<T?>()
@@ -89,6 +88,7 @@ class LiveDataFormTest {
         password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
         age = LiveField(key = AGE_ID, validators = ageValidators)
     }
+
 
     @Test
     fun shouldValidateAfterSubmit() {
