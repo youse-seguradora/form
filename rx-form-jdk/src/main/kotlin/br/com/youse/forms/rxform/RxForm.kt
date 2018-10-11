@@ -23,13 +23,13 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
-import br.com.youse.forms.form.FieldValidationChange
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableChange
 import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.rxform.models.RxField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
@@ -71,39 +71,49 @@ class RxForm<T>(
 
         fields.forEach { rxField ->
             val key = rxField.key
-            val validators = rxField.validators as List<Validator<Any?>>
-            val observableValue = ObservableValue<Any?>()
             val input = rxField.input as Observable<Any?>
+            val validators = rxField.validators as List<Validator<Any?>>
+            val errors = rxField.errors
+
+            val observableInput = ObservableValue<Any?>()
+            val observableErrors = ObservableValue<List<ValidationMessage>>()
             val validationTriggers = mutableListOf<IObservableChange>()
 
-            val errors = object : FieldValidationChange {
-                override fun onFieldValidationChange(validations: List<ValidationMessage>) {
-                    rxField.errors.onNext(validations)
-                }
-            }
-
-            rxField.validationTriggers.forEach { observableTrigger ->
+            rxField.validationTriggers.forEach { trigger ->
 
                 val validationTrigger = ObservableChange()
                 validationTriggers.add(validationTrigger)
 
-                disposables.add(observableTrigger.subscribe {
+                disposables.add(trigger.subscribe {
                     validationTrigger.notifyChange()
                 })
-
             }
+
+            observableErrors.addChangeListener(observer = object : IObservableChange.ChangeObserver {
+                override fun onChange() {
+                    val validations = observableErrors.value ?: emptyList()
+                    errors.onNext(validations)
+                }
+            })
+
             val formField = FormField(key = key,
-                    input = observableValue,
-                    errors = errors,
+                    input = observableInput,
+                    errors = observableErrors,
                     validators = validators,
                     validationTriggers = validationTriggers.toList())
 
-            builder.addField(formField)
+            disposables.add(rxField.enabled
+                    .subscribe { enabled ->
+                        formField.enabled.value = enabled
+                    })
 
             disposables.add(
                     input.subscribe { newValue ->
-                        observableValue.value = newValue
+                        formField.input.value = newValue
                     })
+
+            builder.addField(formField)
+
         }
 
         val form = builder.build()
@@ -144,7 +154,6 @@ class RxForm<T>(
                      private val strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) : IRxForm.Builder<T> {
 
         private val fields = mutableListOf<RxField<T, *>>()
-
 
         override fun <R> addField(field: RxField<T, R>): IRxForm.Builder<T> {
             fields.add(field)

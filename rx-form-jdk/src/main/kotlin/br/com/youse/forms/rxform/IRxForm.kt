@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
+import br.com.youse.forms.rxform.models.RxField
 import br.com.youse.forms.validators.ValidationMessage
 import io.reactivex.Observable
 
