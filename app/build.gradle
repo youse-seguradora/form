@@ -27,7 +27,11 @@ android {
     dataBinding {
         enabled = true
     }
-
+    
+    dexOptions {
+        javaMaxHeapSize "1.0g"
+    }
+    
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
