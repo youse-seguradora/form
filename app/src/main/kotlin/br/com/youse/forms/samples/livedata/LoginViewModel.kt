@@ -34,10 +34,10 @@ import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
 import com.github.musichin.reactivelivedata.ReactiveLiveData
 import com.snakydesign.livedataextensions.OnNextAction
-import com.snakydesign.livedataextensions.doAfterNext
 import com.snakydesign.livedataextensions.doBeforeNext
 import com.snakydesign.livedataextensions.switchMap
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
 
@@ -51,6 +51,11 @@ class LoginViewModel : ViewModel() {
 
     val loading = MutableLiveData<Boolean>()
 
+    val submitData = MutableLiveEvent<LoginState>()
+
+    lateinit var onSubmit: LiveData<LiveEvent<LoginState>>
+
+    lateinit var formEnabled: LiveData<Boolean>
 
     private val emailValidations by lazy {
         listOf(RequiredValidator(
@@ -77,22 +82,11 @@ class LoginViewModel : ViewModel() {
 
         onSubmit = form.onValidSubmit
                 .doBeforeNext(OnNextAction {
-                    loading.value = true
-                })
-                .doAfterNext(OnNextAction {
-                    disposables.add(submitFormToApi()
-                            .subscribe({ response ->
-                                submitData.postEvent(LoginState(data = response))
-                            }, { error ->
-                                submitData.postEvent(LoginState(error = error))
-                            }))
+                    submit()
                 })
                 .switchMap {
                     submitData
                 }
-                .doAfterNext(OnNextAction {
-                    loading.value = false
-                })
 
         formEnabled = ReactiveLiveData.combineLatest(form.onFormValidationChange, loading) { isValidForm, isLoading ->
             if (isLoading == true) {
@@ -104,17 +98,26 @@ class LoginViewModel : ViewModel() {
 
     }
 
-    val submitData = MutableLiveEvent<LoginState>()
-
-    lateinit var onSubmit: MutableLiveData<LiveEvent<LoginState>>
-
-    lateinit var formEnabled : LiveData<Boolean>
 
     init {
         loading.value = false
-
     }
 
+    private fun submit() {
+        disposables.add(submitFormToApi()
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    loading.value = true
+                }
+                .doFinally {
+                    loading.value = false
+                }
+                .subscribe({ response ->
+                    submitData.postEvent(LoginState(data = response))
+                }, { error ->
+                    submitData.postEvent(LoginState(error = error))
+                }))
+    }
 
     private fun submitFormToApi(): Single<Unit> {
         val emailValue = email.input.value
