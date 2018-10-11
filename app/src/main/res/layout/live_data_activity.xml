@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                app:field="@={vm.email.input}" />
+                app:fieldText="@={vm.email.input}" />
         </android.support.design.widget.TextInputLayout>
 
 
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPassword"
-                app:field="@={vm.password.input}" />
+                app:fieldText="@={vm.password.input}" />
         </android.support.design.widget.TextInputLayout>
 
         <Button

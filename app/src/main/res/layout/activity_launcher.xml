@@ -25,13 +25,13 @@
                         android:layout_height="wrap_content">
                 <RadioButton
                         android:id="@+id/afterSubmit"
-                        android:text="After submit"
+                        android:text="AFTER_SUBMIT"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                 <RadioButton
                         android:id="@+id/allTime"
-                        android:text="allTime"
+                        android:text="ALL_TIME"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
             </RadioGroup>
@@ -71,7 +71,7 @@
                 android:layout_margin="16dp"
                 android:id="@+id/submitButton"
                 android:layout_width="match_parent"
-                android:text="Submit"
+                android:text="Open Login Form"
                 android:layout_height="wrap_content"/>
 
         <Button

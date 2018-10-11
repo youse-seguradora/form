@@ -30,7 +30,7 @@ import android.util.Log
 import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.rxform.IRxForm
-import br.com.youse.forms.rxform.RxField
+import br.com.youse.forms.rxform.models.RxField
 import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
