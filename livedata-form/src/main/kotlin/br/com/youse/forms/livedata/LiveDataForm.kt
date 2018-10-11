@@ -25,13 +25,12 @@ package br.com.youse.forms.livedata
 
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import br.com.youse.forms.form.FieldValidationChange
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.models.FormField
-import br.com.youse.forms.form.models.ObservableChange
 import br.com.youse.forms.form.models.ObservableValue
+import br.com.youse.forms.form.models.ObservableChange
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
@@ -83,38 +82,47 @@ class LiveDataForm<T>(
 
         fields.forEach { liveField ->
             val key = liveField.key
-            val validators = liveField.validators as List<Validator<Any?>>
-            val observableValue = ObservableValue<Any?>()
             val input = liveField.input as MutableLiveData<Any?>
+            val validators = liveField.validators as List<Validator<Any?>>
+            val errors = liveField.errors
+
+            val observableInput = ObservableValue(input.value)
+            val observableErrors = ObservableValue<List<ValidationMessage>>()
             val validationTriggers = mutableListOf<IObservableChange>()
 
-            val errors = object : FieldValidationChange {
-                override fun onFieldValidationChange(validations: List<ValidationMessage>) {
-                    liveField.errors.value = validations
-                }
-            }
-
-            liveField.validationTriggers.forEach { liveTrigger ->
+            liveField.validationTriggers.forEach { trigger ->
 
                 val validationTrigger = ObservableChange()
                 validationTriggers.add(validationTrigger)
 
-                onFormValidationChange.addSource(liveTrigger) {
+                onFormValidationChange.addSource(trigger) {
                     validationTrigger.notifyChange()
                 }
             }
 
+            observableErrors.addChangeListener(observer = object : IObservableChange.ChangeObserver {
+                override fun onChange() {
+                    errors.value = observableErrors.value
+                }
+            })
+
             val formField = FormField(key = key,
-                    input = observableValue,
-                    errors = errors,
+                    input = observableInput,
+                    errors = observableErrors,
                     validators = validators,
                     validationTriggers = validationTriggers.toList())
 
-            builder.addField(formField)
+
+            onFormValidationChange.addSource(liveField.enabled) { enabled ->
+                formField.enabled.value = enabled
+            }
 
             onFormValidationChange.addSource(input) { newValue ->
-                observableValue.value = newValue
+                formField.input.value = newValue
             }
+
+            builder.addField(formField)
+
         }
 
         form = builder.build()
