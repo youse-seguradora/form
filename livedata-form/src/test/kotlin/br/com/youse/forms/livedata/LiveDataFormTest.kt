@@ -27,13 +27,13 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import br.com.youse.forms.livedata.models.LiveField
-import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.ValidationType
-import br.com.youse.forms.validators.Validator
 import org.junit.Rule
 import org.junit.rules.TestRule
-import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class TestObserver<T>(private val ld: MutableLiveData<T>) : Observer<T> {
     private val changes = mutableListOf<T?>()
@@ -87,6 +87,9 @@ class LiveDataFormTest {
         email = LiveField(key = EMAIL_ID, validators = emailValidators)
         password = LiveField(key = PASSWORD_ID, validators = passwordValidators)
         age = LiveField(key = AGE_ID, validators = ageValidators)
+        email.input.value = ""
+        password.input.value = ""
+        age.input.value = 0
     }
 
 
@@ -119,20 +122,12 @@ class LiveDataFormTest {
 
         val failedSubmitSub = TestObserver(form.onSubmitFailed).observe()
 
-
         val formValidationSub = TestObserver(form.onFormValidationChange).observe()
-
 
         val validSubmitSub = TestObserver(form.onValidSubmit).observe()
 
         val fieldSubs = listOf(emailErrorsSub, passwordErrorsSub, ageErrorsSub)
         val allSubs = fieldSubs + listOf(failedSubmitSub, formValidationSub, validSubmitSub)
-
-        allSubs.forEach { it.assertNoValues() }
-
-        email.input.value = ""
-        password.input.value = ""
-        age.input.value = MIN_AGE_VALUE - 1
 
         if (isAfterSubmit) {
             // nothing should be initialized yet
@@ -154,7 +149,10 @@ class LiveDataFormTest {
         form.doSubmit()
 
         // field validation was triggered
-        fieldSubs.forEach { it.assertSize(1) }
+        emailErrorsSub.assertSize(1)
+        passwordErrorsSub.assertSize(1)
+
+        ageErrorsSub.assertSize(1)
 
         // form state validation was triggered
         formValidationSub.assertAnyValue()
