@@ -33,7 +33,11 @@ open class ObservableChange : IObservableChange {
         validationObservers.add(observer)
     }
 
-    fun notifyChange(){
+    override fun removeChangeListener(observer: ChangeObserver) {
+        validationObservers.remove(observer)
+    }
+
+    fun notifyChange() {
         validationObservers.forEach { it.onChange() }
     }
 }

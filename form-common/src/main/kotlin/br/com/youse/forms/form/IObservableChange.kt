@@ -35,4 +35,6 @@ interface IObservableChange {
      * Sets a listener for when a change is triggered
      */
     fun addChangeListener(observer: ChangeObserver)
+
+    fun removeChangeListener(observer: ChangeObserver)
 }
