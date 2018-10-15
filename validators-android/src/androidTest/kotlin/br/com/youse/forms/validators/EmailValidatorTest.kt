@@ -23,23 +23,29 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-import kotlin.jvm.JvmStatic
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-class ValidationTypes {
-    companion object {
-        @JvmStatic
-        val REQUIRED = object : ValidationType {}
+class EmailValidatorTest {
 
-        @JvmStatic
-        val MIN_LENGTH = object : ValidationType {}
+    private lateinit var validator: Validator<String>
+    @BeforeTest
+    fun setup() {
+        validator = EmailValidator("invalid message")
+    }
 
-        @JvmStatic
-        val LENGTH = object : ValidationType {}
+    @Test
+    fun shouldValidate() {
+        assertFalse(validator.isValid(null))
+        assertFalse(validator.isValid(""))
+        assertFalse(validator.isValid("1"))
+        assertFalse(validator.isValid("1@"))
+        assertFalse(validator.isValid("1@1"))
+        assertFalse(validator.isValid("1@1."))
 
-        @JvmStatic
-        val MIN_VALUE = object : ValidationType {}
+        assertTrue(validator.isValid("1@1.1"))
 
-        @JvmStatic
-        val HOUR_FORMAT = object : ValidationType {}
     }
 }
