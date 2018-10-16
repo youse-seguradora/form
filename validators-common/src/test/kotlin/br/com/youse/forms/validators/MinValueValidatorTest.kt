@@ -21,41 +21,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+package br.com.youse.forms.validators
 
-package br.com.youse.forms.livedata.databinding
-
-import android.databinding.BindingAdapter
-import android.support.design.widget.TextInputLayout
-import android.view.View
-import br.com.youse.forms.validators.ValidationMessage
-
-@Suppress("UNUSED")
-class BindingAdapters {
-
-    companion object {
-
-        /**
-         *  Use this binding to set the first ValidationMessage or to remove the error message
-         *  from a TextInputLayout.
-         */
-        @BindingAdapter(value = ["fieldError"])
-        @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-        }
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
-        /**
-         * Use this binding to enable or disable a form submit view.
-         */
-        @BindingAdapter(value = ["formEnabled"])
-        @JvmStatic
-        fun onFormValidationChange(view: View, enabled: Boolean?) {
-            enabled?.let {
-                view.isEnabled = enabled
-            }
-        }
+class MinValueValidatorTest {
+
+    @Test
+    fun shouldValidateInt() {
+        val validator = MinValueValidator("invalid min length", 3)
+        assertFalse(validator.isValid(-3))
+        assertFalse(validator.isValid(-1))
+        assertFalse(validator.isValid(0))
+        assertFalse(validator.isValid(1))
+        assertFalse(validator.isValid(2))
+
+        assertTrue(validator.isValid(3))
+        assertTrue(validator.isValid(4))
     }
 
+    @Test
+    fun shouldValidateDouble() {
+        val validator = MinValueValidator("invalid min length", 3.0)
+        assertFalse(validator.isValid(-3.0))
+        assertFalse(validator.isValid(-1.0))
+        assertFalse(validator.isValid(0.0))
+        assertFalse(validator.isValid(1.0))
+        assertFalse(validator.isValid(2.0))
+
+        assertTrue(validator.isValid(3.0))
+        assertTrue(validator.isValid(4.0))
+    }
 }
