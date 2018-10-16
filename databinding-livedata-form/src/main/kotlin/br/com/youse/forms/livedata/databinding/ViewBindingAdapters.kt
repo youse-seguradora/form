@@ -25,37 +25,49 @@ SOFTWARE.
 package br.com.youse.forms.livedata.databinding
 
 import android.databinding.BindingAdapter
-import android.support.design.widget.TextInputLayout
+import android.databinding.InverseBindingAdapter
+import android.databinding.InverseBindingListener
 import android.view.View
-import br.com.youse.forms.validators.ValidationMessage
 
 @Suppress("UNUSED")
-class BindingAdapters {
+class ViewBindingAdapters {
 
     companion object {
 
         /**
-         *  Use this binding to set the first ValidationMessage or to remove the error message
-         *  from a TextInputLayout.
+         *  Use this two way databinding to feed the form with View focus changes.
          */
-        @BindingAdapter(value = ["fieldError"])
-        @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-        }
 
-
-        /**
-         * Use this binding to enable or disable a form submit view.
-         */
-        @BindingAdapter(value = ["formEnabled"])
+        @BindingAdapter(value = ["fieldFocus"])
         @JvmStatic
-        fun onFormValidationChange(view: View, enabled: Boolean?) {
-            enabled?.let {
-                view.isEnabled = enabled
+        fun setViewFocusChangeFormField(view: View, newValue: Boolean?) {
+            val oldValue = view.hasFocus()
+            if (oldValue != newValue) {
+                if (newValue == true) {
+                    view.requestFocus()
+                } else {
+                    view.clearFocus()
+                }
             }
         }
-    }
 
+        @InverseBindingAdapter(attribute = "fieldFocus", event = "fieldFocusAttrChanged")
+        @JvmStatic
+        fun getViewFocusChangeFormField(view: View): Boolean {
+            return view.hasFocus()
+        }
+
+        @BindingAdapter(value = ["fieldFocusAttrChanged"])
+        @JvmStatic
+        fun setViewFocusChangeFormFieldListener(view: View, listener: InverseBindingListener?) {
+            if (listener == null) {
+                return
+            }
+            view.setOnFocusChangeListener { _, _ ->
+                listener.onChange()
+            }
+
+            listener.onChange()
+        }
+    }
 }

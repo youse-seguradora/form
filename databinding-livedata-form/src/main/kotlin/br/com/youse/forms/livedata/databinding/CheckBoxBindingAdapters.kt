@@ -25,37 +25,43 @@ SOFTWARE.
 package br.com.youse.forms.livedata.databinding
 
 import android.databinding.BindingAdapter
-import android.support.design.widget.TextInputLayout
-import android.view.View
-import br.com.youse.forms.validators.ValidationMessage
+import android.databinding.InverseBindingAdapter
+import android.databinding.InverseBindingListener
+import android.widget.CheckBox
 
 @Suppress("UNUSED")
-class BindingAdapters {
+class CheckBoxBindingAdapters {
 
     companion object {
 
         /**
-         *  Use this binding to set the first ValidationMessage or to remove the error message
-         *  from a TextInputLayout.
+         *  Use this two way databinding to feed the form with CheckBoxes check changes.
          */
-        @BindingAdapter(value = ["fieldError"])
+        @BindingAdapter(value = ["fieldCheck"])
         @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-        }
-
-
-        /**
-         * Use this binding to enable or disable a form submit view.
-         */
-        @BindingAdapter(value = ["formEnabled"])
-        @JvmStatic
-        fun onFormValidationChange(view: View, enabled: Boolean?) {
-            enabled?.let {
-                view.isEnabled = enabled
+        fun setCheckBoxFormField(view: CheckBox, newValue: Boolean?) {
+            val oldValue = view.isChecked
+            if (oldValue != newValue) {
+                view.isChecked = newValue ?: oldValue
             }
         }
-    }
 
+        @InverseBindingAdapter(attribute = "fieldCheck", event = "fieldCheckAttrChanged")
+        @JvmStatic
+        fun getCheckBoxFormField(view: CheckBox): Boolean {
+            return view.isChecked
+        }
+
+        @BindingAdapter(value = ["fieldCheckAttrChanged"])
+        @JvmStatic
+        fun setCheckBoxFormFieldListener(view: CheckBox, listener: InverseBindingListener?) {
+            if (listener == null) {
+                return
+            }
+            view.setOnCheckedChangeListener { _, _ ->
+                listener.onChange()
+            }
+            listener.onChange()
+        }
+    }
 }
