@@ -23,23 +23,16 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-import kotlin.jvm.JvmStatic
+import android.util.Patterns
+import br.com.youse.forms.validators.AndroidValidatorsTypes.Companion.EMAIL_FORMAT
 
-class ValidationTypes {
-    companion object {
-        @JvmStatic
-        val REQUIRED = object : ValidationType {}
+class EmailValidator(val message: String) : Validator<String> {
+    override fun validationMessage(): ValidationMessage {
+        return ValidationMessage(message = message, validationType = EMAIL_FORMAT)
+    }
 
-        @JvmStatic
-        val MIN_LENGTH = object : ValidationType {}
-
-        @JvmStatic
-        val LENGTH = object : ValidationType {}
-
-        @JvmStatic
-        val MIN_VALUE = object : ValidationType {}
-
-        @JvmStatic
-        val HOUR_FORMAT = object : ValidationType {}
+    override fun isValid(input: String?): Boolean {
+        input ?: return false
+        return Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
 }
