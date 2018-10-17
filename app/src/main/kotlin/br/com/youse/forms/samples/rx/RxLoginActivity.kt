@@ -86,9 +86,8 @@ class RxLoginActivity : AppCompatActivity() {
 
         disposables.add(form.onFieldValidationChange()
                 .subscribe { pair ->
-                    val field = findViewById<TextInputLayout>(pair.first)
-                    field.isErrorEnabled = pair.second.isNotEmpty()
-                    field.error = pair.second.joinToString { it.message }
+                    findViewById<TextInputLayout>(pair.first)
+                            .error = pair.second.joinToString { it.message }
                 })
 
         disposables.add(form.onFormValidationChange()
