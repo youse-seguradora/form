@@ -23,60 +23,138 @@ SOFTWARE.
  */
 package br.com.youse.forms.rxform
 
+import br.com.youse.forms.rxform.models.RxField
+import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import io.reactivex.Observable
+import br.com.youse.forms.validators.Validator
+import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import org.junit.After
 import org.junit.Before
 import kotlin.test.Test
 
 
 class RxFormTests {
-    private fun <T> getBuilder(submit: Observable<Unit>,
-                               strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT): IRxForm.Builder<T> {
-        return RxForm.Builder(submit, strategy)
+
+
+    private lateinit var form: IRxForm<Int>
+
+    lateinit var emailField: RxField<Int, String>
+
+    lateinit var passwordField: RxField<Int, String>
+
+    lateinit var passwordConfirmationField: RxField<Int, String>
+
+    lateinit var ageField: RxField<Int, Int>
+
+    private lateinit var fieldsSub: TestObserver<Pair<Int, List<ValidationMessage>>>
+
+    private lateinit var formSub: TestObserver<Boolean>
+
+    private lateinit var validSubmitSub: TestObserver<List<Pair<Int, Any?>>>
+
+    private lateinit var submitFailedSub: TestObserver<List<Pair<Int, List<ValidationMessage>>>>
+
+    private val passwordConfirmationValidators: List<Validator<String>> = listOf(object : Validator<String> {
+        override fun isValid(input: String?): Boolean {
+            return input != null && passwordObservable.value == input
+        }
+
+        override fun validationMessage(): ValidationMessage {
+            return PASSWORD_CONFIRMATION_MISMATCH_MESSAGE
+        }
+    })
+
+    private fun buildRegistrationForm(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
+
+        emailField = RxField(
+                EMAIL_ID,
+                emailObservable,
+                validators = emailValidators
+        )
+
+        passwordField = RxField(
+                PASSWORD_ID,
+                passwordObservable,
+                validators = passwordValidators
+        )
+
+        passwordConfirmationField = RxField(
+                PASSWORD_CONFIRMATION_ID,
+                passwordConfirmationObservable,
+                validators = passwordConfirmationValidators,
+                validationTriggers = listOf(passwordObservable.map { Unit })
+        )
+
+        ageField = RxField(
+                AGE_ID,
+                ageObservable,
+                validators = ageValidators
+        )
+
+        form = RxForm.Builder<Int>(submit, strategy)
+                .addField(emailField)
+                .addField(passwordField)
+                .addField(passwordConfirmationField)
+                .addField(ageField)
+                .build()
+
+        fieldsSub = form.onFieldValidationChange().test()
+        formSub = form.onFormValidationChange().test()
+        validSubmitSub = form.onValidSubmit().test()
+        submitFailedSub = form.onSubmitFailed().test()
+    }
+
+    private fun buildEmptyForm(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT) {
+        form = RxForm.Builder<Int>(submit, strategy).build()
+
+        fieldsSub = form.onFieldValidationChange().test()
+        formSub = form.onFormValidationChange().test()
+        validSubmitSub = form.onValidSubmit().test()
+        submitFailedSub = form.onSubmitFailed().test()
     }
 
 
-    private val submit = PublishSubject.create<Unit>()
-    private val emailObservable = BehaviorSubject.create<String>()
-    private val passwordObservable = BehaviorSubject.create<String>()
-    private val ageObservable = BehaviorSubject.create<Int>()
-
-    val emailField = RxField(EMAIL_ID, emailObservable, validators = emailValidators)
-    val passwordField = RxField(PASSWORD_ID, passwordObservable, validators = passwordValidators)
-    val ageField = RxField(AGE_ID, ageObservable, validators = ageValidators)
+    private lateinit var submit: PublishSubject<Unit>
+    private lateinit var emailObservable: BehaviorSubject<String>
+    private lateinit var passwordObservable: BehaviorSubject<String>
+    private lateinit var passwordConfirmationObservable: BehaviorSubject<String>
+    private lateinit var ageObservable: BehaviorSubject<Int>
 
 
     @Before
     fun setup() {
-        emailObservable.onNext("")
-        passwordObservable.onNext("")
-        ageObservable.onNext(0)
+        submit = PublishSubject.create<Unit>()
+        emailObservable = BehaviorSubject.create<String>()
+        passwordObservable = BehaviorSubject.create<String>()
+        passwordConfirmationObservable = BehaviorSubject.create<String>()
+        ageObservable = BehaviorSubject.create<Int>()
+
+    }
+
+    @After
+    fun tearDown() {
+        form.dispose()
+        fieldsSub.dispose()
+        formSub.dispose()
+        validSubmitSub.dispose()
+        submitFailedSub.dispose()
     }
 
     @Test
     fun shouldValidateAllTheTime() {
 
-        val form = getBuilder<Int>(submit, ValidationStrategy.ALL_TIME)
-                .addField(emailField)
-                .addField(passwordField)
-                .addField(ageField)
-                .build()
-
-        val fieldsSub = form.onFieldValidationChange().test()
-        val formSub = form.onFormValidationChange().test()
-        val validSubmitSub = form.onValidSubmit().test()
-        val submitFailedSub = form.onSubmitFailed().test()
-
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
+        passwordConfirmationObservable.onNext("bar1")
         ageObservable.onNext(MIN_AGE_VALUE - 1)
 
+        buildRegistrationForm(ValidationStrategy.ALL_TIME)
 
-        fieldsSub.assertValues(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
+        validationsWithMinValue.forEachIndexed { index, validation ->
+            fieldsSub.assertValueAt(index, validation)
+        }
 
         formSub.assertValue(false)
 
@@ -84,91 +162,102 @@ class RxFormTests {
 
         submitFailedSub.assertNoValues().assertNoErrors()
 
-        form.dispose()
+    }
+
+    @Test
+    fun shouldValidateConfirmPasswordFieldWhenPasswordChange() {
+
+        emailObservable.onNext(VALID_EMAIL)
+        passwordObservable.onNext(VALID_PASSWORD)
+        passwordConfirmationObservable.onNext("bar")
+        ageObservable.onNext(MIN_AGE_VALUE)
+
+        buildRegistrationForm(ValidationStrategy.ALL_TIME)
+
+        fieldsSub.assertValueAt(2,
+                Pair(PASSWORD_CONFIRMATION_ID, listOf(PASSWORD_CONFIRMATION_MISMATCH_MESSAGE)))
+
+        formSub.assertValue(false)
+
+        passwordConfirmationObservable.onNext(VALID_PASSWORD)
+
+        fieldsSub.assertValueAt(4,
+                Pair(PASSWORD_CONFIRMATION_ID, emptyList()))
+
+
+        formSub.assertValues(false, true)
+
+        passwordObservable.onNext("bar")
+
+        passwordConfirmationField.errors.firstOrError()
+                .test()
+                .assertValue(listOf(PASSWORD_CONFIRMATION_MISMATCH_MESSAGE))
+                .dispose()
+
+        fieldsSub.assertValueAt(5,
+                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)))
+
+        fieldsSub.assertValueAt(6,
+                Pair(PASSWORD_CONFIRMATION_ID, listOf(PASSWORD_CONFIRMATION_MISMATCH_MESSAGE)))
+
+        formSub.assertValues(false, true, false)
+
+        validSubmitSub.assertNoValues().assertNoErrors()
+
+        submitFailedSub.assertNoValues().assertNoErrors()
 
     }
 
     @Test
     fun shouldExecuteValidationAfterSubmit() {
 
-        val form = getBuilder<Int>(submit)
-                .addField(emailField)
-                .addField(passwordField)
-                .addField(ageField)
-                .build()
-
-        val fieldsSub = form.onFieldValidationChange().test()
-        val formSub = form.onFormValidationChange().test()
-        val validSubmitSub = form.onValidSubmit().test()
-        val submitFailedSub = form.onSubmitFailed().test()
+        buildRegistrationForm()
 
         emailObservable.onNext("foo")
         passwordObservable.onNext("bar")
+        passwordConfirmationObservable.onNext("bar1")
         ageObservable.onNext(MIN_AGE_VALUE - 1)
 
         submit.onNext(Unit)
 
-        fieldsSub.assertValues(Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)))
+        validationsWithMinValue.forEachIndexed { index, validation ->
+            fieldsSub.assertValueAt(index, validation)
+        }
 
         formSub.assertValue(false)
 
-        submitFailedSub.assertValue(listOf(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
-        ))
+        submitFailedSub.assertValue(validationsWithMinValue)
 
         validSubmitSub.assertNoValues().assertNoErrors()
 
         emailObservable.onNext(VALID_EMAIL)
         passwordObservable.onNext(VALID_PASSWORD)
+        passwordConfirmationObservable.onNext(VALID_PASSWORD)
         ageObservable.onNext(MIN_AGE_VALUE)
 
-        fieldsSub.assertValues(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE)),
-                Pair(EMAIL_ID, listOf()),
-                Pair(PASSWORD_ID, listOf()),
-                Pair(AGE_ID, listOf())
-        )
+        (validationsWithMinValue + validationsEmptyValidations)
+                .forEachIndexed { index, validation ->
+                    fieldsSub.assertValueAt(index, validation)
+                }
 
         formSub.assertValues(false, true)
 
         submit.onNext(Unit)
 
-        submitFailedSub.assertValues(listOf(
-                Pair(EMAIL_ID, listOf(INVALID_EMAIL_MESSAGE)),
-                Pair(PASSWORD_ID, listOf(INVALID_PASSWORD_MESSAGE)),
-                Pair(AGE_ID, listOf(TOO_SMALL_MESSAGE))
-        ))
+        submitFailedSub.assertValue(validationsWithMinValue)
 
-        validSubmitSub.assertValue(listOf(
-                Pair(EMAIL_ID, VALID_EMAIL),
-                Pair(PASSWORD_ID, VALID_PASSWORD),
-                Pair(AGE_ID, MIN_AGE_VALUE)
-        ))
+        validSubmitSub.assertValue(validSubmitWithMinValue)
 
-        form.dispose()
     }
 
     @Test
     fun shouldNotValidateBeforeSubmit() {
-        val form = getBuilder<Int>(submit)
-                .addField(emailField)
-                .addField(passwordField)
-                .addField(ageField)
-                .build()
 
-        val fieldsSub = form.onFieldValidationChange().test()
-        val formSub = form.onFormValidationChange().test()
-        val validSubmitSub = form.onValidSubmit().test()
-        val submitFailedSub = form.onSubmitFailed().test()
+        buildRegistrationForm()
 
         emailObservable.onNext("")
         passwordObservable.onNext("")
+        passwordConfirmationObservable.onNext("")
         ageObservable.onNext(MIN_AGE_VALUE - 1)
 
         fieldsSub.assertNoValues()
@@ -185,6 +274,7 @@ class RxFormTests {
 
         emailObservable.onNext(VALID_EMAIL)
         passwordObservable.onNext(VALID_PASSWORD)
+        passwordConfirmationObservable.onNext(VALID_PASSWORD)
         ageObservable.onNext(MIN_AGE_VALUE)
 
         fieldsSub.assertNoValues()
@@ -199,17 +289,12 @@ class RxFormTests {
         submitFailedSub.assertNoValues()
                 .assertNoErrors()
 
-        form.dispose()
     }
 
     @Test
     fun shouldBuildFormWithoutFieldValidations() {
-        val form = getBuilder<Int>(submit).build()
 
-        val fieldsSub = form.onFieldValidationChange().test()
-        val formSub = form.onFormValidationChange().test()
-        val validSubmitSub = form.onValidSubmit().test()
-        val submitFailedSub = form.onSubmitFailed().test()
+        buildEmptyForm()
 
         submit.onNext(Unit)
 
@@ -225,6 +310,5 @@ class RxFormTests {
         submitFailedSub.assertNoValues()
                 .assertNoErrors()
 
-        form.dispose()
     }
 }

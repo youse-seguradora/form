@@ -21,16 +21,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.form.models
+package br.com.youse.forms.samples.launcher
 
+import android.support.design.widget.TextInputLayout
+import android.widget.RadioGroup
 import br.com.youse.forms.form.IObservableChange
-import br.com.youse.forms.form.IObservableValue
-import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.Validator
 
-class FormField<T, R>(val key: T,
-                      val input: IObservableValue<R> = ObservableValue(),
-                      val errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
-                      val enabled: IObservableValue<Boolean> = ObservableValue(true),
-                      val validators: List<Validator<R>> = emptyList(),
-                      val validationTriggers: List<IObservableChange> = emptyList())
+
+fun RadioGroup.checkChangesField(validators: List<Validator<Int>>): FormField<Int, Int> {
+
+    val inputLayout = (parent as TextInputLayout)
+    val observableValue = ObservableValue<Int>()
+
+    setOnCheckedChangeListener { _, checkedId ->
+        observableValue.value = checkedId
+    }
+
+    val formField = FormField(
+            key = inputLayout.id,
+            input = observableValue,
+            validators = validators
+    )
+
+    formField.observeErrors(inputLayout)
+
+    return formField
+}
+
+
+fun FormField<*, *>.observeErrors(inputLayout: TextInputLayout): IObservableChange.ChangeObserver {
+
+    val observer = object : IObservableChange.ChangeObserver {
+        override fun onChange() {
+            val validations = errors.value ?: emptyList()
+            inputLayout.error = validations.firstOrNull()?.message
+        }
+    }
+
+    errors.addChangeListener(observer = observer)
+
+    return observer
+}

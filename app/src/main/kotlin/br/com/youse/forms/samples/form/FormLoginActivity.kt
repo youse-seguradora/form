@@ -26,22 +26,19 @@ package br.com.youse.forms.samples.form
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.models.FormField
-import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class FormLoginActivity : AppCompatActivity(),
         IForm.FieldValidationChange<Int>,
@@ -63,31 +60,17 @@ class FormLoginActivity : AppCompatActivity(),
                 MIN_PASSSWORD_LENGTH))
     }
 
-    private fun getTextWatcher(observableValue: ObservableValue<String>): TextWatcher {
-        return object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                observableValue.value = p0?.toString()
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
+        val param = intent.getStringExtra("ValidationStrategy")
+                ?: ValidationStrategy.AFTER_SUBMIT.name
         val strategy = ValidationStrategy.valueOf(param)
 
-        val emailChanges = ObservableValue(email.text.toString())
-        val passwordChanges = ObservableValue(password.text.toString())
+        val emailChanges = email.addObservableValue()
+        val passwordChanges = password.addObservableValue()
 
-        email.addTextChangedListener(getTextWatcher(emailChanges))
-        password.addTextChangedListener(getTextWatcher(passwordChanges))
 
         val emailField = FormField(
                 key = emailContainer.id,

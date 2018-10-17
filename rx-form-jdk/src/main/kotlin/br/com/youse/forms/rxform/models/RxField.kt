@@ -21,20 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.form
+package br.com.youse.forms.rxform.models
 
-interface IObservableChange {
-    interface ChangeObserver {
-        /**
-         * Notifies a happened.
-         */
-        fun onChange()
-    }
+import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.Validator
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 
-    /**
-     * Sets a listener for when a change is triggered
-     */
-    fun addChangeListener(observer: ChangeObserver)
-
-    fun removeChangeListener(observer: ChangeObserver)
-}
+class RxField<T, R>(val key: T,
+                    val input: Observable<R> = BehaviorSubject.create(),
+                    val errors: BehaviorSubject<List<ValidationMessage>> = BehaviorSubject.create(),
+                    val enabled: Observable<Boolean> = BehaviorSubject.create<Boolean>(),
+                    val validators: List<Validator<R>> = emptyList(),
+                    val validationTriggers: List<Observable<Unit>> = emptyList())

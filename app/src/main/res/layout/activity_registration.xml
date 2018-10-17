@@ -6,13 +6,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".samples.registration.RegistrationActivity">
+
+    <Switch
+            android:id="@+id/ageSwitch"
+            android:text="Enable age check?"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     <android.support.design.widget.TextInputLayout
             android:id="@+id/ageInputLayout"
             android:layout_margin="16dp"
             android:layout_width="match_parent"
             android:hint="How old are you?"
             android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputEditText
+        <br.com.youse.forms.samples.registration.AgeEditText
                 android:id="@+id/age"
                 android:inputType="number"
                 android:layout_width="match_parent"
