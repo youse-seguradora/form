@@ -1,4 +1,4 @@
-package br.com.youse.forms.samples.form
+package br.com.youse.forms.samples.login.form
 
 import android.text.Editable
 import android.text.TextWatcher

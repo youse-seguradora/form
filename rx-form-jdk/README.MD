@@ -36,7 +36,7 @@ disposables.add(form.onFormValidationChange()
         })
 ```
 
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/rx/RxLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/login/rx/RxLoginActivity.kt)
 
 RxField<T,R> properties
 --------
