@@ -23,17 +23,26 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-enum class ValidationStrategy {
+sealed class ValidationStrategy(val onEnable: Boolean, val onDisable: Boolean) {
     /**
      * Flag to start validating as soo as the form is created.
      */
-    ALL_TIME,
+    class AllTime(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
+
     /**
      * Flag to start validating the form only after the first submit event.
      */
-    AFTER_SUBMIT,
+    class AfterSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
+
     /**
      * Flag to only validate the form only when a submit event happens.
      */
-    ON_SUBMIT
+    class OnSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
+
+
+    companion object {
+        val ALL_TIME = AllTime(true, true)
+        val AFTER_SUBMIT = AfterSubmit(true, true)
+        val ON_SUBMIT = OnSubmit(true, true)
+    }
 }

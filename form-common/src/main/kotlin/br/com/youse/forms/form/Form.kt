@@ -45,7 +45,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         get() = fields.filter { it.enabled.value ?: false }
 
     private var isFormValid: Boolean? = null
-    private var isFormSubmitted: Boolean? = null
+    private var isFormSubmitted: Boolean = false
 
     init {
 
@@ -65,9 +65,12 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
     }
 
     private fun strategyAllowsValidation(isSubmit: Boolean): Boolean {
-        return (strategy == ValidationStrategy.ALL_TIME) ||
-                (strategy == ValidationStrategy.ON_SUBMIT && isSubmit) ||
-                (strategy == ValidationStrategy.AFTER_SUBMIT && isFormSubmitted == true)
+        return when (strategy) {
+            is ValidationStrategy.AllTime -> true
+            is ValidationStrategy.OnSubmit -> isSubmit
+            is ValidationStrategy.AfterSubmit -> isFormSubmitted
+        }
+
     }
 
     private fun notifyFormValidationChangedIfChanged() {
@@ -220,7 +223,6 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
     }
 
 
-
     private open inner class FieldChangeObserver(protected val field: FormField<T, *>) : ChangeObserver {
         override fun onChange() {
             val enabled = field.enabled.value ?: false
@@ -232,17 +234,21 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         }
     }
 
-    private inner class EnabledChangeObserver(field: FormField<T, *>) : FieldChangeObserver(field) {
+    private inner class EnabledChangeObserver(val field: FormField<T, *>) : ChangeObserver {
         override fun onChange() {
-            super.onChange()
             val key = field.key
             val enabled = field.enabled.value ?: false
+
+            if (enabled && strategyAllowsValidation(false) && strategy.onEnable) {
+                validateField(field)
+                notifyFormValidationChangedIfChanged()
+            }
 
             if (!enabled && lastFieldsMessages.containsKey(key)) {
 
                 lastFieldsMessages.remove(key)
 
-                if (strategyAllowsValidation(false)) {
+                if (strategyAllowsValidation(false) && strategy.onDisable) {
                     notifyFieldValidationChange(field, emptyList())
                     notifyFormValidationChangedIfChanged()
                 }
