@@ -23,6 +23,8 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
+import kotlin.jvm.JvmStatic
+
 sealed class ValidationStrategy(val onEnable: Boolean, val onDisable: Boolean) {
     /**
      * Flag to start validating as soo as the form is created.
@@ -38,11 +40,14 @@ sealed class ValidationStrategy(val onEnable: Boolean, val onDisable: Boolean) {
     /**
      * Flag to only validate the form when a submit event happens.
      */
-    class OnSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
+    class OnSubmit() : ValidationStrategy(false, false)
 
     companion object {
+        @JvmStatic
         val ALL_TIME = AllTime(true, true)
+        @JvmStatic
         val AFTER_SUBMIT = AfterSubmit(true, true)
-        val ON_SUBMIT = OnSubmit(false, false)
+        @JvmStatic
+        val ON_SUBMIT = OnSubmit()
     }
 }
