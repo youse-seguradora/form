@@ -22,16 +22,17 @@
                 android:name=".samples.home.HomeActivity"
                 android:label="@string/title_activity_home"/>
         <activity
-                android:name=".samples.form.FormLoginActivity"
+                android:name=".samples.login.form.FormLoginActivity"
                 android:label="@string/title_activity_form"/>
         <activity
-                android:name=".samples.rx.RxLoginActivity"
+                android:name=".samples.login.rx.RxLoginActivity"
                 android:label="@string/title_activity_rx_form"/>
         <activity
-                android:name=".samples.livedata.LiveDataLoginActivity"
+                android:name=".samples.login.livedata.LiveDataLoginActivity"
                 android:label="@string/title_activity_live_data"/>
-        <activity android:name=".samples.registration.RegistrationActivity"
-                  android:label="@string/title_activity_registration_form"/>
+        <activity
+                android:name=".samples.registration.RegistrationActivity"
+                android:label="@string/title_activity_registration_form"/>
     </application>
 
 </manifest>
