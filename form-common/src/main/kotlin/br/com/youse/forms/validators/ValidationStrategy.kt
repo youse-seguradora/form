@@ -31,5 +31,9 @@ enum class ValidationStrategy {
     /**
      * Flag to start validating the form only after the first submit event.
      */
-    AFTER_SUBMIT
+    AFTER_SUBMIT,
+    /**
+     * Flag to only validate the form only when a submit event happens.
+     */
+    ON_SUBMIT
 }

@@ -64,9 +64,9 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         }
     }
 
-    private fun strategyAllowsValidation(): Boolean {
-        return (strategy == ValidationStrategy.ALL_TIME)
-                ||
+    private fun strategyAllowsValidation(isSubmit: Boolean): Boolean {
+        return (strategy == ValidationStrategy.ALL_TIME) ||
+                (strategy == ValidationStrategy.ON_SUBMIT && isSubmit) ||
                 (strategy == ValidationStrategy.AFTER_SUBMIT && isFormSubmitted == true)
     }
 
@@ -159,7 +159,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
         isFormSubmitted = true
 
-        if (strategy == ValidationStrategy.AFTER_SUBMIT) {
+        if (strategyAllowsValidation(true)) {
             validateAllFields()
             notifyFormValidationChangedIfChanged()
         }
@@ -225,7 +225,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         override fun onChange() {
             val enabled = field.enabled.value ?: false
 
-            if (enabled && strategyAllowsValidation()) {
+            if (enabled && strategyAllowsValidation(false)) {
                 validateField(field)
                 notifyFormValidationChangedIfChanged()
             }
@@ -242,7 +242,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
                 lastFieldsMessages.remove(key)
 
-                if (strategyAllowsValidation()) {
+                if (strategyAllowsValidation(false)) {
                     notifyFieldValidationChange(field, emptyList())
                     notifyFormValidationChangedIfChanged()
                 }
