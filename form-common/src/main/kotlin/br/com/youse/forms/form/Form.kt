@@ -70,7 +70,6 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
             is ValidationStrategy.OnSubmit -> isSubmit
             is ValidationStrategy.AfterSubmit -> isFormSubmitted
         }
-
     }
 
     private fun notifyFormValidationChangedIfChanged() {
@@ -256,4 +255,3 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         }
     }
 }
-

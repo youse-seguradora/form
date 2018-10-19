@@ -32,17 +32,17 @@ sealed class ValidationStrategy(val onEnable: Boolean, val onDisable: Boolean) {
     /**
      * Flag to start validating the form only after the first submit event.
      */
+
     class AfterSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
 
     /**
-     * Flag to only validate the form only when a submit event happens.
+     * Flag to only validate the form when a submit event happens.
      */
     class OnSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
-
 
     companion object {
         val ALL_TIME = AllTime(true, true)
         val AFTER_SUBMIT = AfterSubmit(true, true)
-        val ON_SUBMIT = OnSubmit(true, true)
+        val ON_SUBMIT = OnSubmit(false, false)
     }
 }

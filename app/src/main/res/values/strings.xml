@@ -14,5 +14,6 @@
     <string name="title_activity_registration_form">Registration Form</string>
 
     <string name="title_activity_home">Home</string>
+
     <string name="title_activity_launcher">Launcher</string>
 </resources>

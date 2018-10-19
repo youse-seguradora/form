@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.samples.form
+package br.com.youse.forms.samples.login.form
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
@@ -33,6 +33,8 @@ import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.samples.launcher.name
+import br.com.youse.forms.samples.launcher.valueOf
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
@@ -65,8 +67,8 @@ class FormLoginActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val param = intent.getStringExtra("ValidationStrategy")
-                ?: ValidationStrategy.AFTER_SUBMIT.name
-        val strategy = ValidationStrategy.valueOf(param)
+                ?: ValidationStrategy.AFTER_SUBMIT.name()
+        val strategy = ValidationStrategy.valueOf(param)!!
 
         val emailChanges = email.addObservableValue()
         val passwordChanges = password.addObservableValue()

@@ -36,7 +36,7 @@ disposables.add(form.onFormValidationChange()
         })
 ```
 
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/rx/RxLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/login/rx/RxLoginActivity.kt)
 
 RxField<T,R> properties
 --------
@@ -70,7 +70,7 @@ Download or grab via Maven:
 <dependency>
   <groupId>br.com.youse.forms</groupId>
   <artifactId>rx-form-jdk</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 or Gradle:
@@ -80,7 +80,7 @@ add
 ```
 and
 ```groovy
-implementation 'br.com.youse.forms:rx-form-jdk:0.2.0'
+implementation 'br.com.youse.forms:rx-form-jdk:0.3.0'
 ```
 
 

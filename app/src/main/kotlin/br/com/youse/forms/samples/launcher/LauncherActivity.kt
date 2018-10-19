@@ -30,10 +30,10 @@ import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.FormValidationChange
-import br.com.youse.forms.samples.form.FormLoginActivity
-import br.com.youse.forms.samples.livedata.LiveDataLoginActivity
+import br.com.youse.forms.samples.login.form.FormLoginActivity
+import br.com.youse.forms.samples.login.livedata.LiveDataLoginActivity
 import br.com.youse.forms.samples.registration.RegistrationActivity
-import br.com.youse.forms.samples.rx.RxLoginActivity
+import br.com.youse.forms.samples.login.rx.RxLoginActivity
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType
@@ -98,7 +98,7 @@ class LauncherActivity : Activity() {
             }
 
             val intent = Intent(this@LauncherActivity, clazz)
-            intent.putExtra("ValidationStrategy", strategy.name)
+            intent.putExtra("ValidationStrategy", strategy.name())
             startActivity(intent)
 
         }
@@ -125,3 +125,17 @@ class LauncherActivity : Activity() {
     }
 
 }
+
+fun ValidationStrategy.name(): String = when (this) {
+    is ValidationStrategy.AllTime -> "ALL_TIME"
+    is ValidationStrategy.AfterSubmit -> "AFTER_SUBMIT"
+    is ValidationStrategy.OnSubmit -> "ON_SUBMIT"
+}
+
+fun ValidationStrategy.Companion.valueOf(name: String): ValidationStrategy? =
+        when (name) {
+            "ALL_TIME" -> ALL_TIME
+            "AFTER_SUBMIT" -> AFTER_SUBMIT
+            "ON_SUBMIT" -> ON_SUBMIT
+            else -> null
+        }

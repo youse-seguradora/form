@@ -46,7 +46,7 @@ Sample below uses databinding-livedata-form module to observe the LiveData event
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        app:field="@={vm.email.input}" />
+        app:fieldText="@={vm.email.input}" />
 </android.support.design.widget.TextInputLayout>
 ...
 <Button
@@ -58,7 +58,7 @@ Sample below uses databinding-livedata-form module to observe the LiveData event
     android:onClick="@={ _ -> vm.form.doSubmit()}" />
 ```
 
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/livedata/LiveDataLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/login/livedata/LiveDataLoginActivity.kt)
 
 LiveField<T,R> properties
 --------
@@ -111,7 +111,7 @@ Download or grab via Maven:
 <dependency>
   <groupId>br.com.youse.forms</groupId>
   <artifactId>livedata-form</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 add
@@ -121,5 +121,5 @@ add
 and
 or Gradle:
 ```groovy
-implementation 'br.com.youse.forms:livedata-form:0.2.0'
+implementation 'br.com.youse.forms:livedata-form:0.3.0'
 ```

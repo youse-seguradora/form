@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.samples.livedata
+package br.com.youse.forms.samples.login.livedata
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -32,6 +32,8 @@ import android.widget.Toast
 import br.com.youse.forms.R
 import br.com.youse.forms.databinding.LiveDataActivityBinding
 import br.com.youse.forms.samples.home.HomeActivity
+import br.com.youse.forms.samples.launcher.name
+import br.com.youse.forms.samples.launcher.valueOf
 import br.com.youse.forms.validators.ValidationStrategy
 
 class LiveDataLoginActivity : AppCompatActivity() {
@@ -40,8 +42,8 @@ class LiveDataLoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
-        val strategy = ValidationStrategy.valueOf(param)
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name()
+        val strategy = ValidationStrategy.valueOf(param)!!
 
         val binding: LiveDataActivityBinding = DataBindingUtil.setContentView(this, R.layout.live_data_activity)
 
