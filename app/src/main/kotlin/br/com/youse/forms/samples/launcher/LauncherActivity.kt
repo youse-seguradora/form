@@ -30,10 +30,10 @@ import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.FormValidationChange
-import br.com.youse.forms.samples.form.FormLoginActivity
-import br.com.youse.forms.samples.livedata.LiveDataLoginActivity
+import br.com.youse.forms.samples.login.form.FormLoginActivity
+import br.com.youse.forms.samples.login.livedata.LiveDataLoginActivity
 import br.com.youse.forms.samples.registration.RegistrationActivity
-import br.com.youse.forms.samples.rx.RxLoginActivity
+import br.com.youse.forms.samples.login.rx.RxLoginActivity
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.ValidationType

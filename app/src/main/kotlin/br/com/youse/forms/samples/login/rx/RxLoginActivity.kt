@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package br.com.youse.forms.samples.form
+package br.com.youse.forms.samples.login.rx
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
@@ -29,26 +29,21 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import br.com.youse.forms.R
-import br.com.youse.forms.form.Form
-import br.com.youse.forms.form.IForm
-import br.com.youse.forms.form.IForm.*
-import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.rxform.IRxForm
+import br.com.youse.forms.rxform.models.RxField
+import br.com.youse.forms.rxform.RxForm
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
+import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.textChanges
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 
-
-class FormLoginActivity : AppCompatActivity(),
-        IForm.FieldValidationChange<Int>,
-        FormValidationChange,
-        ValidSubmit<Int>,
-        SubmitFailed<Int> {
-
+class RxLoginActivity : AppCompatActivity() {
 
     val MIN_PASSSWORD_LENGTH = 8
-
+    val disposables = CompositeDisposable()
     val emailValidations by lazy {
         listOf(RequiredValidator(
                 getString(R.string.empty_email_validation_message)
@@ -60,71 +55,63 @@ class FormLoginActivity : AppCompatActivity(),
                 MIN_PASSSWORD_LENGTH))
     }
 
+    private lateinit var form: IRxForm<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val param = intent.getStringExtra("ValidationStrategy")
-                ?: ValidationStrategy.AFTER_SUBMIT.name
+
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
         val strategy = ValidationStrategy.valueOf(param)
 
-        val emailChanges = email.addObservableValue()
-        val passwordChanges = password.addObservableValue()
 
+        val submitObservable = submit.clicks()
+        val emailChanges = email.textChanges().map { it.toString() }
+        val passwordChanges = password.textChanges().map { it.toString() }
 
-        val emailField = FormField(
+        val emailField = RxField(
                 key = emailContainer.id,
                 input = emailChanges,
-                validators = emailValidations
-        )
+                validators = emailValidations)
 
-        val passwordField = FormField(
+        val passwordField = RxField(
                 key = passwordContainer.id,
                 input = passwordChanges,
-                validators = passwordValidations
-        )
+                validators = passwordValidations)
 
-        val form = Form.Builder<Int>(strategy = strategy)
-                .setFieldValidationListener(this)
-                .setFormValidationListener(this)
-                .setValidSubmitListener(this)
-                .setSubmitFailedListener(this)
+        form = RxForm.Builder<Int>(submitObservable, strategy = strategy)
                 .addField(emailField)
                 .addField(passwordField)
                 .build()
 
-        submit.setOnClickListener {
-            form.doSubmit()
-        }
+        disposables.add(form.onFieldValidationChange()
+                .subscribe { pair ->
+                    findViewById<TextInputLayout>(pair.first)
+                            .error = pair.second.joinToString { it.message }
+                })
 
+        disposables.add(form.onFormValidationChange()
+                .subscribe {
+                    submit.isEnabled = it
+                })
+
+        disposables.add(form.onValidSubmit()
+                .subscribe { fields ->
+                    println(fields)
+
+                    val email = fields.first { it.first == emailContainer.id }.second.toString()
+                    val password = fields.first { it.first == passwordContainer.id }.second.toString()
+
+                    //TODO: submit email and password to server
+                    Toast.makeText(this@RxLoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
+                    Log.d("Debug", "email : $email, password: $$password")
+
+                })
     }
 
-    override fun onFieldValidationChange(key: Int, validations: List<ValidationMessage>) {
-        val field = findViewById<TextInputLayout>(key)
-        field.isErrorEnabled = validations.isNotEmpty()
-        field.error = validations.joinToString { it.message }
+    override fun onDestroy() {
+        form.dispose()
+        disposables.clear()
+        super.onDestroy()
     }
-
-    override fun onFormValidationChange(isValid: Boolean) {
-        submit.isEnabled = isValid
-    }
-
-    override fun onSubmitFailed(validations: List<Pair<Int, List<ValidationMessage>>>) {
-        validations.firstOrNull()?.first?.let {
-            // Scroll to this view to highlight the problem, or make the field blink
-            // it's up to you. :-P
-        }
-    }
-
-    override fun onValidSubmit(fields: List<Pair<Int, Any?>>) {
-        val email = fields.first { it.first == emailContainer.id }.second.toString()
-        val password = fields.first { it.first == passwordContainer.id }.second.toString()
-
-        //TODO: submit email and password to server
-        Log.d("Debug", "email : $email, password: $$password")
-
-        Toast.makeText(this@FormLoginActivity, "$email and $password submitted to server", Toast.LENGTH_LONG).show()
-
-    }
-
 }

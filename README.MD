@@ -55,7 +55,7 @@ submit.setOnClickListener {
 }
 
 ```
-Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/form/FormLoginActivity.kt)
+Full sample [here](https://github.com/youse-seguradora/form/blob/master/app/src/main/kotlin/br/com/youse/forms/samples/login/form/FormLoginActivity.kt)
 
 How to RxForm
 --------

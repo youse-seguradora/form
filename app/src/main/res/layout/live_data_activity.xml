@@ -8,7 +8,7 @@
 
         <variable
             name="vm"
-            type="br.com.youse.forms.samples.livedata.LoginViewModel" />
+            type="br.com.youse.forms.samples.login.livedata.LoginViewModel" />
 
     </data>
 
