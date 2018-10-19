@@ -24,6 +24,5 @@ SOFTWARE.
 package br.com.youse.forms.form
 
 interface IObservableValue<T> : IObservableChange {
-
     var value: T?
 }

@@ -28,9 +28,26 @@ import br.com.youse.forms.form.IObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
-class FormField<T, R>(val key: T,
-                      val input: IObservableValue<R> = ObservableValue(),
-                      val errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
-                      val enabled: IObservableValue<Boolean> = ObservableValue(true),
-                      val validators: List<Validator<R>> = emptyList(),
-                      val validationTriggers: List<IObservableChange> = emptyList())
+class FormField<T, R> constructor(val key: T,
+                                  val input: IObservableValue<R> = ObservableValue(),
+                                  val errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
+                                  val enabled: IObservableValue<Boolean> = ObservableValue(true),
+                                  val validators: List<Validator<R>> = emptyList(),
+                                  val validationTriggers: List<IObservableChange> = emptyList()) {
+    fun hasErrors(): Boolean {
+        return errors.value?.isNotEmpty() ?: false
+    }
+
+    constructor(key: T,
+                initialValue: R,
+                errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
+                enabled: IObservableValue<Boolean> = ObservableValue(true),
+                validators: List<Validator<R>> = emptyList(),
+                validationTriggers: List<IObservableChange> = emptyList()) : this(key = key,
+            errors = errors,
+            enabled = enabled,
+            validators = validators,
+            validationTriggers = validationTriggers) {
+        input.value = initialValue
+    }
+}
