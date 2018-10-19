@@ -115,7 +115,7 @@ class RegistrationActivity : AppCompatActivity() {
                 input = checkChanges,
                 validators = listOf(requireTrueValidator))
 
-        rxForm = RxForm.Builder<Key>(submit.clicks())
+        rxForm = RxForm.Builder<Key>(submit.clicks(), strategy = ValidationStrategy.ON_SUBMIT)
                 .addField(ageField)
                 .addField(passwordField)
                 .addField(confirmPasswordField)
@@ -129,7 +129,7 @@ class RegistrationActivity : AppCompatActivity() {
                 })
         disposables.add(rxForm.onFormValidationChange()
                 .subscribe {
-                    submit.isEnabled = it
+              //      submit.isEnabled = it
                 })
 
         disposables.add(rxForm.onValidSubmit()
