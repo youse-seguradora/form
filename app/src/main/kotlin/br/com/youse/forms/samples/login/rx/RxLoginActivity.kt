@@ -32,6 +32,8 @@ import br.com.youse.forms.R
 import br.com.youse.forms.rxform.IRxForm
 import br.com.youse.forms.rxform.models.RxField
 import br.com.youse.forms.rxform.RxForm
+import br.com.youse.forms.samples.launcher.name
+import br.com.youse.forms.samples.launcher.valueOf
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
@@ -61,8 +63,8 @@ class RxLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name
-        val strategy = ValidationStrategy.valueOf(param)
+        val param = intent.getStringExtra("ValidationStrategy") ?: ValidationStrategy.AFTER_SUBMIT.name()
+        val strategy = ValidationStrategy.valueOf(param)!!
 
 
         val submitObservable = submit.clicks()
