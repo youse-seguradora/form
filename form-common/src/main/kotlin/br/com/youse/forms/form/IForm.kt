@@ -101,4 +101,6 @@ interface IForm {
          */
         fun build(): IForm
     }
+
+    fun reset()
 }

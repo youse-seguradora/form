@@ -26,9 +26,7 @@ package br.com.youse.forms.form
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.IObservableChange.ChangeObserver
 import br.com.youse.forms.form.models.FormField
-import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
-import br.com.youse.forms.validators.Validator
 
 @Suppress("UNCHECKED_CAST")
 class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T>?,
@@ -42,31 +40,49 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         get() = fields.filter { it.enabled.value.isTrue() }
 
     private var isFormValid: Boolean? = null
-    private var isFormSubmitted: Boolean? = null
+    private var isFormSubmitted: Boolean = false
 
     init {
 
         fields.forEach { field ->
 
-            val validationTriggers = listOf<IObservableChange>(field.input) + field.validationTriggers
-            val changeObserver = FieldChangeObserver(field)
-            val enabledChangeObserver = EnabledChangeObserver(field)
+            val inputChangeObserver = InputChangeObserver(this, strategy, field)
+            val enabledChangeObserver = EnabledChangeObserver(this, strategy, field)
+            val triggerChangeObserver = TriggerChangeObserver(this, strategy, field)
 
-            validationTriggers.forEach { validationTrigger ->
-                validationTrigger.addChangeListener(observer = changeObserver)
-            }
+            field.input.addChangeListener(observer = inputChangeObserver)
 
             field.enabled.addChangeListener(observer = enabledChangeObserver)
+
+            field.validationTriggers.forEach { validationTrigger ->
+                validationTrigger.addChangeListener(observer = triggerChangeObserver)
+            }
+
+            fieldValidationListener?.let {
+                field.errors.addChangeListener(observer = object : ChangeObserver {
+                    override fun onChange() {
+                        val errors = field.errors.value ?: emptyList()
+                        fieldValidationListener.onFieldValidationChange(field.key, errors)
+                    }
+                })
+            }
         }
     }
 
-    private fun strategyAllowsValidation(isSubmit: Boolean): Boolean {
-        return (strategy == ValidationStrategy.ALL_TIME) ||
-                (strategy == ValidationStrategy.ON_SUBMIT && isSubmit) ||
-                (strategy == ValidationStrategy.AFTER_SUBMIT && isFormSubmitted.isTrue())
+    internal fun formStateAllowsValidation(): Boolean {
+        if (!isFormSubmitted && strategy.beforeSubmit) {
+            return true
+        }
+        if (isFormSubmitted && strategy.onSubmit) {
+            return true
+        }
+        if (isFormSubmitted && strategy.afterSubmit) {
+            return true
+        }
+        return false
     }
 
-    private fun notifyFormValidationChangedIfChanged() {
+    internal fun notifyFormValidationChangedIfChanged() {
 
         val areAllFieldsValid = areAllFieldValid()
         val hasFormValidationChanged = isFormValid != areAllFieldsValid
@@ -77,32 +93,6 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         }
 
         isFormValid = areAllFieldsValid
-    }
-
-    private fun validateField(field: FormField<T, *>) {
-        val value = field.input.value
-        val validators = field.validators as List<Validator<Any?>>
-
-        val messages = mutableListOf<ValidationMessage>()
-
-        for (validator in validators) {
-            if (!validator.isValid(value)) {
-                messages += validator.validationMessage()
-            }
-        }
-
-        val hasFieldValidationChanged = messages != field.errors.value
-
-        if (hasFieldValidationChanged) {
-            // notify field validation changed
-            notifyFieldValidationChange(field, messages)
-        }
-    }
-
-    private fun notifyFieldValidationChange(field: FormField<T, *>, messages: List<ValidationMessage>) {
-
-        field.errors.value = messages
-        fieldValidationListener?.onFieldValidationChange(field.key, messages)
     }
 
     private fun areAllFieldValid(): Boolean {
@@ -116,7 +106,7 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
 
     private fun validateAllFields() {
         enabledFields.forEach { field ->
-            validateField(field)
+            field.validate()
         }
     }
 
@@ -143,11 +133,16 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
         submitFailedListener?.onSubmitFailed(validationMessages)
     }
 
+    override fun reset() {
+        isFormSubmitted = false
+        isFormValid = null
+    }
+
     override fun doSubmit() {
 
         isFormSubmitted = true
 
-        if (strategyAllowsValidation(true)) {
+        if (formStateAllowsValidation()) {
             validateAllFields()
             notifyFormValidationChangedIfChanged()
         }
@@ -206,31 +201,63 @@ class Form<T>(private val fieldValidationListener: IForm.FieldValidationChange<T
                     fields = fields.toList())
         }
     }
+}
 
-
-    private open inner class FieldChangeObserver(protected val field: FormField<T, *>) : ChangeObserver {
-        override fun onChange() {
-            val enabled = field.enabled.value.isTrue()
-
-            if (enabled && strategyAllowsValidation(false)) {
-                validateField(field)
-                notifyFormValidationChangedIfChanged()
-            }
+internal abstract class FormChangeObserver<T>(private val form: Form<T>) : ChangeObserver {
+    override fun onChange() {
+        if (form.formStateAllowsValidation()) {
+            validateField()
+            form.notifyFormValidationChangedIfChanged()
         }
     }
 
-    private inner class EnabledChangeObserver(field: FormField<T, *>) : FieldChangeObserver(field) {
-        override fun onChange() {
-            super.onChange()
+    abstract fun validateField()
+}
 
-            val enabled = field.enabled.value.isTrue()
-
-            if (!enabled && strategyAllowsValidation(false)) {
-                notifyFieldValidationChange(field, emptyList())
-                notifyFormValidationChangedIfChanged()
+internal class InputChangeObserver<T>(form: Form<T>,
+                                      private val strategy: ValidationStrategy,
+                                      private val field: FormField<T, *>) : FormChangeObserver<T>(form) {
+    override fun validateField() {
+        val enabled = field.enabled.value.isTrue()
+        if (enabled) {
+            if (strategy.onChange) {
+                field.validate()
+            }
+            if (strategy.clearErrorOnChange) {
+                field.errors.value = emptyList()
             }
         }
     }
 }
 
-fun Boolean?.isTrue(): Boolean = this == true
+internal class TriggerChangeObserver<T>(form: Form<T>,
+                                        private val strategy: ValidationStrategy,
+                                        private val field: FormField<T, *>) : FormChangeObserver<T>(form) {
+    override fun validateField() {
+        val enabled = field.enabled.value.isTrue()
+        if (enabled) {
+            if (strategy.onTrigger) {
+                field.validate()
+            }
+        }
+    }
+}
+
+internal class EnabledChangeObserver<T>(form: Form<T>,
+                                        private val strategy: ValidationStrategy,
+                                        private val field: FormField<T, *>) : FormChangeObserver<T>(form) {
+    override fun validateField() {
+        val enabled = field.enabled.value.isTrue()
+        if (enabled) {
+            if (strategy.onEnable) {
+                field.validate()
+            }
+        } else {
+            if (strategy.onDisable) {
+                field.errors.value = emptyList()
+            }
+        }
+    }
+}
+
+internal fun Boolean?.isTrue(): Boolean = this == true
