@@ -129,7 +129,7 @@ class RegistrationActivity : AppCompatActivity() {
                 })
         disposables.add(rxForm.onFormValidationChange()
                 .subscribe {
-              //      submit.isEnabled = it
+                    //      submit.isEnabled = it
                 })
 
         disposables.add(rxForm.onValidSubmit()

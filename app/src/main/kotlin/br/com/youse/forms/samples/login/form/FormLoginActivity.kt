@@ -68,7 +68,7 @@ class FormLoginActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         val param = intent.getStringExtra("ValidationStrategy")
                 ?: ValidationStrategy.AFTER_SUBMIT.name()
-        ValidationStrategy.AfterSubmit(false, true)
+
         val strategy = ValidationStrategy.valueOf(param)!!
 
         val emailChanges = email.addObservableValue()

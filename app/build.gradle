@@ -43,13 +43,10 @@ android {
 dependencies {
     implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
     implementation 'com.github.musichin.reactivelivedata:reactivelivedata:0.14.0'
-    implementation 'br.com.youse.forms:databinding-livedata-form:0.4.1-SNAPSHOT'
-
-    implementation "br.com.youse.forms:validators-jdk:0.4.1-SNAPSHOT"
-    implementation 'br.com.youse.forms:formatters-jdk:0.4.1-SNAPSHOT'
-
-    implementation 'br.com.youse.forms:rx-form-jdk:0.4.1-SNAPSHOT'
-    implementation 'br.com.youse.forms:livedata-form:0.4.1-SNAPSHOT'
+    implementation project(':databinding-livedata-form')
+    implementation project(':rx-form-jdk')
+    implementation project(":validators-jdk")
+    implementation project(':formatters-jdk')
 
     implementation deps.kotlin.stdlib.jdk
     implementation deps.android.support.appcompat

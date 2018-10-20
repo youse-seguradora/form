@@ -126,13 +126,14 @@ class LauncherActivity : Activity() {
 
 }
 
-fun ValidationStrategy.name(): String = when (this) {
-    is ValidationStrategy.AllTime -> "ALL_TIME"
-    is ValidationStrategy.AfterSubmit -> "AFTER_SUBMIT"
-    is ValidationStrategy.OnSubmit -> "ON_SUBMIT"
+fun ValidationStrategy.name(): String? = when (this) {
+    ValidationStrategy.ALL_TIME -> "ALL_TIME"
+    ValidationStrategy.AFTER_SUBMIT -> "AFTER_SUBMIT"
+    ValidationStrategy.ON_SUBMIT -> "ON_SUBMIT"
+    else -> null
 }
 
-fun ValidationStrategy.Companion.valueOf(name: String): ValidationStrategy? =
+fun ValidationStrategy.Companion.valueOf(name: String?): ValidationStrategy? =
         when (name) {
             "ALL_TIME" -> ALL_TIME
             "AFTER_SUBMIT" -> AFTER_SUBMIT

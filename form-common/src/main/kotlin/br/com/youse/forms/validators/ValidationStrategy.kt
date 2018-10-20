@@ -25,29 +25,59 @@ package br.com.youse.forms.validators
 
 import kotlin.jvm.JvmStatic
 
-sealed class ValidationStrategy(val onEnable: Boolean, val onDisable: Boolean) {
-    /**
-     * Flag to start validating as soo as the form is created.
-     */
-    class AllTime(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
-
-    /**
-     * Flag to start validating the form only after the first submit event.
-     */
-
-    class AfterSubmit(onEnable: Boolean, onDisable: Boolean) : ValidationStrategy(onEnable, onDisable)
-
-    /**
-     * Flag to only validate the form when a submit event happens.
-     */
-    class OnSubmit() : ValidationStrategy(false, false)
+data class ValidationStrategy(val onChange: Boolean,
+                              val beforeSubmit: Boolean,
+                              val onSubmit: Boolean,
+                              val afterSubmit: Boolean,
+                              val onEnable: Boolean,
+                              val onDisable: Boolean,
+                              val onTrigger: Boolean,
+                              val clearErrorOnChange: Boolean) {
 
     companion object {
+        /**
+         * Flag to start validating as soo as the form is created.
+         */
+
         @JvmStatic
-        val ALL_TIME = AllTime(true, true)
+        val ALL_TIME = ValidationStrategy(
+                onChange = true,
+                beforeSubmit = true,
+                onSubmit = true,
+                afterSubmit = true,
+                onEnable = true,
+                onDisable = true,
+                onTrigger = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to start validating the form only after the first submit event.
+         */
+
         @JvmStatic
-        val AFTER_SUBMIT = AfterSubmit(true, true)
+        val AFTER_SUBMIT = ValidationStrategy(
+                onChange = true,
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = true,
+                onEnable = true,
+                onDisable = true,
+                onTrigger = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to only validate the form when a submit event happens.
+         */
+
         @JvmStatic
-        val ON_SUBMIT = OnSubmit()
+        val ON_SUBMIT = ValidationStrategy(
+                onChange = false,
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = false,
+                onEnable = false,
+                onDisable = false,
+                onTrigger = true,
+                clearErrorOnChange = false)
     }
 }
