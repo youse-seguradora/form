@@ -43,6 +43,9 @@ class LiveDataForm<T>(
         strategy: ValidationStrategy,
         private val fields: List<LiveField<T, *>>) : ILiveDataForm<T> {
 
+
+    private var form: IForm
+
     override val onSubmitFailed = MutableLiveData<List<Pair<T, List<ValidationMessage>>>>()
     override val onValidSubmit = MutableLiveData<Unit>()
     override val onFieldValidationChange: MutableLiveData<Pair<T, List<ValidationMessage>>>
@@ -58,7 +61,6 @@ class LiveDataForm<T>(
             return mediator
         }
 
-    private var form: IForm
 
     init {
 
@@ -127,6 +129,10 @@ class LiveDataForm<T>(
 
         form = builder.build()
 
+    }
+
+    override fun reset() {
+        form.reset()
     }
 
     override fun doSubmit() = form.doSubmit()
