@@ -23,17 +23,61 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-enum class ValidationStrategy {
-    /**
-     * Flag to start validating as soo as the form is created.
-     */
-    ALL_TIME,
-    /**
-     * Flag to start validating the form only after the first submit event.
-     */
-    AFTER_SUBMIT,
-    /**
-     * Flag to only validate the form only when a submit event happens.
-     */
-    ON_SUBMIT
+import kotlin.jvm.JvmStatic
+
+data class ValidationStrategy(val onChange: Boolean,
+                              val beforeSubmit: Boolean,
+                              val onSubmit: Boolean,
+                              val afterSubmit: Boolean,
+                              val onEnable: Boolean,
+                              val onDisable: Boolean,
+                              val onTrigger: Boolean,
+                              val clearErrorOnChange: Boolean) {
+
+    companion object {
+        /**
+         * Flag to start validating as soo as the form is created.
+         */
+
+        @JvmStatic
+        val ALL_TIME = ValidationStrategy(
+                onChange = true,
+                beforeSubmit = true,
+                onSubmit = true,
+                afterSubmit = true,
+                onEnable = true,
+                onDisable = true,
+                onTrigger = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to start validating the form only after the first submit event.
+         */
+
+        @JvmStatic
+        val AFTER_SUBMIT = ValidationStrategy(
+                onChange = true,
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = true,
+                onEnable = true,
+                onDisable = true,
+                onTrigger = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to only validate the form when a submit event happens.
+         */
+
+        @JvmStatic
+        val ON_SUBMIT = ValidationStrategy(
+                onChange = false,
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = false,
+                onEnable = false,
+                onDisable = false,
+                onTrigger = true,
+                clearErrorOnChange = false)
+    }
 }
