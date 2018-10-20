@@ -24,6 +24,7 @@ SOFTWARE.
 package br.com.youse.forms.rxform
 
 import br.com.youse.forms.form.Form
+import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.models.FormField
@@ -43,6 +44,8 @@ class RxForm<T>(
         strategy: ValidationStrategy,
         private val fields: List<RxField<T, *>>
 ) : IRxForm<T> {
+
+    private val form: IForm
 
     private val disposables = CompositeDisposable()
 
@@ -116,13 +119,17 @@ class RxForm<T>(
 
         }
 
-        val form = builder.build()
+        form = builder.build()
 
         disposables.add(
                 submitObservable.subscribe {
                     form.doSubmit()
                 }
         )
+    }
+
+    override fun reset() {
+        form.reset()
     }
 
     override fun onFieldValidationChange(): Observable<Pair<T, List<ValidationMessage>>> {
