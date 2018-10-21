@@ -25,13 +25,13 @@ package br.com.youse.forms.validators
 
 import kotlin.jvm.JvmStatic
 
-data class ValidationStrategy(val onChange: Boolean,
-                              val beforeSubmit: Boolean,
+data class ValidationStrategy(val beforeSubmit: Boolean,
                               val onSubmit: Boolean,
                               val afterSubmit: Boolean,
+                              val onChange: Boolean,
                               val onEnable: Boolean,
-                              val onDisable: Boolean,
                               val onTrigger: Boolean,
+                              val clearErrorsOnDisable: Boolean,
                               val clearErrorOnChange: Boolean) {
 
     companion object {
@@ -41,13 +41,13 @@ data class ValidationStrategy(val onChange: Boolean,
 
         @JvmStatic
         val ALL_TIME = ValidationStrategy(
-                onChange = true,
                 beforeSubmit = true,
                 onSubmit = true,
                 afterSubmit = true,
+                onChange = true,
                 onEnable = true,
-                onDisable = true,
                 onTrigger = true,
+                clearErrorsOnDisable = true,
                 clearErrorOnChange = false
         )
         /**
@@ -56,28 +56,28 @@ data class ValidationStrategy(val onChange: Boolean,
 
         @JvmStatic
         val AFTER_SUBMIT = ValidationStrategy(
-                onChange = true,
                 beforeSubmit = false,
                 onSubmit = true,
                 afterSubmit = true,
+                onChange = true,
                 onEnable = true,
-                onDisable = true,
                 onTrigger = true,
+                clearErrorsOnDisable = true,
                 clearErrorOnChange = false
         )
         /**
-         * Flag to only validate the form when a submit event happens.
+         * Flag to only validate the form when a submit or trigger events happens.
          */
 
         @JvmStatic
         val ON_SUBMIT = ValidationStrategy(
-                onChange = false,
                 beforeSubmit = false,
                 onSubmit = true,
                 afterSubmit = false,
+                onChange = false,
                 onEnable = false,
-                onDisable = false,
                 onTrigger = true,
-                clearErrorOnChange = false)
+                clearErrorsOnDisable = true,
+                clearErrorOnChange = true)
     }
 }
