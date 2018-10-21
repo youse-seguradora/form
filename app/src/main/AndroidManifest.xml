@@ -10,8 +10,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name=".samples.launcher.LauncherActivity"
-                android:label="@string/title_activity_launcher">
+                android:name=".samples.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
