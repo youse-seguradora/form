@@ -106,7 +106,7 @@ class RegistrationActivity : AppCompatActivity() {
 
         val confirmPasswordField = RxField(key = Key(passwordConfirmationInputLayout.id, "confirm_password"),
                 input = passwordConfirmation.textChanges().map { it.toString() },
-                validators = listOf(isEqualsValidator),
+                validators = passwordValidators + listOf(isEqualsValidator),
                 validationTriggers = listOf(passwordChanges.map { Unit }))
 
 
@@ -129,7 +129,7 @@ class RegistrationActivity : AppCompatActivity() {
                 })
         disposables.add(rxForm.onFormValidationChange()
                 .subscribe {
-              //      submit.isEnabled = it
+                    submit.isEnabled = it
                 })
 
         disposables.add(rxForm.onValidSubmit()

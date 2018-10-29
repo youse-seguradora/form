@@ -23,17 +23,61 @@ SOFTWARE.
  */
 package br.com.youse.forms.validators
 
-enum class ValidationStrategy {
-    /**
-     * Flag to start validating as soo as the form is created.
-     */
-    ALL_TIME,
-    /**
-     * Flag to start validating the form only after the first submit event.
-     */
-    AFTER_SUBMIT,
-    /**
-     * Flag to only validate the form only when a submit event happens.
-     */
-    ON_SUBMIT
+import kotlin.jvm.JvmStatic
+
+data class ValidationStrategy(val beforeSubmit: Boolean,
+                              val onSubmit: Boolean,
+                              val afterSubmit: Boolean,
+                              val onChange: Boolean,
+                              val onEnable: Boolean,
+                              val onTrigger: Boolean,
+                              val clearErrorsOnDisable: Boolean,
+                              val clearErrorOnChange: Boolean) {
+
+    companion object {
+        /**
+         * Flag to start validating as soo as the form is created.
+         */
+
+        @JvmStatic
+        val ALL_TIME = ValidationStrategy(
+                beforeSubmit = true,
+                onSubmit = true,
+                afterSubmit = true,
+                onChange = true,
+                onEnable = true,
+                onTrigger = true,
+                clearErrorsOnDisable = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to start validating the form only after the first submit event.
+         */
+
+        @JvmStatic
+        val AFTER_SUBMIT = ValidationStrategy(
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = true,
+                onChange = true,
+                onEnable = true,
+                onTrigger = true,
+                clearErrorsOnDisable = true,
+                clearErrorOnChange = false
+        )
+        /**
+         * Flag to only validate the form when a submit or trigger events happens.
+         */
+
+        @JvmStatic
+        val ON_SUBMIT = ValidationStrategy(
+                beforeSubmit = false,
+                onSubmit = true,
+                afterSubmit = false,
+                onChange = false,
+                onEnable = false,
+                onTrigger = true,
+                clearErrorsOnDisable = true,
+                clearErrorOnChange = true)
+    }
 }

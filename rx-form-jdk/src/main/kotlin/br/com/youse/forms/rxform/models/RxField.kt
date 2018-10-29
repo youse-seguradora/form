@@ -29,7 +29,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
 class RxField<T, R>(val key: T,
-                    val input: Observable<R> = BehaviorSubject.create(),
+                    val input: Observable<R>,
                     val errors: BehaviorSubject<List<ValidationMessage>> = BehaviorSubject.create(),
                     val enabled: Observable<Boolean> = BehaviorSubject.create<Boolean>(),
                     val validators: List<Validator<R>> = emptyList(),

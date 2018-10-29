@@ -79,4 +79,6 @@ interface IRxForm<T> {
         fun build(): IRxForm<T>
 
     }
+
+    fun reset()
 }

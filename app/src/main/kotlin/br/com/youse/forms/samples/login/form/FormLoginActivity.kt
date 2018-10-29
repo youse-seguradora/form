@@ -33,6 +33,8 @@ import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
 import br.com.youse.forms.form.IForm.*
 import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.samples.launcher.name
+import br.com.youse.forms.samples.launcher.valueOf
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
@@ -65,8 +67,9 @@ class FormLoginActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val param = intent.getStringExtra("ValidationStrategy")
-                ?: ValidationStrategy.AFTER_SUBMIT.name
-        val strategy = ValidationStrategy.valueOf(param)
+                ?: ValidationStrategy.AFTER_SUBMIT.name()
+
+        val strategy = ValidationStrategy.valueOf(param)!!
 
         val emailChanges = email.addObservableValue()
         val passwordChanges = password.addObservableValue()

@@ -98,7 +98,7 @@ class LauncherActivity : Activity() {
             }
 
             val intent = Intent(this@LauncherActivity, clazz)
-            intent.putExtra("ValidationStrategy", strategy.name)
+            intent.putExtra("ValidationStrategy", strategy.name())
             startActivity(intent)
 
         }
@@ -125,3 +125,18 @@ class LauncherActivity : Activity() {
     }
 
 }
+
+fun ValidationStrategy.name(): String? = when (this) {
+    ValidationStrategy.ALL_TIME -> "ALL_TIME"
+    ValidationStrategy.AFTER_SUBMIT -> "AFTER_SUBMIT"
+    ValidationStrategy.ON_SUBMIT -> "ON_SUBMIT"
+    else -> null
+}
+
+fun ValidationStrategy.Companion.valueOf(name: String?): ValidationStrategy? =
+        when (name) {
+            "ALL_TIME" -> ALL_TIME
+            "AFTER_SUBMIT" -> AFTER_SUBMIT
+            "ON_SUBMIT" -> ON_SUBMIT
+            else -> null
+        }

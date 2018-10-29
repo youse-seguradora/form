@@ -42,4 +42,5 @@ interface ILiveDataForm<T> {
         fun build(): ILiveDataForm<T>
     }
 
+    fun reset()
 }

@@ -34,20 +34,35 @@ class FormField<T, R> constructor(val key: T,
                                   val enabled: IObservableValue<Boolean> = ObservableValue(true),
                                   val validators: List<Validator<R>> = emptyList(),
                                   val validationTriggers: List<IObservableChange> = emptyList()) {
-    fun hasErrors(): Boolean {
-        return errors.value?.isNotEmpty() ?: false
-    }
 
     constructor(key: T,
                 initialValue: R,
                 errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
                 enabled: IObservableValue<Boolean> = ObservableValue(true),
                 validators: List<Validator<R>> = emptyList(),
-                validationTriggers: List<IObservableChange> = emptyList()) : this(key = key,
+                validationTriggers: List<IObservableChange> = emptyList()) : this(
+            key = key,
+            input = ObservableValue(initialValue),
             errors = errors,
             enabled = enabled,
             validators = validators,
-            validationTriggers = validationTriggers) {
-        input.value = initialValue
+            validationTriggers = validationTriggers)
+
+    internal fun hasErrors(): Boolean {
+        return errors.value?.isNotEmpty() ?: false
+    }
+
+    internal fun validate() {
+        val value = input.value
+
+        val messages = mutableListOf<ValidationMessage>()
+
+        for (validator in validators) {
+            if (!validator.isValid(value)) {
+                messages += validator.validationMessage()
+            }
+        }
+
+        errors.value = messages
     }
 }
