@@ -119,6 +119,7 @@ class TestSubmitFailed<T> : IForm.SubmitFailed<T> {
         assertEquals(failedSubmits.size, size)
         return this
     }
+
     fun assertNoValue(): TestSubmitFailed<T> {
         assertSize(0)
         return this
@@ -138,10 +139,10 @@ class FormTest {
         ageObservable = ObservableValue()
     }
 
-    private fun getBuilderWithFields(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT,
-                                     email: String,
-                                     password: String,
-                                     age: Int): IForm.Builder<Int> {
+    private fun buildForm(strategy: ValidationStrategy = ValidationStrategy.AFTER_SUBMIT,
+                          email: String,
+                          password: String,
+                          age: Int): IForm.Builder<Int> {
 
         emailObservable.value = email
         passwordObservable.value = password
@@ -151,6 +152,48 @@ class FormTest {
                 .addField(FormField(EMAIL_ID, emailObservable, validators = emailValidators))
                 .addField(FormField(PASSWORD_ID, passwordObservable, validators = passwordValidators))
                 .addField(FormField(AGE_ID, ageObservable, validators = ageValidators))
+
+    }
+
+    @Test
+    fun shouldResetFormState() {
+        val fieldChange = TestFieldValidationChange<Int>()
+        val formChange = TestFormValidationChange()
+        val validSubmit = TestValidSubmit<Int>()
+        val failedSubmit = TestSubmitFailed<Int>()
+
+        val form = buildForm(ValidationStrategy.AFTER_SUBMIT, "foo", "bar", MIN_AGE_VALUE - 1)
+                .setFieldValidationListener(fieldChange)
+                .setFormValidationListener(formChange)
+                .setValidSubmitListener(validSubmit)
+                .setSubmitFailedListener(failedSubmit)
+                .build()
+
+        formChange.assertNoValue()
+        fieldChange.assertNoValue()
+
+        form.doSubmit()
+
+        fieldChange.assertSize(3)
+        formChange.assertChange(0, false)
+        formChange.assertSize(1)
+
+        form.reset()
+
+        fieldChange.assertSize(3)
+        formChange.assertSize(1)
+
+        emailObservable.value = VALID_EMAIL
+        passwordObservable.value = VALID_PASSWORD
+        ageObservable.value = MIN_AGE_VALUE
+
+        fieldChange.assertSize(3)
+        formChange.assertSize(1)
+
+        form.doSubmit()
+
+        fieldChange.assertSize(6)
+        formChange.assertSize(2)
 
     }
 
@@ -166,7 +209,7 @@ class FormTest {
         val validSubmit = TestValidSubmit<Int>()
         val failedSubmit = TestSubmitFailed<Int>()
 
-        getBuilderWithFields(ValidationStrategy.ALL_TIME, "foo", "bar", MIN_AGE_VALUE - 1)
+        buildForm(ValidationStrategy.ALL_TIME, "foo", "bar", MIN_AGE_VALUE - 1)
                 .setFieldValidationListener(fieldChange)
                 .setFormValidationListener(formChange)
                 .setValidSubmitListener(validSubmit)
@@ -198,7 +241,7 @@ class FormTest {
         val validSubmit = TestValidSubmit<Int>()
         val failedSubmit = TestSubmitFailed<Int>()
 
-        val form = getBuilderWithFields(
+        val form = buildForm(
                 ValidationStrategy.AFTER_SUBMIT,
                 "foo",
                 "bar",
