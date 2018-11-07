@@ -52,6 +52,10 @@ class FormField<T, R> constructor(val key: T,
         return errors.value?.isNotEmpty() ?: false
     }
 
+    internal fun cleanErrors() {
+        errors.value = emptyList()
+    }
+
     internal fun validate() {
         val value = input.value
 

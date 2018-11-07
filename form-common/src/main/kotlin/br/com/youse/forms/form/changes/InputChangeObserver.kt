@@ -17,7 +17,7 @@ internal class InputChangeObserver<T>(private val formState: FormState,
         }
 
         if (shouldClearErrorsOnChange()) {
-            field.errors.value = emptyList()
+            field.cleanErrors()
         }
     }
 

@@ -11,6 +11,32 @@ internal class EnabledChangeObserver<T>(private val formState: FormState,
 
     private val strategy = formState.strategy
 
+    override fun onChange() {
+        val validateFieldOnEnable = shouldValidateFieldOnEnable()
+
+        if (validateFieldOnEnable) {
+            field.validate()
+        }
+
+        val clearErrorsOnDisable = shouldClearErrorsOnDisable()
+
+        if (clearErrorsOnDisable) {
+            field.cleanErrors()
+        }
+
+        val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
+        val formAllowsFormValidation = formState.isFormValidationEnabled.value.isTrue()
+
+        val requestFormStateUpdate = !validateFieldOnEnable
+                && !clearErrorsOnDisable
+                && formAllowsFieldValidation
+                && formAllowsFormValidation
+
+        if (requestFormStateUpdate) {
+            validateForm()
+        }
+    }
+
     private fun shouldValidateFieldOnEnable(): Boolean {
         val fieldAllowsValidation = field.enabled.value.isTrue()
         val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
@@ -30,29 +56,4 @@ internal class EnabledChangeObserver<T>(private val formState: FormState,
                 && hasErrors
     }
 
-    override fun onChange() {
-        val validateFieldOnEnable = shouldValidateFieldOnEnable()
-
-        if (validateFieldOnEnable) {
-            field.validate()
-        }
-
-        val clearErrorsOnDisable = shouldClearErrorsOnDisable()
-
-        if (clearErrorsOnDisable) {
-            field.errors.value = emptyList()
-        }
-
-        val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
-        val formAllowsFormValidation = formState.isFormValidationEnabled.value.isTrue()
-
-        val requestFormStateUpdate = !validateFieldOnEnable
-                && !clearErrorsOnDisable
-                && formAllowsFieldValidation
-                && formAllowsFormValidation
-
-        if (requestFormStateUpdate) {
-            validateForm()
-        }
-    }
 }

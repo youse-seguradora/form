@@ -37,7 +37,6 @@ enum class FormSubmissionState {
     AFTER_SUBMIT
 }
 
-
 class FormState(val strategy: ValidationStrategy) {
 
     val isFieldValidationEnabled = ObservableValue<Boolean>()
@@ -60,7 +59,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
         setupFieldsValidations()
 
-        setupFormValidations()
+        setupFormChangeListeners()
     }
 
     private fun setupFieldsValidations() {
@@ -78,8 +77,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
             }
 
             field.errors.addChangeListener(observer = FieldAllowsValidationOnChange(formState) {
-                val errors = field.errors.value ?: emptyList()
-                fieldValidationListener?.onFieldValidationChange(field.key, errors)
+                notifyFieldValidationChange(field)
             })
 
             field.errors.addChangeListener(observer = FormAllowsValidationOnChange(formState) {
@@ -88,7 +86,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         }
     }
 
-    private fun setupFormValidations() {
+    private fun setupFormChangeListeners() {
         formState.submissionState.addChangeListener(object : ChangeObserver {
             override fun onChange() {
                 val isValidationEnabled = submitStateAllowsFieldValidation()
@@ -105,8 +103,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         })
 
         formState.isFormValid.addChangeListener(observer = FormAllowsValidationOnChange(formState) {
-            val isFormValid = formState.isFormValid.value.isTrue()
-            formValidationListener?.onFormValidationChange(isFormValid)
+            notifyFormChange()
         })
     }
 
@@ -149,10 +146,20 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
         formState.isFormValidationEnabled.value = isFormValidationEnabled
     }
 
+    private fun notifyFieldValidationChange(field: FormField<T, *>) {
+        val errors = field.errors.value ?: emptyList()
+        fieldValidationListener?.onFieldValidationChange(field.key, errors)
+    }
+
+    private fun notifyFormChange() {
+        val isFormValid = formState.isFormValid.value.isTrue()
+        formValidationListener?.onFormValidationChange(isFormValid)
+    }
+
     private fun notifyValidSubmit() {
         val validData = enabledFields
-                .map {
-                    Pair(it.key, it.input.value)
+                .map { field ->
+                    Pair(field.key, field.input.value)
                 }
                 .toList()
 
