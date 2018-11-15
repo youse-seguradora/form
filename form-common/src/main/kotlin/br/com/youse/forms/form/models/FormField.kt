@@ -28,7 +28,7 @@ import br.com.youse.forms.form.IObservableValue
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
-class FormField<T, R> constructor(val key: T,
+open class FormField<T, R> constructor(val key: T,
                                   val input: IObservableValue<R> = ObservableValue(),
                                   val errors: IObservableValue<List<ValidationMessage>> = ObservableValue(),
                                   val enabled: IObservableValue<Boolean> = ObservableValue(true),

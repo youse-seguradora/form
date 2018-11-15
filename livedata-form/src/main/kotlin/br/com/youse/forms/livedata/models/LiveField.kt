@@ -28,7 +28,7 @@ import android.arch.lifecycle.MutableLiveData
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
-class LiveField<T, R> constructor(val key: T,
+open class LiveField<T, R> constructor(val key: T,
                                   val input: MutableLiveData<R> = MutableLiveData(),
                                   val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
                                   val enabled: LiveData<Boolean> = MutableLiveData(),
