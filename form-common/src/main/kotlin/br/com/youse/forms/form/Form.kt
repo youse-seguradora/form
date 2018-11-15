@@ -40,7 +40,6 @@ enum class FormSubmissionState {
 class FormState(val strategy: ValidationStrategy) {
 
     val isFieldValidationEnabled = ObservableValue<Boolean>()
-    val isFormValidationEnabled = ObservableValue<Boolean>()
     val submissionState = ObservableValue(BEFORE_SUBMIT)
     val isFormValid = ObservableValue<Boolean>()
 }
@@ -78,9 +77,6 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
 
             field.errors.addChangeListener(observer = FieldAllowsValidationOnChange(formState) {
                 notifyFieldValidationChange(field)
-            })
-
-            field.errors.addChangeListener(observer = FormAllowsValidationOnChange(formState) {
                 validateForm()
             })
         }
@@ -91,18 +87,15 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
             override fun onChange() {
                 val isValidationEnabled = submitStateAllowsFieldValidation()
                 formState.isFieldValidationEnabled.value = isValidationEnabled
-                formState.isFormValidationEnabled.value = isValidationEnabled
             }
         })
+
         formState.submissionState.addChangeListener(observer = FieldAllowsValidationOnChange(formState) {
             validateAllEnabledFields()
-        })
-
-        formState.submissionState.addChangeListener(observer = FormAllowsValidationOnChange(formState) {
             validateForm()
         })
 
-        formState.isFormValid.addChangeListener(observer = FormAllowsValidationOnChange(formState) {
+        formState.isFormValid.addChangeListener(observer = FieldAllowsValidationOnChange(formState) {
             notifyFormChange()
         })
     }
@@ -135,15 +128,9 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
     }
 
     private fun validateAllEnabledFields() {
-        val isFormValidationEnabled = formState.isFormValidationEnabled.value
-
-        formState.isFormValidationEnabled.value = false
-
         enabledFields.forEach { field ->
             field.validate()
         }
-
-        formState.isFormValidationEnabled.value = isFormValidationEnabled
     }
 
     private fun notifyFieldValidationChange(field: FormField<T, *>) {
@@ -182,6 +169,7 @@ class Form<T>(private val fieldValidationListener: FieldValidationChange<T>?,
     override fun reset() {
         formState.submissionState.value = BEFORE_SUBMIT
         formState.isFormValid.value = null
+        enabledFields.forEach { it.errors.value = null }
     }
 
     override fun doSubmit() {

@@ -6,7 +6,7 @@ buildscript {
             'compileSdk'      : 28,
             'targetSdk'       : 28,
 
-            'kotlin'          : '1.3.0',
+            'kotlin'          : '1.3.10',
 
             'androidPlugin'   : '3.3.0-beta02',
 

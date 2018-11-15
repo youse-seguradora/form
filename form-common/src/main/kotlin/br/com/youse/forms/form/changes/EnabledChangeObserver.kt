@@ -25,12 +25,10 @@ internal class EnabledChangeObserver<T>(private val formState: FormState,
         }
 
         val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
-        val formAllowsFormValidation = formState.isFormValidationEnabled.value.isTrue()
 
         val requestFormStateUpdate = !validateFieldOnEnable
                 && !clearErrorsOnDisable
                 && formAllowsFieldValidation
-                && formAllowsFormValidation
 
         if (requestFormStateUpdate) {
             validateForm()
