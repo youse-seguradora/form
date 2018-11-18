@@ -111,7 +111,7 @@ Download or grab via Maven:
 <dependency>
   <groupId>br.com.youse.forms</groupId>
   <artifactId>livedata-form</artifactId>
-  <version>0.3.0</version>
+  <version>0.5.0</version>
 </dependency>
 ```
 add
@@ -121,5 +121,5 @@ add
 and
 or Gradle:
 ```groovy
-implementation 'br.com.youse.forms:livedata-form:0.3.0'
+implementation 'br.com.youse.forms:livedata-form:0.5.0'
 ```

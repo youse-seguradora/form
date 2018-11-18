@@ -70,7 +70,7 @@ Download or grab via Maven:
 <dependency>
   <groupId>br.com.youse.forms</groupId>
   <artifactId>rx-form-jdk</artifactId>
-  <version>0.3.0</version>
+  <version>0.5.0</version>
 </dependency>
 ```
 or Gradle:
@@ -80,7 +80,7 @@ add
 ```
 and
 ```groovy
-implementation 'br.com.youse.forms:rx-form-jdk:0.3.0'
+implementation 'br.com.youse.forms:rx-form-jdk:0.5.0'
 ```
 
 
