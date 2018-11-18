@@ -23,7 +23,7 @@ SOFTWARE.
  */
 package br.com.youse.forms.form.models
 
-import br.com.youse.forms.form.IObservableChange
+import br.com.youse.forms.form.IObservableChange.ChangeObserver
 import br.com.youse.forms.form.IObservableValue
 
 /**
@@ -33,22 +33,14 @@ class ObservableValue<T> : ObservableChange, IObservableValue<T> {
 
     private var hasChanged = false
 
-    /**
-     *  Updates the current realValue if the newValue is different.
-     *  Only calls the notifyChange() if the current value is updated.
-     */
-    private var realValue: T? = null
 
-    override var value: T?
+    override var value: T? = null
         set(newValue) {
-            if (newValue != this.realValue) {
-                realValue = newValue
+            if (newValue != field) {
+                field = newValue
                 hasChanged = true
                 notifyChange()
             }
-        }
-        get() {
-            return realValue
         }
 
     constructor() : super()
@@ -57,11 +49,10 @@ class ObservableValue<T> : ObservableChange, IObservableValue<T> {
         this.value = value
     }
 
-    override fun addChangeListener(observer: IObservableChange.ChangeObserver) {
+    override fun addChangeListener(observer: ChangeObserver) {
         super.addChangeListener(observer)
         if (hasChanged) {
             observer.onChange()
         }
     }
-
 }

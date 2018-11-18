@@ -29,12 +29,12 @@ import android.arch.lifecycle.ViewModel
 import br.com.youse.forms.livedata.ILiveDataForm
 import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.models.LiveField
-import br.com.youse.forms.validators.MinLengthValidator
-import br.com.youse.forms.validators.RequiredValidator
-import br.com.youse.forms.validators.ValidationStrategy
+import br.com.youse.forms.samples.registration.RegistrationActivity
+import br.com.youse.forms.validators.*
 import com.github.musichin.reactivelivedata.ReactiveLiveData
 import com.snakydesign.livedataextensions.OnNextAction
 import com.snakydesign.livedataextensions.doBeforeNext
+import com.snakydesign.livedataextensions.map
 import com.snakydesign.livedataextensions.switchMap
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,6 +46,8 @@ class LoginViewModel : ViewModel() {
 
     private val EMAIL_KEY = "email"
     private val PASSWORD_KEY = "password"
+    private val CONFIRM_PASSWORD_KEY = "confirm_password"
+
 
     val disposables = CompositeDisposable()
 
@@ -71,6 +73,20 @@ class LoginViewModel : ViewModel() {
     val email = LiveField(key = EMAIL_KEY, validators = emailValidations)
     val password = LiveField(key = PASSWORD_KEY, validators = passwordValidations)
 
+    private val isEqualsValidator = object : Validator<String> {
+        override fun validationMessage(): ValidationMessage {
+            return ValidationMessage(message = "password and confirm password is not the same",
+                    validationType = RegistrationActivity.PASSWORD_CONFIRMATION_MISMATCH)
+        }
+
+        override fun isValid(input: String?): Boolean {
+            return input == password.input.value
+        }
+    }
+    val confirmPassword = LiveField(key = CONFIRM_PASSWORD_KEY,
+            validators = listOf(isEqualsValidator) + passwordValidations,
+            validationTriggers = listOf(password.input.map { Unit }))
+
     lateinit var form: ILiveDataForm<String>
 
     // TODO: remove this method and pass the strategy by DI in the constructor
@@ -78,6 +94,7 @@ class LoginViewModel : ViewModel() {
         form = LiveDataForm.Builder<String>(strategy = strategy)
                 .addField(email)
                 .addField(password)
+                .addField(confirmPassword)
                 .build()
 
         onSubmit = form.onValidSubmit

@@ -27,17 +27,17 @@ import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.IObservableChange.ChangeObserver
 
 open class ObservableChange : IObservableChange {
-    private val validationObservers = mutableListOf<ChangeObserver>()
+    private val changeObservers = mutableListOf<ChangeObserver>()
 
     override fun addChangeListener(observer: ChangeObserver) {
-        validationObservers.add(observer)
+        changeObservers.add(observer)
     }
 
     override fun removeChangeListener(observer: ChangeObserver) {
-        validationObservers.remove(observer)
+        changeObservers.remove(observer)
     }
 
     fun notifyChange() {
-        validationObservers.forEach { it.onChange() }
+        changeObservers.forEach { it.onChange() }
     }
 }

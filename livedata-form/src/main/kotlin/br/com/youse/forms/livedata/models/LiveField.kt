@@ -23,23 +23,24 @@ SOFTWARE.
  */
 package br.com.youse.forms.livedata.models
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.Validator
 
-class LiveField<T, R> constructor(val key: T,
+open class LiveField<T, R> constructor(val key: T,
                                   val input: MutableLiveData<R> = MutableLiveData(),
                                   val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
-                                  val enabled: MutableLiveData<Boolean> = MutableLiveData(),
+                                  val enabled: LiveData<Boolean> = MutableLiveData(),
                                   val validators: List<Validator<R>>,
-                                  val validationTriggers: List<MutableLiveData<Unit>> = emptyList()) {
+                                  val validationTriggers: List<LiveData<Unit>> = emptyList()) {
 
     constructor(key: T,
                 initialValue: R,
                 errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
-                enabled: MutableLiveData<Boolean> = MutableLiveData(),
+                enabled: LiveData<Boolean> = MutableLiveData(),
                 validators: List<Validator<R>>,
-                validationTriggers: List<MutableLiveData<Unit>> = emptyList()) : this(
+                validationTriggers: List<LiveData<Unit>> = emptyList()) : this(
             key = key,
             input = MutableLiveData<R>().apply { value = initialValue },
             errors = errors,
