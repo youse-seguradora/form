@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/android:api-27-alpha
+      - image: circleci/android:api-28
     environment:
       JVM_OPTS: -Xms512m -Xmx3072m
     steps:
@@ -23,4 +23,3 @@ jobs:
       - store_artifacts:
           path: app/build/reports
           destination: reports
-
