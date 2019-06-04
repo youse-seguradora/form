@@ -5,13 +5,13 @@ archivesBaseName = 'rxform'
 
 dependencies {
 
-    compile project(":form-jdk")
+    implementation project(":form-jdk")
 
-    compile deps.kotlin.stdlib.jdk
-    compile deps.rx.java
+    implementation deps.kotlin.stdlib.jdk
+    implementation deps.rx.java
 
-    testCompile deps.kotlin.test.jdk
-    testCompile deps.kotlin.test.annotations
+    implementation deps.kotlin.test.jdk
+    implementation deps.kotlin.test.annotations
 }
 
 
@@ -20,7 +20,7 @@ sourceSets {
     test.java.srcDirs += "src/test/kotlin"
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

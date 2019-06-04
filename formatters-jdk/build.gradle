@@ -6,7 +6,7 @@ dependencies {
 
     expectedBy project(':formatters-common')
 
-    compile project(":form-jdk")
+    api project(":form-jdk")
 
     implementation deps.kotlin.stdlib.jdk
 

@@ -8,7 +8,7 @@ How to `LiveDataForm`
 1) Create a `LiveDataForm.Builder<T>()` where `T` is the type of each field key;
 2) Call `builder.addField()` as many `LiveField`s in the form;
 3) Execute the `builder.build()` method to get a hold of a `LiveDataForm` instance;
-4) Observe the `form.onFormValidationChange` MediatorLiveData<Boolean>, this will bootstrap the form validation. Without it the form will not work!!
+4) Observe the `form.onValidSubmit` MediatorLiveData<Boolean>, this will bootstrap the form validation. Without it the form will not work!!
 5) Observe to the other LiveData available from the `LiveDataForm` instance methods;
 6) Bind your `LiveField.input` and `LiveField.errors` to your XML layout or observe them in your Activity/Fragment;
 
@@ -91,11 +91,11 @@ LiveField<T,R> properties
 LiveDataForm events
 --------
 ## LiveDataForm.onFormValidationChange
- - The `LiveDataForm` class uses this `MediatorLiveData as validation bootstrap.
  - It's triggered when the form validation state change. A boolean is used to indicate if the form is valid as a whole or not.
  - This `LiveData` allow you to enable or disable a submit button.
 
 ## LiveDataForm.onValidSubmit
+ - The `LiveDataForm` class uses this `MediatorLiveData as validation bootstrap.
  - It emits when a valid submit happens.
  - This `LiveData` is called to inform you when to send the form data to your server.
 

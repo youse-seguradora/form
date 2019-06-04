@@ -29,9 +29,9 @@ import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationMessage
 
 interface ILiveDataForm<T> {
-    val onFormValidationChange: MediatorLiveData<Boolean>
+    val onFormValidationChange: MutableLiveData<Boolean>
     val onSubmitFailed: MutableLiveData<List<Pair<T, List<ValidationMessage>>>>
-    val onValidSubmit: MutableLiveData<Unit>
+    val onValidSubmit: MediatorLiveData<Unit>
     val onFieldValidationChange: MutableLiveData<Pair<T, List<ValidationMessage>>>
 
     fun doSubmit()

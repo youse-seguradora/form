@@ -8,8 +8,8 @@ archivesBaseName = 'form'
 
 dependencies {
     expectedBy project(':form-common')
-    compile deps.kotlin.stdlib.js
-    testCompile deps.kotlin.test.js
+    implementation deps.kotlin.stdlib.js
+    testImplementation  deps.kotlin.test.js
 }
 
 kotlinFrontend {
