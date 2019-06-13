@@ -8,13 +8,9 @@ buildscript {
 
             'kotlin'          : '1.3.31',
 
-            'androidPlugin'   : '3.6.0-alpha02',
-
-            'supportLibrary'  : '28.0.0',
-            'androidArch'     : '1.1.1',
+            'androidPlugin'   : '3.6.0-alpha03',
             'rxJava'          : '2.2.2',
-            'rxBinding'       : '2.1.1',
-            'constraintLayout': '1.1.2',
+            'rxBinding'       : '3.0.0-SNAPSHOT',
             'junit'           : '4.12'
     ]
 
@@ -36,21 +32,21 @@ buildscript {
             ],
             rx           : [
                     java   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
-                    binding: "com.jakewharton.rxbinding2:rxbinding-kotlin:${versions.rxBinding}",
+                    binding: "com.jakewharton.rxbinding3:rxbinding-kotlin:${versions.rxBinding}",
             ],
             android      : [
                     support: [
-                            appcompat       : "com.android.support:appcompat-v7:${versions.supportLibrary}",
-                            design          : "com.android.support:design:${versions.supportLibrary}",
-                            constraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}"
+                            appcompat       : 'androidx.appcompat:appcompat:1.0.0',
+                            design          : 'com.google.android.material:material:1.0.0',
+                            constraintLayout: 'androidx.constraintlayout:constraintlayout:1.1.3'
                     ],
                     arch   : [
                             lifecycle: [
-                                    livedata       : "android.arch.lifecycle:livedata:${versions.androidArch}",
-                                    extensions     : "android.arch.lifecycle:extensions:${versions.androidArch}",
-                                    reactivestreams: "android.arch.lifecycle:reactivestreams:${versions.androidArch}"
+                                    livedata       : 'androidx.lifecycle:lifecycle-livedata:2.0.0',
+                                    extensions     : 'androidx.lifecycle:lifecycle-extensions:2.0.0',
+                                    reactivestreams: 'androidx.lifecycle:lifecycle-reactivestreams:2.0.0'
                             ],
-                            core     : [testing: "android.arch.core:core-testing:${versions.androidArch}"]
+                            core     : [testing: 'androidx.arch.core:core-testing:2.0.0']
                     ]
             ],
             annotations  : 'org.jetbrains:annotations:16.0.3',
@@ -63,11 +59,12 @@ buildscript {
         jcenter()
         gradlePluginPortal()
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 
     dependencies {
         classpath deps.androidPlugin
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
         classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.45"
     }
@@ -78,6 +75,8 @@ subprojects {
         google()
         mavenCentral()
         jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
     }
 
     tasks.withType(Test) {

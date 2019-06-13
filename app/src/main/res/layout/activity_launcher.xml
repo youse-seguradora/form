@@ -16,7 +16,7 @@
                   android:paddingTop="16dp"
                   android:layout_height="wrap_content"/>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/strategyGroupInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -35,13 +35,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
             </RadioGroup>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <TextView android:layout_width="wrap_content"
                   android:text="Form Flavor"
                   android:layout_margin="16dp"
                   android:paddingTop="16dp"
                   android:layout_height="wrap_content"/>
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/formGroupInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -66,7 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
             </RadioGroup>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <Button
                 android:layout_margin="16dp"
                 android:id="@+id/submitButton"

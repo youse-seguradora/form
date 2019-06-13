@@ -24,44 +24,41 @@ SOFTWARE.
 
 package br.com.youse.forms.livedata.databinding
 
-import android.databinding.BindingAdapter
-import android.databinding.InverseBindingAdapter
-import android.databinding.InverseBindingListener
 import android.widget.RadioGroup
+import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 
 @Suppress("UNUSED")
-class RadioGroupBindingAdapters {
+object RadioGroupBindingAdapters {
 
-    companion object {
-
-        /**
-         *  Use this two way databinding to feed the form with RadioGroups check changes.
-         */
-        @BindingAdapter(value = ["fieldCheck"])
-        @JvmStatic
-        fun setRadioGroupFormField(view: RadioGroup, newValue: Int?) {
-            val oldValue = view.checkedRadioButtonId
-            if (oldValue != newValue) {
-                view.check(newValue ?: oldValue)
-            }
+    /**
+     *  Use this two way databinding to feed the form with RadioGroups check changes.
+     */
+    @BindingAdapter(value = ["fieldCheck"])
+    @JvmStatic
+    fun setRadioGroupFormField(view: RadioGroup, newValue: Int?) {
+        val oldValue = view.checkedRadioButtonId
+        if (oldValue != newValue) {
+            view.check(newValue ?: oldValue)
         }
+    }
 
-        @InverseBindingAdapter(attribute = "fieldCheck", event = "fieldCheckAttrChanged")
-        @JvmStatic
-        fun getRadioGroupFormField(view: RadioGroup): Int {
-            return view.checkedRadioButtonId
+    @InverseBindingAdapter(attribute = "fieldCheck", event = "fieldCheckAttrChanged")
+    @JvmStatic
+    fun getRadioGroupFormField(view: RadioGroup): Int {
+        return view.checkedRadioButtonId
+    }
+
+    @BindingAdapter(value = ["fieldCheckAttrChanged"])
+    @JvmStatic
+    fun setRadioGroupFormFieldListener(view: RadioGroup, listener: InverseBindingListener?) {
+        if (listener == null) {
+            return
         }
-
-        @BindingAdapter(value = ["fieldCheckAttrChanged"])
-        @JvmStatic
-        fun setRadioGroupFormFieldListener(view: RadioGroup, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.setOnCheckedChangeListener { _, _ ->
-                listener.onChange()
-            }
+        view.setOnCheckedChangeListener { _, _ ->
             listener.onChange()
         }
+        listener.onChange()
     }
 }

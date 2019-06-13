@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {
@@ -25,7 +25,7 @@ dependencies {
 
     androidTestImplementation deps.kotlin.test.jdk
     androidTestImplementation deps.kotlin.test.annotations
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

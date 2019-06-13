@@ -23,19 +23,17 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.login.livedata
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import br.com.youse.forms.livedata.ILiveDataForm
 import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.samples.registration.RegistrationActivity
 import br.com.youse.forms.validators.*
-import com.github.musichin.reactivelivedata.ReactiveLiveData
-import com.snakydesign.livedataextensions.OnNextAction
+
 import com.snakydesign.livedataextensions.doBeforeNext
 import com.snakydesign.livedataextensions.map
-import com.snakydesign.livedataextensions.switchMap
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -98,9 +96,9 @@ class LoginViewModel : ViewModel() {
                 .build()
 
         onSubmit = form.onValidSubmit
-                .doBeforeNext(OnNextAction {
+                .doBeforeNext {
                     submit()
-                })
+                }
                 .switchMap {
                     submitData
                 }

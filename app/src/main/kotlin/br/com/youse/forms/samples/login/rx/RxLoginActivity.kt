@@ -24,10 +24,9 @@ SOFTWARE.
 package br.com.youse.forms.samples.login.rx
 
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import br.com.youse.forms.R
 import br.com.youse.forms.rxform.IRxForm
 import br.com.youse.forms.rxform.models.RxField
@@ -37,8 +36,9 @@ import br.com.youse.forms.samples.launcher.valueOf
 import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationStrategy
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.widget.textChanges
+import com.google.android.material.textfield.TextInputLayout
+import com.jakewharton.rxbinding3.view.clicks
+import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 

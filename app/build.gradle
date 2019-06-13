@@ -15,7 +15,7 @@ android {
         targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -40,8 +40,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.snakydesign.livedataextensions:lives:1.0.1'
-    implementation 'com.github.musichin.reactivelivedata:reactivelivedata:0.14.0'
+    implementation 'com.snakydesign.livedataextensions:lives:1.3.0'
     implementation project(':databinding-livedata-form')
     implementation project(':rx-form-jdk')
     implementation project(":validators-jdk")
@@ -56,10 +55,7 @@ dependencies {
     implementation deps.android.arch.lifecycle.extensions
     implementation deps.android.arch.lifecycle.reactivestreams
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     androidTestImplementation deps.junit
 
-
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
