@@ -50,7 +50,7 @@ class LiveDataLoginActivity : AppCompatActivity() {
         val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         vm.createForm(strategy)
         binding.vm = vm
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
 
         vm.onSubmit.observe(this, object : LiveEventObserver<LoginState>() {
             override fun onEventChanged(event: LoginState?) {

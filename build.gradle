@@ -3,8 +3,8 @@ apply plugin: 'com.github.ben-manes.versions'
 buildscript {
     ext.versions = [
             'minSdk'          : 16,
-            'compileSdk'      : 28,
-            'targetSdk'       : 28,
+            'compileSdk'      : 29,
+            'targetSdk'       : 29,
 
             'kotlin'          : '1.3.31',
 
@@ -58,6 +58,7 @@ buildscript {
         google()
         jcenter()
         gradlePluginPortal()
+        maven { url 'https://jitpack.io' }
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
