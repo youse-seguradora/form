@@ -3,11 +3,11 @@ apply plugin: 'org.jetbrains.kotlin.platform.common'
 archivesBaseName = 'form-formatters-common'
 
 dependencies {
-    compile project(":form-common")
+    implementation project(":form-common")
 
-    compile deps.kotlin.stdlib.common
-    testCompile deps.kotlin.test.common
-    testCompile deps.kotlin.test.annotations
+    implementation deps.kotlin.stdlib.common
+    testImplementation  deps.kotlin.test.common
+    testImplementation  deps.kotlin.test.annotations
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

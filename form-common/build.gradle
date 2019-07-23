@@ -4,10 +4,10 @@ archivesBaseName = 'form-common'
 
 dependencies {
 
-    compile deps.kotlin.stdlib.common
+    implementation deps.kotlin.stdlib.common
 
-    testCompile deps.kotlin.test.common
-    testCompile deps.kotlin.test.annotations
+    testImplementation  deps.kotlin.test.common
+    testImplementation  deps.kotlin.test.annotations
 }
 
 

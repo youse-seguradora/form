@@ -6,10 +6,10 @@ dependencies {
 
     expectedBy project(':form-common')
 
-    compile deps.kotlin.stdlib.jdk
+    implementation deps.kotlin.stdlib.jdk
 
-    testCompile deps.kotlin.test.jdk
-    testCompile deps.kotlin.test.annotations
+    testImplementation deps.kotlin.test.jdk
+    testImplementation deps.kotlin.test.annotations
 }
 
 sourceSets {

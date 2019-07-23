@@ -6,12 +6,12 @@ dependencies {
 
     expectedBy project(':validators-common')
 
-    compile project(":form-jdk")
+    api project(":form-jdk")
 
-    compile deps.kotlin.stdlib.jdk
+    implementation deps.kotlin.stdlib.jdk
 
-    testCompile deps.kotlin.test.jdk
-    testCompile deps.kotlin.test.annotations
+    testImplementation  deps.kotlin.test.jdk
+    testImplementation  deps.kotlin.test.annotations
 }
 
 sourceSets {
