@@ -33,6 +33,8 @@ import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.samples.registration.RegistrationActivity
 import br.com.youse.forms.validators.*
+import com.github.musichin.reactivelivedata.ReactiveLiveData
+import com.github.musichin.reactivelivedata.map
 
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
