@@ -23,12 +23,12 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.login.livedata
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import br.com.youse.forms.R
 import br.com.youse.forms.databinding.LiveDataActivityBinding
 import br.com.youse.forms.samples.home.HomeActivity
@@ -50,7 +50,7 @@ class LiveDataLoginActivity : AppCompatActivity() {
         val vm: LoginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         vm.createForm(strategy)
         binding.vm = vm
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
 
         vm.onSubmit.observe(this, object : LiveEventObserver<LoginState>() {
             override fun onEventChanged(event: LoginState?) {

@@ -23,19 +23,19 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.login.livedata
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import br.com.live.disposable.LiveCompositeDisposable
+import br.com.live.disposable.subscribe
 import br.com.youse.forms.livedata.ILiveDataForm
 import br.com.youse.forms.livedata.LiveDataForm
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.samples.registration.RegistrationActivity
 import br.com.youse.forms.validators.*
 import com.github.musichin.reactivelivedata.ReactiveLiveData
-import com.snakydesign.livedataextensions.OnNextAction
-import com.snakydesign.livedataextensions.doBeforeNext
-import com.snakydesign.livedataextensions.map
-import com.snakydesign.livedataextensions.switchMap
+import com.github.musichin.reactivelivedata.map
+
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -50,12 +50,10 @@ class LoginViewModel : ViewModel() {
 
 
     val disposables = CompositeDisposable()
-
+    val liveDisposables = LiveCompositeDisposable()
     val loading = MutableLiveData<Boolean>()
 
-    val submitData = MutableLiveEvent<LoginState>()
-
-    lateinit var onSubmit: LiveData<LiveEvent<LoginState>>
+    val onSubmit = MutableLiveEvent<LoginState>()
 
     lateinit var formEnabled: LiveData<Boolean>
 
@@ -97,13 +95,11 @@ class LoginViewModel : ViewModel() {
                 .addField(confirmPassword)
                 .build()
 
-        onSubmit = form.onValidSubmit
-                .doBeforeNext(OnNextAction {
-                    submit()
-                })
-                .switchMap {
-                    submitData
-                }
+        liveDisposables.clear()
+        liveDisposables.add(form.onValidSubmit.subscribe {
+            submit()
+        })
+
 
         formEnabled = ReactiveLiveData.combineLatest(form.onFormValidationChange, loading) { isValidForm, isLoading ->
             if (isLoading == true) {
@@ -112,7 +108,6 @@ class LoginViewModel : ViewModel() {
                 isValidForm != false
             }
         }
-
     }
 
 
@@ -130,9 +125,9 @@ class LoginViewModel : ViewModel() {
                     loading.value = false
                 }
                 .subscribe({ response ->
-                    submitData.postEvent(LoginState(data = response))
+                    onSubmit.postEvent(LoginState(data = response))
                 }, { error ->
-                    submitData.postEvent(LoginState(error = error))
+                    onSubmit.postEvent(LoginState(error = error))
                 }))
     }
 
@@ -150,5 +145,6 @@ class LoginViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        liveDisposables.clear()
     }
 }

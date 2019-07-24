@@ -23,8 +23,9 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.login.livedata
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+
 
 class LiveEvent<T>(private val content: T) {
     private var consumed = false	

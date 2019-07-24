@@ -24,44 +24,41 @@ SOFTWARE.
 
 package br.com.youse.forms.livedata.databinding
 
-import android.databinding.BindingAdapter
-import android.databinding.InverseBindingAdapter
-import android.databinding.InverseBindingListener
 import android.widget.CheckBox
+import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 
 @Suppress("UNUSED")
-class CheckBoxBindingAdapters {
+object CheckBoxBindingAdapters {
 
-    companion object {
-
-        /**
-         *  Use this two way databinding to feed the form with CheckBoxes check changes.
-         */
-        @BindingAdapter(value = ["fieldCheck"])
-        @JvmStatic
-        fun setCheckBoxFormField(view: CheckBox, newValue: Boolean?) {
-            val oldValue = view.isChecked
-            if (oldValue != newValue) {
-                view.isChecked = newValue ?: oldValue
-            }
+    /**
+     *  Use this two way databinding to feed the form with CheckBoxes check changes.
+     */
+    @BindingAdapter(value = ["fieldCheck"])
+    @JvmStatic
+    fun setCheckBoxFormField(view: CheckBox, newValue: Boolean?) {
+        val oldValue = view.isChecked
+        if (oldValue != newValue) {
+            view.isChecked = newValue ?: oldValue
         }
+    }
 
-        @InverseBindingAdapter(attribute = "fieldCheck", event = "fieldCheckAttrChanged")
-        @JvmStatic
-        fun getCheckBoxFormField(view: CheckBox): Boolean {
-            return view.isChecked
+    @InverseBindingAdapter(attribute = "fieldCheck", event = "fieldCheckAttrChanged")
+    @JvmStatic
+    fun getCheckBoxFormField(view: CheckBox): Boolean {
+        return view.isChecked
+    }
+
+    @BindingAdapter(value = ["fieldCheckAttrChanged"])
+    @JvmStatic
+    fun setCheckBoxFormFieldListener(view: CheckBox, listener: InverseBindingListener?) {
+        if (listener == null) {
+            return
         }
-
-        @BindingAdapter(value = ["fieldCheckAttrChanged"])
-        @JvmStatic
-        fun setCheckBoxFormFieldListener(view: CheckBox, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.setOnCheckedChangeListener { _, _ ->
-                listener.onChange()
-            }
+        view.setOnCheckedChangeListener { _, _ ->
             listener.onChange()
         }
+        listener.onChange()
     }
 }

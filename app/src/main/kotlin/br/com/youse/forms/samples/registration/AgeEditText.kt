@@ -24,15 +24,15 @@ SOFTWARE.
 package br.com.youse.forms.samples.registration
 
 import android.content.Context
-import android.support.design.widget.TextInputEditText
 import android.util.AttributeSet
 import br.com.youse.forms.extensions.isDigitsOnly
-import com.jakewharton.rxbinding2.widget.textChanges
+import com.google.android.material.textfield.TextInputEditText
+import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class AgeEditText @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = android.support.design.R.attr.editTextStyle
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = com.google.android.material.R.attr.editTextStyle
 ) : TextInputEditText(context, attrs, defStyleAttr) {
     // we don't really need a custom EditText for Age in this sample,
     // however I did one to make you think that a change may come from more than one place,

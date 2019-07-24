@@ -23,9 +23,9 @@ SOFTWARE.
  */
 package br.com.youse.forms.livedata
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import br.com.youse.forms.livedata.models.LiveField
 import br.com.youse.forms.validators.ValidationStrategy
 import org.junit.Rule

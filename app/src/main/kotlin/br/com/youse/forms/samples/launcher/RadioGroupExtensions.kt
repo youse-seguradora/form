@@ -23,12 +23,12 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.launcher
 
-import android.support.design.widget.TextInputLayout
 import android.widget.RadioGroup
 import br.com.youse.forms.form.IObservableChange
 import br.com.youse.forms.form.models.FormField
 import br.com.youse.forms.form.models.ObservableValue
 import br.com.youse.forms.validators.Validator
+import com.google.android.material.textfield.TextInputLayout
 
 
 fun RadioGroup.checkChangesField(validators: List<Validator<Int>>): FormField<Int, Int> {
