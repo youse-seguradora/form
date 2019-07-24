@@ -24,9 +24,9 @@ SOFTWARE.
 package br.com.youse.forms.samples.home
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import br.com.youse.forms.R
+import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_home.*
 

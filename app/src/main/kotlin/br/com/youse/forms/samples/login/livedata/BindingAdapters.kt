@@ -23,10 +23,11 @@ SOFTWARE.
  */
 package br.com.youse.forms.samples.login.livedata
 
-import android.databinding.BindingAdapter
 import android.view.View
+import androidx.databinding.BindingAdapter
 
 object BindingAdapters {
+
     @BindingAdapter("visible")
     @JvmStatic fun setVisible(view: View, visible: Boolean) {
         view.visibility =  if (visible) {

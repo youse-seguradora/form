@@ -24,50 +24,48 @@ SOFTWARE.
 
 package br.com.youse.forms.livedata.databinding
 
-import android.databinding.BindingAdapter
-import android.databinding.InverseBindingAdapter
-import android.databinding.InverseBindingListener
 import android.view.View
+import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 
 @Suppress("UNUSED")
-class ViewBindingAdapters {
 
-    companion object {
+object ViewBindingAdapters {
 
-        /**
-         *  Use this two way databinding to feed the form with View focus changes.
-         */
+    /**
+     *  Use this two way databinding to feed the form with View focus changes.
+     */
 
-        @BindingAdapter(value = ["fieldFocus"])
-        @JvmStatic
-        fun setViewFocusChangeFormField(view: View, newValue: Boolean?) {
-            val oldValue = view.hasFocus()
-            if (oldValue != newValue) {
-                if (newValue == true) {
-                    view.requestFocus()
-                } else {
-                    view.clearFocus()
-                }
+    @BindingAdapter(value = ["fieldFocus"])
+    @JvmStatic
+    fun setViewFocusChangeFormField(view: View, newValue: Boolean?) {
+        val oldValue = view.hasFocus()
+        if (oldValue != newValue) {
+            if (newValue == true) {
+                view.requestFocus()
+            } else {
+                view.clearFocus()
             }
         }
+    }
 
-        @InverseBindingAdapter(attribute = "fieldFocus", event = "fieldFocusAttrChanged")
-        @JvmStatic
-        fun getViewFocusChangeFormField(view: View): Boolean {
-            return view.hasFocus()
+    @InverseBindingAdapter(attribute = "fieldFocus", event = "fieldFocusAttrChanged")
+    @JvmStatic
+    fun getViewFocusChangeFormField(view: View): Boolean {
+        return view.hasFocus()
+    }
+
+    @BindingAdapter(value = ["fieldFocusAttrChanged"])
+    @JvmStatic
+    fun setViewFocusChangeFormFieldListener(view: View, listener: InverseBindingListener?) {
+        if (listener == null) {
+            return
         }
-
-        @BindingAdapter(value = ["fieldFocusAttrChanged"])
-        @JvmStatic
-        fun setViewFocusChangeFormFieldListener(view: View, listener: InverseBindingListener?) {
-            if (listener == null) {
-                return
-            }
-            view.setOnFocusChangeListener { _, _ ->
-                listener.onChange()
-            }
-
+        view.setOnFocusChangeListener { _, _ ->
             listener.onChange()
         }
+
+        listener.onChange()
     }
 }

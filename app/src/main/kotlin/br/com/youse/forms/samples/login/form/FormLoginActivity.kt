@@ -24,10 +24,9 @@ SOFTWARE.
 package br.com.youse.forms.samples.login.form
 
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import br.com.youse.forms.R
 import br.com.youse.forms.form.Form
 import br.com.youse.forms.form.IForm
@@ -39,6 +38,7 @@ import br.com.youse.forms.validators.MinLengthValidator
 import br.com.youse.forms.validators.RequiredValidator
 import br.com.youse.forms.validators.ValidationMessage
 import br.com.youse.forms.validators.ValidationStrategy
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_main.*
 
 

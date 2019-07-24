@@ -24,38 +24,34 @@ SOFTWARE.
 
 package br.com.youse.forms.livedata.databinding
 
-import android.databinding.BindingAdapter
-import android.support.design.widget.TextInputLayout
 import android.view.View
+import androidx.databinding.BindingAdapter
 import br.com.youse.forms.validators.ValidationMessage
+import com.google.android.material.textfield.TextInputLayout
 
 @Suppress("UNUSED")
-class BindingAdapters {
+object BindingAdapters {
 
-    companion object {
-
-        /**
-         *  Use this binding to set the first ValidationMessage or to remove the error message
-         *  from a TextInputLayout.
-         */
-        @BindingAdapter(value = ["fieldError"])
-        @JvmStatic
-        fun onFieldValidationChange(view: TextInputLayout,
-                                    validations: List<ValidationMessage>?) {
-            view.error = validations?.firstOrNull()?.message
-        }
-
-
-        /**
-         * Use this binding to enable or disable a form submit view.
-         */
-        @BindingAdapter(value = ["formEnabled"])
-        @JvmStatic
-        fun onFormValidationChange(view: View, enabled: Boolean?) {
-            enabled?.let {
-                view.isEnabled = enabled
-            }
-        }
+    /**
+     *  Use this binding to set the first ValidationMessage or to remove the error message
+     *  from a TextInputLayout.
+     */
+    @BindingAdapter(value = ["fieldError"])
+    @JvmStatic
+    fun onFieldValidationChange(view: TextInputLayout,
+                                validations: List<ValidationMessage>?) {
+        view.error = validations?.firstOrNull()?.message
     }
 
+
+    /**
+     * Use this binding to enable or disable a form submit view.
+     */
+    @BindingAdapter(value = ["formEnabled"])
+    @JvmStatic
+    fun onFormValidationChange(view: View, enabled: Boolean?) {
+        enabled?.let {
+            view.isEnabled = enabled
+        }
+    }
 }
