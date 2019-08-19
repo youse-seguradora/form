@@ -196,7 +196,7 @@ Download or grab via Maven:
 <dependency>
   <groupId>br.com.youse.forms</groupId>
   <artifactId>form-jdk</artifactId>
-  <version>0.5.0</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 or Gradle:
@@ -210,10 +210,10 @@ add
 and
 
 ```groovy
-implementation 'br.com.youse.forms:form-jdk:0.5.0'
-implementation 'br.com.youse.forms:rx-form-jdk:0.5.0'
-implementation 'br.com.youse.forms:validators-jdk:0.5.0' // optional
-implementation 'br.com.youse.forms:formatters-jdk:0.5.0' // optional
+implementation 'br.com.youse.forms:form-jdk:0.7.0'
+implementation 'br.com.youse.forms:rx-form-jdk:0.7.0'
+implementation 'br.com.youse.forms:validators-jdk:0.7.0' // optional
+implementation 'br.com.youse.forms:formatters-jdk:0.7.0' // optional
 ```
 
 

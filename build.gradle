@@ -32,7 +32,7 @@ buildscript {
             ],
             rx           : [
                     java   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
-                    binding: "com.jakewharton.rxbinding3:rxbinding-kotlin:${versions.rxBinding}",
+                    binding: "com.jakewharton.rxbinding3:rxbinding-core:${versions.rxBinding}",
             ],
             android      : [
                     support: [
