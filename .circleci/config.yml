@@ -14,7 +14,7 @@ jobs:
           name: Install PhantomJS Dependencies
           command: |
             [ -f /usr/local/bin/phantomjs ] || sudo apt-get update
-            [ -f /usr/local/bin/phantomjs ] || sudo apt-get install -y fontconfig wget
+            [ -f /usr/local/bin/phantomjs ] || sudo apt-get install -y fontconfig wget openssl
       - run:
           name: Install PhantomJS
           command: |
