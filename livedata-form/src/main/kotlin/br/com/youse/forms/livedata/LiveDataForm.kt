@@ -106,7 +106,8 @@ class LiveDataForm<T>(
                     input = observableInput,
                     errors = observableErrors,
                     validators = liveField.validators as List<Validator<Any?>>,
-                    validationTriggers = validationTriggers.toList())
+                    validationTriggers = validationTriggers.toList(),
+                    strategy = liveField.strategy)
 
             onValidSubmit.addSource(liveField.errors) { errors ->
                 formField.errors.value = errors

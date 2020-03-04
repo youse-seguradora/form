@@ -4,12 +4,15 @@ import br.com.youse.forms.form.FormState
 import br.com.youse.forms.form.IObservableChange.ChangeObserver
 import br.com.youse.forms.form.isTrue
 import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.validators.ValidationStrategy
 
-internal class EnabledChangeObserver<T>(private val formState: FormState,
-                                        private val field: FormField<T, *>,
-                                        private val validateForm: () -> Unit) : ChangeObserver {
+internal class EnabledChangeObserver<T>(
+        formStrategy: ValidationStrategy,
+        private val formState: FormState,
+        private val field: FormField<T, *>,
+        private val validateForm: () -> Unit) : ChangeObserver {
 
-    private val strategy = formState.strategy
+    private val strategy = field.strategy ?: formStrategy
 
     override fun onChange() {
         val validateFieldOnEnable = shouldValidateFieldOnEnable()
@@ -24,7 +27,7 @@ internal class EnabledChangeObserver<T>(private val formState: FormState,
             field.cleanErrors()
         }
 
-        val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
+        val formAllowsFieldValidation = formState.submitStateAllowsFieldValidation(strategy)
 
         val requestFormStateUpdate = !validateFieldOnEnable
                 && !clearErrorsOnDisable
@@ -37,7 +40,7 @@ internal class EnabledChangeObserver<T>(private val formState: FormState,
 
     private fun shouldValidateFieldOnEnable(): Boolean {
         val fieldAllowsValidation = field.enabled.value.isTrue()
-        val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
+        val formAllowsFieldValidation = formState.submitStateAllowsFieldValidation(strategy)
         val strategyAllowsValidationOnEnable = strategy.onEnable
 
         return fieldAllowsValidation

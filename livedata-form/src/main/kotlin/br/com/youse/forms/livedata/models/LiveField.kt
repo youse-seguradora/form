@@ -26,26 +26,33 @@ package br.com.youse.forms.livedata.models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 
-open class LiveField<T, R> constructor(val key: T,
-                                       val input: MutableLiveData<R> = MutableLiveData(),
-                                       val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
-                                       val enabled: LiveData<Boolean> = MutableLiveData(),
-                                       val validators: List<Validator<R>>,
-                                       val validationTriggers: List<LiveData<Unit>> = emptyList()) {
+open class LiveField<T, R> constructor(
+        val key: T,
+        val input: MutableLiveData<R> = MutableLiveData(),
+        val errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
+        val enabled: LiveData<Boolean> = MutableLiveData(),
+        val validators: List<Validator<R>>,
+        val validationTriggers: List<LiveData<Unit>> = emptyList(),
+        val strategy: ValidationStrategy? = null
+) {
 
     constructor(key: T,
                 initialValue: R,
                 errors: MutableLiveData<List<ValidationMessage>> = MutableLiveData(),
                 enabled: LiveData<Boolean> = MutableLiveData(),
                 validators: List<Validator<R>>,
-                validationTriggers: List<LiveData<Unit>> = emptyList()) : this(
+                validationTriggers: List<LiveData<Unit>> = emptyList(),
+                strategy: ValidationStrategy? = null
+    ) : this(
             key = key,
             input = MutableLiveData<R>().apply { value = initialValue },
             errors = errors,
             enabled = enabled,
             validators = validators,
-            validationTriggers = validationTriggers
+            validationTriggers = validationTriggers,
+            strategy = strategy
     )
 }
