@@ -73,10 +73,6 @@ class RxForm<T>(
                 })
 
         fields.forEach { rxField ->
-            val key = rxField.key
-            val input = rxField.input as Observable<Any?>
-            val validators = rxField.validators as List<Validator<Any?>>
-            val errors = rxField.errors
 
             val observableInput = ObservableValue<Any?>()
             val observableErrors = ObservableValue<List<ValidationMessage>>()
@@ -95,15 +91,20 @@ class RxForm<T>(
             observableErrors.addChangeListener(observer = object : IObservableChange.ChangeObserver {
                 override fun onChange() {
                     val validations = observableErrors.value ?: emptyList()
-                    errors.onNext(validations)
+                    rxField.errors.onNext(validations)
                 }
             })
 
-            val formField = FormField(key = key,
+            val formField = FormField(key = rxField.key,
                     input = observableInput,
                     errors = observableErrors,
-                    validators = validators,
+                    validators = rxField.validators as List<Validator<Any?>>,
                     validationTriggers = validationTriggers.toList())
+
+            disposables.add(rxField.errors
+                    .subscribe { errors ->
+                        formField.errors.value = errors
+                    })
 
             disposables.add(rxField.enabled
                     .subscribe { enabled ->
@@ -111,7 +112,7 @@ class RxForm<T>(
                     })
 
             disposables.add(
-                    input.subscribe { newValue ->
+                    rxField.input.subscribe { newValue ->
                         formField.input.value = newValue
                     })
 
