@@ -24,13 +24,17 @@ SOFTWARE.
 package br.com.youse.forms.rxform.models
 
 import br.com.youse.forms.validators.ValidationMessage
+import br.com.youse.forms.validators.ValidationStrategy
 import br.com.youse.forms.validators.Validator
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
-open class RxField<T, R>(val key: T,
-                    val input: Observable<R>,
-                    val errors: BehaviorSubject<List<ValidationMessage>> = BehaviorSubject.create(),
-                    val enabled: Observable<Boolean> = BehaviorSubject.create<Boolean>(),
-                    val validators: List<Validator<R>> = emptyList(),
-                    val validationTriggers: List<Observable<Unit>> = emptyList())
+open class RxField<T, R>(
+        val key: T,
+        val input: Observable<R>,
+        val errors: BehaviorSubject<List<ValidationMessage>> = BehaviorSubject.create(),
+        val enabled: Observable<Boolean> = BehaviorSubject.create(),
+        val validators: List<Validator<R>> = emptyList(),
+        val validationTriggers: List<Observable<Unit>> = emptyList(),
+        val strategy: ValidationStrategy? = null
+)

@@ -99,7 +99,13 @@ class RxForm<T>(
                     input = observableInput,
                     errors = observableErrors,
                     validators = rxField.validators as List<Validator<Any?>>,
-                    validationTriggers = validationTriggers.toList())
+                    validationTriggers = validationTriggers.toList(),
+                    strategy = rxField.strategy)
+
+            disposables.add(rxField.errors
+                    .subscribe { errors ->
+                        formField.errors.value = errors
+                    })
 
             disposables.add(rxField.errors
                     .subscribe { errors ->

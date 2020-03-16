@@ -4,11 +4,14 @@ import br.com.youse.forms.form.FormState
 import br.com.youse.forms.form.IObservableChange.ChangeObserver
 import br.com.youse.forms.form.isTrue
 import br.com.youse.forms.form.models.FormField
+import br.com.youse.forms.validators.ValidationStrategy
 
-internal class TriggerChangeObserver<T>(private val formState: FormState,
-                                        private val field: FormField<T, *>) : ChangeObserver {
+internal class TriggerChangeObserver<T>(
+        strategy: ValidationStrategy,
+        private val formState: FormState,
+        private val field: FormField<T, *>) : ChangeObserver {
 
-    private val strategy = formState.strategy
+    private val strategy = field.strategy ?: strategy
 
     override fun onChange() {
         if (shouldValidateField()) {
@@ -18,7 +21,7 @@ internal class TriggerChangeObserver<T>(private val formState: FormState,
 
     private fun shouldValidateField(): Boolean {
         val fieldAllowsValidation = field.enabled.value.isTrue()
-        val formAllowsFieldValidation = formState.isFieldValidationEnabled.value.isTrue()
+        val formAllowsFieldValidation = formState.submitStateAllowsFieldValidation(strategy)
         val strategyAllowsValidation = strategy.onTrigger
 
         return fieldAllowsValidation
