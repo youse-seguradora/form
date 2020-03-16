@@ -107,6 +107,11 @@ class RxForm<T>(
                         formField.errors.value = errors
                     })
 
+            disposables.add(rxField.errors
+                    .subscribe { errors ->
+                        formField.errors.value = errors
+                    })
+
             disposables.add(rxField.enabled
                     .subscribe { enabled ->
                         formField.enabled.value = enabled
